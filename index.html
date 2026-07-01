@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f1ea">
+    <title>Margin — Find out what stuck</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <aside class="sidebar" aria-label="Reading library">
+      <div class="brand-row">
+        <a class="brand" href="#" aria-label="Margin home">
+          <span class="brand-mark" aria-hidden="true">M</span>
+          <span>Margin</span>
+        </a>
+        <button class="icon-button" id="toggle-sidebar" type="button" aria-label="Collapse library">←</button>
+      </div>
+
+      <button class="new-check" id="new-check" type="button" title="Add chapter">
+        <span class="new-check-icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="new-check-label">Add chapter</span>
+      </button>
+
+      <nav class="side-nav" aria-label="Main navigation">
+        <button class="nav-item is-active" type="button" data-nav="home" title="Home">
+          <span class="home-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m3.5 10.5 8.5-7 8.5 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5.5 9.5V21h13V9.5M9.5 21v-6h5v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span> Home
+        </button>
+        <button class="nav-item" type="button" data-nav="reviews" title="Reviews due">
+          <span class="notification-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 21h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </span> Reviews due
+          <em id="review-count">0</em>
+        </button>
+        <button class="nav-item" type="button" data-nav="practice" title="Practice">
+          <span class="practice-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 1 5 16V4.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M8 8h7M8 11.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </span> Practice
+        </button>
+      </nav>
+
+      <div class="library-head">
+        <span>Your library</span>
+        <span id="library-count">0 chapters</span>
+      </div>
+      <div class="library-list" id="library-list">
+        <div class="empty-library">
+          <span aria-hidden="true">⌁</span>
+          <p>Your completed chapter checks will live here.</p>
+        </div>
+      </div>
+
+      <div class="sidebar-foot">
+        <button id="profile-button" type="button" title="Reader profile" aria-haspopup="menu" aria-expanded="false"><span class="avatar">A</span><span>Reader profile</span><span>···</span></button>
+        <div class="profile-menu" id="profile-menu" role="menu" hidden>
+          <div class="profile-menu-head">
+            <span class="avatar">A</span>
+            <div><strong>Austin</strong><small>reader@example.com</small></div>
+          </div>
+          <button type="button" role="menuitem">Help</button>
+          <button type="button" role="menuitem">Account settings</button>
+          <button class="logout-button" id="logout-button" type="button" role="menuitem">Log out</button>
+        </div>
+        <div class="signed-out-note">
+          <span class="avatar">?</span>
+          <span>Signed out</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="shell">
+      <header class="topbar">
+        <button class="mobile-menu icon-button" id="mobile-menu" type="button" aria-label="Open navigation">☰</button>
+        <div class="top-actions">
+          <div class="auth-actions">
+            <button class="text-button" id="login-button" type="button">Log in</button>
+            <button class="primary compact" id="signup-button" type="button">Create account</button>
+          </div>
+        </div>
+      </header>
+
+      <main id="app" tabindex="-1">
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+        <section class="view home-view is-active" data-view="home">
+          <div class="home-hero" id="onboarding-home">
+            <div>
+              <h1 id="onboarding-title">Remember what you read.<br><em>Use it when it matters.</em></h1>
+              <p id="onboarding-copy">For nonfiction readers whose highlights and notes still aren’t becoming usable knowledge.</p>
+              <button class="primary large" id="hero-start" type="button"><span id="hero-start-label">Start a chapter check</span> <span>→</span></button>
+              <p class="hero-reassurance" id="hero-reassurance">Use it for the chapters worth remembering. A focused check takes about six minutes.</p>
+            </div>
+            <div class="loop-card" aria-label="Learning loop">
+              <span class="loop-label">After a chapter worth remembering</span>
+              <ol>
+                <li><span>01</span><div><strong>Close the book and explain it</strong><p>Start with what you can recall in your own words.</p></div></li>
+                <li><span>02</span><div><strong>Find out what you actually understood</strong><p>Get feedback grounded in the source—not a generic summary.</p></div></li>
+                <li><span>03</span><div><strong>Work through one weak spot</strong><p>Take a focused challenge before the missing connection fades.</p></div></li>
+                <li><span>04</span><div><strong>Bring the idea back later</strong><p>Review what matters until you can explain and use it.</p></div></li>
+              </ol>
+            </div>
+          </div>
+
+          <section class="logged-out-value" aria-label="What Margin helps you do">
+            <header><span class="eyebrow">For readers with a system already</span><h2>Your highlights aren’t the problem. Retrieval is.</h2></header>
+            <div>
+              <article><span>01</span><h3>Stop losing the useful framework</h3><p>Recover the argument before it becomes another highlight you never revisit.</p></article>
+              <article><span>02</span><h3>Know whether you understood it</h3><p>Compare your explanation with the source and see the exact connection that needs work.</p></article>
+              <article><span>03</span><h3>Use more of what you read</h3><p>Bring important ideas back when you’re ready to explain, recommend, decide, or lead.</p></article>
+            </div>
+          </section>
+
+          <section class="logged-out-section product-tour" aria-labelledby="product-tour-title">
+            <header>
+              <span class="eyebrow">Beyond notes and highlights</span>
+              <h2 id="product-tour-title">Turn a finished chapter into knowledge you can explain.</h2>
+              <p>Margin adds the missing layer after reading: retrieval, evidence-grounded feedback, focused practice, and review.</p>
+            </header>
+            <div class="product-carousel-window">
+              <div class="product-carousel-track">
+                <div class="product-carousel-group">
+                  <article class="product-frame recall-frame">
+                    <span class="frame-step">01 · Recall</span>
+                    <h3>Explain it before you look back.</h3>
+                    <div class="mock-answer"><i></i><i></i><i></i><i></i></div>
+                    <small>Your own words reveal what recognition can hide.</small>
+                  </article>
+                  <article class="product-frame compare-frame">
+                    <span class="frame-step">02 · Compare</span>
+                    <h3>See the strongest thread—and the useful gap.</h3>
+                    <div class="mock-signal good"><b>✓</b><span>Central idea recovered</span></div>
+                    <div class="mock-signal gap"><b>↗</b><span>Relationship needs another pass</span></div>
+                  </article>
+                  <article class="product-frame challenge-frame">
+                    <span class="frame-step">03 · Challenge</span>
+                    <h3>Push the one idea that matters.</h3>
+                    <blockquote>How do these two ideas depend on one another?</blockquote>
+                    <div class="mock-button">Take the challenge →</div>
+                  </article>
+                  <article class="product-frame review-frame">
+                    <span class="frame-step">04 · Review</span>
+                    <h3>Return before the idea fades.</h3>
+                    <div class="mock-review-row"><span>Previous gap</span><strong>Recovered</strong></div>
+                    <div class="mock-review-row"><span>Central claim</span><strong>Developing</strong></div>
+                    <small>Next review adapts to the weaker result.</small>
+                  </article>
+                  <article class="product-frame practice-frame">
+                    <span class="frame-step">05 · Practice</span>
+                    <h3>Build the skill behind the gap.</h3>
+                    <div class="mock-success"><b>✓</b><span><strong>You got it</strong>Central claim found</span></div>
+                    <small>Short exercises improve transferable reading skills.</small>
+                  </article>
+                </div>
+                <div class="product-carousel-group" aria-hidden="true">
+                  <article class="product-frame recall-frame"><span class="frame-step">01 · Recall</span><h3>Explain it before you look back.</h3><div class="mock-answer"><i></i><i></i><i></i><i></i></div><small>Your own words reveal what recognition can hide.</small></article>
+                  <article class="product-frame compare-frame"><span class="frame-step">02 · Compare</span><h3>See the strongest thread—and the useful gap.</h3><div class="mock-signal good"><b>✓</b><span>Central idea recovered</span></div><div class="mock-signal gap"><b>↗</b><span>Relationship needs another pass</span></div></article>
+                  <article class="product-frame challenge-frame"><span class="frame-step">03 · Challenge</span><h3>Push the one idea that matters.</h3><blockquote>How do these two ideas depend on one another?</blockquote><div class="mock-button">Take the challenge →</div></article>
+                  <article class="product-frame review-frame"><span class="frame-step">04 · Review</span><h3>Return before the idea fades.</h3><div class="mock-review-row"><span>Previous gap</span><strong>Recovered</strong></div><div class="mock-review-row"><span>Central claim</span><strong>Developing</strong></div><small>Next review adapts to the weaker result.</small></article>
+                  <article class="product-frame practice-frame"><span class="frame-step">05 · Practice</span><h3>Build the skill behind the gap.</h3><div class="mock-success"><b>✓</b><span><strong>You got it</strong>Central claim found</span></div><small>Short exercises improve transferable reading skills.</small></article>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="logged-out-section compounding-value" aria-labelledby="compounding-title">
+            <div class="compounding-copy">
+              <span class="eyebrow">Make your reading system earn its keep</span>
+              <h2 id="compounding-title">See what your notes app can’t tell you.</h2>
+              <p>Kindle, Readwise, Notion, and Obsidian help you save ideas. Margin helps you discover whether you can still explain them—and what to strengthen next.</p>
+              <ul>
+                <li><span>✓</span> Find the framework you would otherwise forget</li>
+                <li><span>✓</span> See recurring weak spots across chapters</li>
+                <li><span>✓</span> Practice the reading skill behind the gap</li>
+                <li><span>✓</span> Build proof that an idea lasted</li>
+              </ul>
+            </div>
+            <div class="insight-carousel" aria-label="Examples of accumulating reading insights">
+              <article class="insight-slide slide-one">
+                <span>What’s sticking?</span>
+                <h3>You consistently recover central claims.</h3>
+                <p>Your next opportunity is making the relationship between supporting ideas more explicit.</p>
+                <div><i style="--strength:82%"></i><small>Central claims · strong</small></div>
+              </article>
+              <article class="insight-slide slide-two">
+                <span>Recommended practice</span>
+                <h3>Connect two ideas</h3>
+                <p>This pattern appeared in three chapter checks. Try a focused three-minute activity.</p>
+                <div class="insight-action">Start practice →</div>
+              </article>
+              <article class="insight-slide slide-three">
+                <span>Delayed proof</span>
+                <h3>You remembered this two weeks later.</h3>
+                <p>The central argument from your earlier chapter check returned strongly.</p>
+                <div class="retention-mark">14 days <b>✓</b></div>
+              </article>
+            </div>
+          </section>
+
+          <section class="logged-out-section landing-cta">
+            <span class="eyebrow">For the books you want to change how you work</span>
+            <h2>The next time a chapter matters, don’t just highlight it.</h2>
+            <p>Find out whether you can explain it before it becomes another idea you know you read somewhere.</p>
+            <button class="primary large" type="button" data-action="start-landing-check">Try it on a chapter <span>→</span></button>
+          </section>
+
+          <div class="returning-home" id="returning-home" hidden>
+            <header class="dashboard-hero">
+              <div>
+                <h1 data-local-greeting>Good morning.</h1>
+                <p id="dashboard-message">Let’s see what’s sticking.</p>
+              </div>
+              <button class="primary" id="dashboard-start" type="button">Add chapter <span>→</span></button>
+            </header>
+
+            <section class="learning-snapshot" aria-label="Learning snapshot">
+              <article><span>Chapters checked</span><strong id="stat-chapters">0</strong><small>Across your library</small></article>
+              <article><span>Reviews completed</span><strong id="stat-reviews">0</strong><small>Delayed retrievals</small></article>
+              <article><span>Challenges completed</span><strong id="stat-repairs">0</strong><small>Ideas strengthened</small></article>
+              <article>
+                <span class="stat-label">Common gap <button class="stat-info-button" type="button" data-action="open-gap-info" aria-label="About common gaps">i</button></span>
+                <strong class="text-stat" id="stat-gap">—</strong>
+                <small>Across recent checks</small>
+              </article>
+            </section>
+
+            <section class="continue-card" id="continue-card">
+              <div class="continue-marker" aria-hidden="true">↗</div>
+              <div class="continue-copy">
+                <span class="eyebrow">Continue reading</span>
+                <h2 id="continue-book">Your latest book</h2>
+                <p id="continue-meta">Pick up where you left off.</p>
+              </div>
+              <div class="continue-actions">
+                <button class="text-button" id="open-book-insights" type="button">What’s sticking?</button>
+                <button class="text-button" id="open-latest" type="button">Open last check</button>
+                <button class="secondary" id="check-next" type="button">Check next chapter</button>
+              </div>
+            </section>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="dashboard-section">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">Up next</span>
+                  <h2>Reviews due</h2>
+                </div>
+                <button class="text-button" type="button" data-nav="reviews">View all →</button>
+              </div>
+              <div id="home-reviews" class="review-list"></div>
+            </section>
+            <section class="dashboard-section">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">Recent</span>
+                  <h2>Chapter checks</h2>
+                </div>
+              </div>
+              <div id="recent-checks" class="recent-list"></div>
+            </section>
+            <section class="dashboard-section practice-promo" id="practice-home-promo">
+              <div>
+                <span class="eyebrow">Practice a reading skill</span>
+                <h2>Find the central claim</h2>
+                <p id="practice-home-reason">Learn to separate what a passage discusses from what its author actually argues.</p>
+              </div>
+              <button class="secondary" type="button" data-nav="practice">Try 3-minute practice <span>→</span></button>
+            </section>
+          </div>
+        </section>
+
+        <section class="view reviews-view" data-view="reviews">
+          <div class="page-heading">
+            <span class="eyebrow">Delayed proof</span>
+            <h1>Reviews due</h1>
+            <p>Come back without looking. The point is not perfection—it is seeing what lasted.</p>
+          </div>
+          <div id="all-reviews" class="review-list wide"></div>
+        </section>
+
+        <section class="view practice-view" data-view="practice">
+          <div class="page-heading">
+            <span class="eyebrow">One skill at a time</span>
+            <h1>Daily practice</h1>
+            <p>One focused question each day. Build reliable skill before moving to the next one.</p>
+          </div>
+          <section class="practice-recommendation">
+            <div>
+              <span class="eyebrow" id="practice-focus-label">Today’s skill</span>
+              <h2 id="practice-focus-title">Find the central claim</h2>
+              <p id="practice-reason">Practice separating what a passage discusses from what its author actually argues.</p>
+              <div class="skill-proficiency"><span id="skill-proficiency-label">0 of 3 successful days</span><div><i id="skill-proficiency-fill"></i></div></div>
+            </div>
+            <span class="practice-time">3 min</span>
+          </section>
+          <section class="practice-path" aria-labelledby="practice-path-title">
+            <header>
+              <div><span class="eyebrow">Your sequence</span><h2 id="practice-path-title">Build one skill at a time</h2></div>
+              <small>Recommended order</small>
+            </header>
+            <div class="practice-path-list" id="practice-path-list"></div>
+          </section>
+          <section class="completed-practice" id="completed-practice" aria-labelledby="completed-practice-title" hidden>
+            <header><span class="eyebrow">Completed</span><h2 id="completed-practice-title">Practice you can revisit anytime</h2></header>
+            <div id="completed-practice-list"></div>
+          </section>
+          <section class="daily-practice-complete" id="daily-practice-complete" hidden>
+            <span class="daily-complete-mark" aria-hidden="true">✓</span>
+            <div>
+              <span class="eyebrow">Done for today</span>
+              <h2>Today’s practice is complete.</h2>
+              <p>Your successful attempt has been added to this skill’s proficiency. A new question will be available tomorrow.</p>
+              <small id="next-practice-date"></small>
+            </div>
+          </section>
+          <section class="practice-lesson" id="practice-lesson">
+            <header><span class="eyebrow">Quick lesson</span><h2 id="daily-lesson-title">Topic is not the same as claim</h2></header>
+            <p id="daily-lesson-copy">A topic names what a passage is about. A central claim tells you what the author wants you to believe about that topic.</p>
+            <div class="worked-example">
+              <span>Worked example</span>
+              <p id="daily-example-one"><strong>Topic:</strong> Public transportation</p>
+              <p id="daily-example-two"><strong>Claim:</strong> Cities should prioritize reliable bus service before investing in more expensive transit projects.</p>
+            </div>
+          </section>
+          <section class="practice-activity" id="practice-activity">
+            <header><span class="eyebrow">Today’s question</span><h2 id="daily-question-title">What is this passage arguing?</h2></header>
+            <blockquote id="daily-practice-passage">Many workplaces treat fast replies as evidence of commitment. Yet constant responsiveness fragments attention and pushes demanding work into evenings. Teams should establish shared response windows so employees can protect focused time without leaving colleagues uncertain.</blockquote>
+            <label class="answer-box">
+              <span class="sr-only" id="daily-answer-label">Practice answer</span>
+              <textarea id="practice-answer" rows="6" placeholder="State the author’s central claim in your own words…"></textarea>
+            </label>
+            <div class="practice-actions">
+              <button class="secondary" type="button" data-action="reset-practice">Start over</button>
+              <button class="primary" id="practice-check" type="button" data-action="check-practice">Check my answer <span>→</span></button>
+            </div>
+            <div class="practice-feedback" id="practice-feedback" role="status" aria-live="polite" hidden></div>
+          </section>
+        </section>
+
+        <section class="view flow-view" data-view="flow">
+          <div class="flow-top">
+            <div class="flow-top-actions">
+              <button class="back-link" id="flow-exit" type="button">← Exit to home</button>
+              <button class="save-draft-button" id="save-entry-draft" type="button">Save draft</button>
+            </div>
+            <ol class="progress" id="progress" aria-label="Chapter check progress">
+              <li class="is-active"><span>1</span> Source</li>
+              <li><span>2</span> Recall</li>
+              <li><span>3</span> Compare</li>
+              <li><span>4</span> Challenge</li>
+              <li><span>5</span> Save</li>
+            </ol>
+          </div>
+
+          <form id="check-form">
+            <section class="flow-step is-active" data-step="0">
+              <div class="step-heading">
+                <span class="eyebrow">Set the ground truth</span>
+                <h1>What did you just read?</h1>
+                <p>Add the chapter and enough source material for feedback to stay anchored to the text.</p>
+              </div>
+
+              <div class="paper-card source-card">
+                <fieldset class="book-path">
+                  <legend>Where should this chapter live?</legend>
+                  <label>
+                    <input type="radio" name="bookPath" value="existing">
+                    <span><strong>Existing book</strong><small>Add another chapter to your library</small></span>
+                  </label>
+                  <label>
+                    <input type="radio" name="bookPath" value="new">
+                    <span><strong>New book</strong><small>Create a book and its first chapter</small></span>
+                  </label>
+                </fieldset>
+
+                <div class="book-path-panel" id="existing-book-panel" hidden>
+                  <label>
+                    <span>Choose a book <b>Required</b></span>
+                    <select id="existing-book" name="existingBook">
+                      <option value="">Select from your library…</option>
+                    </select>
+                  </label>
+                  <p id="existing-book-help">The author and book title will be carried forward automatically.</p>
+                </div>
+
+                <div class="book-path-panel" id="new-book-panel" hidden>
+                  <div class="field-grid">
+                    <label><span>Book title <b>Required</b></span><input id="book-title" name="bookTitle" placeholder="e.g. Deep Work" autocomplete="off"></label>
+                    <label><span>Author <i>Optional</i></span><input id="author-name" name="authorName" placeholder="e.g. Cal Newport" autocomplete="off"></label>
+                  </div>
+                </div>
+                <label class="chapter-total-field">
+                  <span>Total chapters in this book <i>Optional</i></span>
+                  <input id="book-total-chapters" name="bookTotalChapters" type="number" min="1" step="1" placeholder="e.g. 12">
+                  <small>Used only to show your progress through the book.</small>
+                </label>
+                <label><span>Chapter or section <b>Required</b></span><input id="chapter-title" name="chapterTitle" placeholder="e.g. Deep Work Is Valuable" autocomplete="off"></label>
+                <fieldset class="source-kind">
+                  <legend>What are you adding?</legend>
+                  <label><input type="radio" name="sourceKind" value="full" checked><span><strong>Chapter text</strong><small>Best evidence</small></span></label>
+                  <label><input type="radio" name="sourceKind" value="notes"><span><strong>Detailed notes</strong><small>Limited feedback</small></span></label>
+                  <label><input type="radio" name="sourceKind" value="highlights"><span><strong>Highlights</strong><small>Partial view</small></span></label>
+                  <label><input type="radio" name="sourceKind" value="pdf"><span><strong>PDF upload</strong><small>Text-based files</small></span></label>
+                </fieldset>
+                <div class="pdf-source" id="pdf-source" hidden>
+                  <label class="pdf-upload" for="pdf-file">
+                    <input id="pdf-file" type="file" accept="application/pdf,.pdf">
+                    <span class="pdf-upload-icon" aria-hidden="true">PDF</span>
+                    <span><strong id="pdf-upload-title">Choose a PDF</strong><small id="pdf-upload-copy">Text-based PDF · up to 10 MB</small></span>
+                  </label>
+                  <button class="text-button pdf-remove" type="button" data-action="remove-pdf" hidden>Remove PDF</button>
+                </div>
+                <label class="source-input">
+                  <span>Source material <b>Required</b></span>
+                  <textarea id="source-text" name="sourceText" rows="10" placeholder="Paste the chapter, excerpt, or detailed notes here…"></textarea>
+                  <small id="source-status">Your text stays private in this prototype.</small>
+                </label>
+                <label class="check-row"><input id="wants-application" name="wantsApplication" type="checkbox"><span>Include an optional application prompt</span></label>
+              </div>
+
+              <div class="flow-actions">
+                <button class="secondary" id="load-sample" type="button">Load sample</button>
+                <button class="primary" type="button" data-action="begin-recall">Hide source & begin recall <span>→</span></button>
+              </div>
+            </section>
+
+            <section class="flow-step recall-step" data-step="1">
+              <div class="closed-source">
+                <span aria-hidden="true">◉</span>
+                <div><strong>Source hidden</strong><small>Retrieval works best when you resist looking back.</small></div>
+              </div>
+              <div class="step-heading">
+                <span class="eyebrow">Recall · without looking</span>
+                <h1>Explain the chapter in your own words.</h1>
+                <p>What was the central claim, and which supporting ideas mattered most? Bullets and fragments are fine.</p>
+              </div>
+              <label class="answer-box">
+                <span class="sr-only">Your recall</span>
+                <textarea id="recall" name="recall" rows="10" placeholder="Start with what feels most important…"></textarea>
+                <small><span id="recall-words">0 words</span><span>There is no target length.</span></small>
+              </label>
+              <div class="flow-actions">
+                <button class="secondary" type="button" data-action="reveal-source">End recall & view source</button>
+                <button class="primary" type="button" data-action="to-confidence">Continue <span>→</span></button>
+              </div>
+            </section>
+
+            <section class="flow-step confidence-step" data-step="2">
+              <div class="step-heading centered">
+                <span class="eyebrow">Before feedback</span>
+                <h1>How well do you think you understood it?</h1>
+                <p>Your estimate stays separate from the evaluation. Over time, the comparison helps sharpen your judgment.</p>
+              </div>
+              <fieldset class="confidence-options">
+                <legend class="sr-only">Confidence</legend>
+                <label><input type="radio" name="confidence" value="Not yet"><span><b>1</b><strong>Not yet</strong><small>I missed the thread.</small></span></label>
+                <label><input type="radio" name="confidence" value="Partly"><span><b>2</b><strong>Partly</strong><small>I have pieces of it.</small></span></label>
+                <label><input type="radio" name="confidence" value="Mostly"><span><b>3</b><strong>Mostly</strong><small>The argument is clear.</small></span></label>
+                <label><input type="radio" name="confidence" value="Very well"><span><b>4</b><strong>Very well</strong><small>I could teach it.</small></span></label>
+              </fieldset>
+              <div class="flow-actions centered-actions">
+                <button class="secondary" type="button" data-action="back-recall">Back</button>
+                <button class="primary" type="button" data-action="evaluate">Compare with source <span>→</span></button>
+              </div>
+            </section>
+
+            <section class="flow-step feedback-step" data-step="3">
+              <div class="step-heading">
+                <span class="eyebrow">Compare · source grounded</span>
+                <h1 id="feedback-title">Here is what your answer shows.</h1>
+                <p id="feedback-intro"></p>
+              </div>
+              <div id="evaluation"></div>
+              <div class="feedback-controls">
+                <span>AI-assisted prototype feedback. Verify it against the source.</span>
+                <div><button class="text-button" type="button" data-action="disagree">I disagree</button><button class="text-button" type="button" data-action="unsupported">Evidence is unsupported</button></div>
+              </div>
+              <div class="flow-actions">
+                <button class="secondary" type="button" data-action="inspect-source">Inspect source</button>
+                <button class="primary" type="button" data-action="to-repair">Take the challenge <span>→</span></button>
+              </div>
+            </section>
+
+            <section class="flow-step repair-step" data-step="4">
+              <div class="step-heading">
+                <span class="eyebrow">Challenge · one useful stretch</span>
+                <h1 id="repair-title">Push this idea one step further.</h1>
+                <p id="repair-prompt"></p>
+              </div>
+              <div class="evidence-mini" id="repair-evidence"></div>
+              <label class="answer-box">
+                <span class="sr-only">Your challenge response</span>
+                <textarea id="repair" name="repair" rows="7" placeholder="Take on the challenge in your own words…"></textarea>
+              </label>
+              <div class="flow-actions">
+                <button class="secondary" type="button" data-action="skip-repair">Skip challenge</button>
+                <button class="primary" type="button" data-action="submit-repair">Check my answer <span>→</span></button>
+              </div>
+            </section>
+
+            <section class="flow-step save-step" data-step="5">
+              <div class="completion-mark" aria-hidden="true">✓</div>
+              <div class="step-heading centered">
+                <span class="eyebrow">Immediate check complete</span>
+                <h1 id="completion-title">That gap is clearer now.</h1>
+                <p id="completion-copy"></p>
+              </div>
+              <div id="completion-summary" class="completion-summary"></div>
+
+              <div class="schedule-card">
+                <div>
+                  <span class="eyebrow">Delayed proof</span>
+                  <h2>When should we bring this back?</h2>
+                  <p>Try again later without the source. Three days is a useful default.</p>
+                </div>
+                <fieldset class="schedule-options">
+                  <legend class="sr-only">Review date</legend>
+                  <label><input type="radio" name="reviewDelay" value="1"><span>Tomorrow</span></label>
+                  <label><input type="radio" name="reviewDelay" value="3" checked><span>In 3 days</span></label>
+                  <label><input type="radio" name="reviewDelay" value="7"><span>In 7 days</span></label>
+                  <label><input type="radio" name="reviewDelay" value="none"><span>No reminder</span></label>
+                </fieldset>
+              </div>
+              <div class="flow-actions">
+                <button class="secondary" type="button" data-action="new-after-save">Check another chapter</button>
+                <button class="primary" type="button" data-action="save-chapter">Save to library <span>→</span></button>
+              </div>
+            </section>
+          </form>
+        </section>
+
+        <section class="view review-session" data-view="review-session">
+          <button class="back-link" type="button" data-nav="reviews">← Reviews due</button>
+          <div class="review-session-inner">
+            <div class="closed-source"><span aria-hidden="true">◉</span><div><strong id="review-source-state">Source and prior answer hidden</strong><small id="review-source-note">This is a check of what lasted.</small></div></div>
+            <div class="review-progress" aria-label="Review progress">
+              <span id="review-part-label">1 of 2 · Previous gap</span>
+              <div><i id="review-progress-fill"></i></div>
+            </div>
+            <div class="step-heading">
+              <span class="eyebrow" id="review-step-eyebrow">Revisit the gap</span>
+              <h1 id="review-session-title">What do you remember now?</h1>
+              <p id="review-session-meta"></p>
+            </div>
+            <div class="review-scaffold" id="review-scaffold" hidden>
+              <span>Focused source support</span>
+              <blockquote id="review-scaffold-source"></blockquote>
+              <p>Explain this in your own words. The excerpt is support, not an answer to copy.</p>
+            </div>
+            <label class="answer-box">
+              <span class="sr-only">Delayed recall</span>
+              <textarea id="delayed-recall" rows="9" placeholder="Reconstruct the central claim and its most important support…"></textarea>
+            </label>
+            <fieldset class="mini-confidence">
+              <legend>How confident are you?</legend>
+              <label><input type="radio" name="delayedConfidence" value="Partly"><span>Partly</span></label>
+              <label><input type="radio" name="delayedConfidence" value="Mostly"><span>Mostly</span></label>
+              <label><input type="radio" name="delayedConfidence" value="Very well"><span>Very well</span></label>
+            </fieldset>
+            <div class="flow-actions">
+              <button class="secondary" type="button" data-action="reschedule-review">Not now</button>
+              <button class="primary" id="review-continue" type="button" data-action="complete-review">Next question <span>→</span></button>
+            </div>
+          </div>
+        </section>
+
+        <section class="view chapter-view" data-view="chapter">
+          <button class="back-link" type="button" data-nav="home">← Library</button>
+          <div id="chapter-detail"></div>
+        </section>
+
+        <section class="view book-insights-view" data-view="book-insights">
+          <button class="back-link" type="button" data-nav="home">← Library</button>
+          <div id="book-insights"></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="source-dialog">
+      <div class="dialog-head"><div><span class="eyebrow">Source material</span><h2 id="dialog-title">Chapter source</h2></div><button class="icon-button" type="button" data-action="close-dialog" aria-label="Close">×</button></div>
+      <div class="dialog-source" id="dialog-source"></div>
+    </dialog>
+    <dialog id="gap-info-dialog" class="gap-info-dialog">
+      <div class="dialog-head">
+        <div><span class="eyebrow">Learning snapshot</span><h2>What “Common gap” means</h2></div>
+        <button class="icon-button" type="button" data-action="close-gap-info" aria-label="Close">×</button>
+      </div>
+      <div class="gap-glossary">
+        <p>This reflects the pattern that appears most often across your completed chapter checks. It is a direction for practice—not a grade.</p>
+        <dl>
+          <div><dt>No pattern yet</dt><dd>There are not enough repeated signals to name a trustworthy pattern.</dd></div>
+          <div><dt>Insufficient response</dt><dd>The response was too brief to compare meaningfully with the source.</dd></div>
+          <div><dt>Weak relationship between ideas</dt><dd>Important ideas were recalled, but the connection between them was left unclear.</dd></div>
+          <div><dt>Missed central claim</dt><dd>The topic was present, but the author’s main argument was not yet reconstructed.</dd></div>
+          <div><dt>Missed supporting evidence</dt><dd>The central direction was present, but an important reason or example was missing.</dd></div>
+        </dl>
+      </div>
+    </dialog>
+    <dialog id="initial-check-info-dialog" class="gap-info-dialog">
+      <div class="dialog-head">
+        <div><span class="eyebrow">Your result</span><h2>How the initial check is calculated</h2></div>
+        <button class="icon-button" type="button" data-action="close-initial-check-info" aria-label="Close">×</button>
+      </div>
+      <div class="gap-glossary">
+        <p>Your response is compared with the source you provided. The check considers how much of the chapter’s important language and argument you recovered, whether you explained relationships between ideas, and whether there is enough detail to evaluate responsibly.</p>
+        <dl>
+          <div><dt>Strong</dt><dd>The central argument and meaningful support were recovered with enough detail.</dd></div>
+          <div><dt>Developing</dt><dd>The broad direction is accurate, but one useful idea or connection needs more attention.</dd></div>
+          <div><dt>Needs another pass</dt><dd>The topic may be present, but the central thread is not yet clear enough.</dd></div>
+          <div><dt>Not enough evidence</dt><dd>The response or supplied source is too brief for a responsible comparison.</dd></div>
+        </dl>
+        <p class="dialog-caveat">This is guidance, not an objective grade. Feedback is less certain when only a summary or excerpt is supplied.</p>
+      </div>
+    </dialog>
+    <dialog id="confidence-info-dialog" class="gap-info-dialog">
+      <div class="dialog-head">
+        <div><span class="eyebrow">Your estimate</span><h2>What confidence means</h2></div>
+        <button class="icon-button" type="button" data-action="close-confidence-info" aria-label="Close">×</button>
+      </div>
+      <div class="gap-glossary">
+        <p>Confidence is the estimate you chose before seeing feedback. Margin does not calculate or change it.</p>
+        <dl>
+          <div><dt>Partly</dt><dd>You remembered fragments or felt unsure about the chapter’s main argument.</dd></div>
+          <div><dt>Mostly</dt><dd>You believed the important ideas were present, with some uncertainty or missing detail.</dd></div>
+          <div><dt>Very well</dt><dd>You felt you could explain the chapter clearly without looking back.</dd></div>
+        </dl>
+        <p class="dialog-caveat">Comparing confidence with demonstrated recall over time helps you judge your own understanding more accurately.</p>
+      </div>
+    </dialog>
+    <script src="app.js"></script>
+  </body>
+</html>
