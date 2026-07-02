@@ -160,7 +160,7 @@ function getValues() {
     recall: $("#recall").value.trim(),
     confidence: $('[name="confidence"]:checked')?.value || "",
     repair: $("#repair").value.trim(),
-    wantsApplication: $("#wants-application").checked
+    wantsApplication: $("#wants-application")?.checked || false
   };
 }
 
@@ -173,7 +173,7 @@ function setValues(values = {}) {
   setPdfStatus(values.pdfName || "", values.pdfSize || 0, Boolean(values.pdfName));
   $("#recall").value = values.recall || "";
   $("#repair").value = values.repair || "";
-  $("#wants-application").checked = Boolean(values.wantsApplication);
+  if ($("#wants-application")) $("#wants-application").checked = Boolean(values.wantsApplication);
   const bookPath = values.bookPath && $(`[name="bookPath"][value="${values.bookPath}"]`);
   if (bookPath) bookPath.checked = true;
   const sourceKind = $(`[name="sourceKind"][value="${values.sourceKind || "full"}"]`);
@@ -337,6 +337,80 @@ function setStep(step) {
     item.classList.toggle("is-complete", index < mapped);
   });
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function resetAnalysisTransition() {
+  const transition = $("#analysis-transition");
+  const results = $("#feedback-results");
+  if (!transition || !results) return;
+  transition.hidden = false;
+  transition.classList.remove("is-exiting");
+  results.hidden = true;
+  results.classList.remove("is-entering");
+  $$("[data-analysis-module]").forEach(module => {
+    module.classList.remove("is-measuring", "is-complete");
+    module.style.setProperty("--analysis-progress", "0%");
+    const stateLabel = module.querySelector("em");
+    if (stateLabel) stateLabel.textContent = "Queued";
+  });
+}
+
+function completeAnalysisTransition(evaluation) {
+  const modules = [
+    ["central-claim", evaluation.band === "Strong" ? "Strong" : evaluation.gapType === "Missed central claim" ? "Needs work" : "Measured"],
+    ["supporting-ideas", evaluation.gapType === "Missed supporting evidence" ? "Needs work" : "Measured"],
+    ["source-fidelity", evaluation.gapType === "Unsupported claim" || evaluation.gapType === "Distorted idea" ? "Review" : "Aligned"],
+    ["next-challenge", "Ready"],
+  ];
+  modules.forEach(([name, label]) => {
+    const module = $(`[data-analysis-module="${name}"]`);
+    if (!module) return;
+    module.classList.remove("is-measuring");
+    module.classList.add("is-complete");
+    module.style.setProperty("--analysis-progress", "100%");
+    const stateLabel = module.querySelector("em");
+    if (stateLabel) stateLabel.textContent = label;
+  });
+}
+
+function revealFeedbackResults() {
+  const transition = $("#analysis-transition");
+  const results = $("#feedback-results");
+  if (!transition || !results) return;
+  transition.classList.add("is-exiting");
+  setTimeout(() => {
+    transition.hidden = true;
+    transition.classList.remove("is-exiting");
+    results.hidden = false;
+    results.classList.add("is-entering");
+    requestAnimationFrame(() => results.classList.remove("is-entering"));
+  }, 260);
+}
+
+function runAnalysisTransition(evaluation, onComplete) {
+  resetAnalysisTransition();
+  const modules = $$("[data-analysis-module]");
+  const stepDuration = 520;
+  modules.forEach((module, index) => {
+    setTimeout(() => {
+      module.classList.add("is-measuring");
+      module.style.setProperty("--analysis-progress", "72%");
+      const stateLabel = module.querySelector("em");
+      if (stateLabel) stateLabel.textContent = "Measuring";
+    }, index * stepDuration);
+    setTimeout(() => {
+      module.classList.remove("is-measuring");
+      module.classList.add("is-complete");
+      module.style.setProperty("--analysis-progress", "100%");
+      const stateLabel = module.querySelector("em");
+      if (stateLabel) stateLabel.textContent = "Measured";
+    }, index * stepDuration + stepDuration - 110);
+  });
+  setTimeout(() => {
+    completeAnalysisTransition(evaluation);
+    onComplete();
+    setTimeout(revealFeedbackResults, 850);
+  }, modules.length * stepDuration + 450);
 }
 
 function startNew(prefill = null) {
@@ -539,40 +613,260 @@ function evaluateResponse(source, response, sourceKind) {
   };
 }
 
-function renderEvaluation() {
-  const evaluation = state.evaluation;
-  const bandDescriptions = {
-    "Strong": "Accurate and sufficiently complete for this prompt.",
-    "Developing": "Broadly accurate, with one useful idea to strengthen.",
-    "Needs another pass": "The central thread needs another pass.",
-    "Not enough evidence": "A responsible judgment needs more material."
+function confidencePhrase(confidence = "") {
+  return {
+    "Not yet": "You thought the thread was not there yet.",
+    "Partly": "You thought you had pieces of it.",
+    "Mostly": "You thought the argument was mostly clear.",
+    "Very well": "You thought you could explain it to someone else."
+  }[confidence] || "You made an estimate before feedback.";
+}
+
+function localStructuredFeedback(evaluation = {}) {
+  const remembered = evaluation.strength ? [evaluation.strength] : ["You made a real attempt to recall the chapter without copying from the source."];
+  const missed = evaluation.band === "Strong" ? [] : [evaluation.gap].filter(Boolean);
+  const distorted = evaluation.gapType === "Unsupported claim" || evaluation.gapType === "Distorted idea" ? [evaluation.gap] : [];
+  return {
+    overall_score: Math.max(0, Math.min(100, Math.round((evaluation.coverage || 0) * 100))),
+    feedback: {
+      what_you_remembered: remembered,
+      what_you_missed: missed,
+      what_may_be_distorted: distorted,
+      what_to_review_next: [evaluation.prompt || "Return to the source and explain the central claim in one plain sentence."]
+    },
+    recall_pattern_diagnosis: evaluation.gradingResult?.recall_pattern_diagnosis || []
   };
-  const icon = evaluation.band === "Strong" ? "✓" : evaluation.band === "Developing" ? "↗" : evaluation.band === "Needs another pass" ? "!" : "?";
-  $("#feedback-title").textContent = evaluation.band === "Strong" ? "The central thread came through." : "Here is the most useful gap.";
-  $("#feedback-intro").textContent = evaluation.uncertainty || "This diagnosis compares your language with the supplied source and points to exact evidence.";
+}
+
+function progressionForEvaluation(evaluation = {}) {
+  const structured = evaluation.gradingResult || localStructuredFeedback(evaluation);
+  const raw = Number.isFinite(structured.overall_score) ? structured.overall_score : Math.round((evaluation.coverage || 0) * 100);
+  const progress = Math.max(0, Math.min(100, raw));
+  if (progress >= 80) {
+    return {
+      progress,
+      title: "Strong recall",
+      signal: "You recovered the central thread and enough support to move into a useful challenge."
+    };
+  }
+  if (progress >= 50) {
+    return {
+      progress,
+      title: "Developing recall",
+      signal: "You brought back meaningful pieces. The next step is making the connection between them easier to explain."
+    };
+  }
+  return {
+    progress,
+    title: "Needs another pass",
+    signal: "A few pieces came back. Use the next step to rebuild the main idea in plain language."
+  };
+}
+
+function cleanRememberedFeedback(items = []) {
+  return items
+    .filter(Boolean)
+    .filter(item => !/retrieval attempt|recovered useful meaning|behavior this check is designed/i.test(item));
+}
+
+function whatHeldIntro(evaluation = {}, structured = {}) {
+  const items = cleanRememberedFeedback(structured.feedback?.what_you_remembered || []);
+  if (evaluation.band === "Strong") {
+    return "Nice work. You brought back the main idea and kept the meaning close to the source.";
+  }
+  if (items.length) {
+    return "You have something real to build from. A few important pieces came back clearly.";
+  }
+  return "You started from memory, which gives Margin something honest to work with.";
+}
+
+function sourceEvidenceBlock(label, evidence, tone = "neutral") {
+  if (!evidence?.sentence) return "";
+  return `<div class="evidence-block compact ${tone === "revisit" ? "is-revisit" : ""}"><span>${escapeHtml(label)}</span><blockquote>“${escapeHtml(evidence.sentence)}”</blockquote></div>`;
+}
+
+function feedbackConceptList(title, items = []) {
+  const clean = items.filter(Boolean);
+  if (!clean.length) return "";
+  return `<div class="feedback-concepts"><span>${escapeHtml(title)}</span><ul>${clean.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>`;
+}
+
+function recallPatternLabel(pattern = "") {
+  return {
+    claim_loss: "Main point",
+    entity_loss: "Names and people",
+    temporal_loss: "Dates and timing",
+    evidence_loss: "Concrete examples",
+    relationship_loss: "How ideas connect",
+    qualification_loss: "Limits and exceptions",
+    distortion_or_unsupported_addition: "Source vs. inference"
+  }[pattern] || "Recall pattern";
+}
+
+function formalRecallPatternFeedback(diagnosis = []) {
+  const usable = diagnosis.filter(item => item?.pattern && item?.coaching);
+  if (!usable.length) return null;
+  return {
+    title: usable.length === 1 ? "Pattern to watch" : "Patterns to watch",
+    items: usable.map(item => `${recallPatternLabel(item.pattern)}: ${item.coaching}`)
+  };
+}
+
+function recallGapReminderFeedback(evaluation = {}, structured = {}) {
+  const missed = structured.feedback?.what_you_missed || [];
+  const distorted = structured.feedback?.what_may_be_distorted || [];
+  if (evaluation.band === "Strong") {
+    return {
+      title: "Reminder for next time",
+      intro: "Pressure-testing an argument shows you understand more than what the author said. It shows you can see when the idea applies, where it may break down, and what would make it stronger or weaker.",
+      items: ["After you remember the central claim, ask: what example, contrast, or condition makes this claim work?"]
+    };
+  }
+  if (evaluation.gapType === "Weak relationship between ideas") {
+    return {
+      title: "Reminder for next time",
+      intro: "Explaining how two ideas relate shows you have a stronger grasp of both. The goal is not just to remember the parts, but to describe the connection that makes them matter together.",
+      items: ["As you read, pause when the author explains why one idea leads to, depends on, contrasts with, or changes another."]
+    };
+  }
+  if (evaluation.gapType === "Missed central claim") {
+    return {
+      title: "Reminder for next time",
+      intro: "Finding the central claim shows you can separate the subject of a chapter from the point the author wants you to carry away. That is what makes the rest of the details easier to organize.",
+      items: ["Before collecting details, try finishing this sentence: The author wants me to believe that..."]
+    };
+  }
+  if (evaluation.gapType === "Insufficient response") {
+    return {
+      title: "Reminder for next time",
+      intro: "Starting with one clear claim shows you can turn a vague impression into something explainable. Once that sentence exists, the supporting details have somewhere to attach.",
+      items: ["Write one plain sentence first. Then add one reason, example, or contrast from the chapter."]
+    };
+  }
+  const fallbackItems = [...missed, ...distorted].filter(Boolean);
+  return {
+    title: "Reminder for next time",
+    intro: "Noticing this kind of detail shows you can move from remembering isolated points to understanding how the chapter is built. That is what makes an idea easier to explain later.",
+    items: fallbackItems.length ? fallbackItems.slice(0, 2) : [evaluation.gap || "Look for the specific support that makes the chapter’s claim easier to explain."]
+  };
+}
+
+function readingStrategyFor(evaluation = {}) {
+  if (evaluation.band === "Strong") return "You have the main idea in hand. The next useful move is to test where the argument might bend.";
+  if (evaluation.gapType === "Weak relationship between ideas") return "Look for the word that connects the ideas: because, but, therefore, depends on, or leads to.";
+  if (evaluation.gapType === "Missed central claim") return "Before adding details, write one sentence that starts with: The author wants me to believe that...";
+  if (evaluation.gapType === "Insufficient response") return "Start smaller. One plain sentence about the chapter is enough to begin rebuilding it.";
+  return "Return to the evidence and attach one specific reason or example to the main idea.";
+}
+
+function challengeWhy(evaluation = {}) {
+  if (evaluation.band === "Strong") return "This keeps the work from stopping at recall. A good reader can also test the edge of an argument.";
+  return "This challenge is designed to strengthen the part of the chapter that did not fully come back yet.";
+}
+
+function challengeGuideFor(evaluation = {}) {
+  if (evaluation.band === "Strong") {
+    return {
+      title: "Pressure-test the argument.",
+      body: "You remembered the chapter well enough to ask a sharper question about when the author’s claim might not hold.",
+      helper: "Name a boundary, assumption, or condition that would make the argument less convincing."
+    };
+  }
+  if (evaluation.gapType === "Weak relationship between ideas") {
+    return {
+      title: "Make the connection visible.",
+      body: "Your answer named useful ideas. Now explain how one idea supports, changes, or depends on the other.",
+      helper: "Try using because, but, therefore, depends on, or leads to."
+    };
+  }
+  if (evaluation.gapType === "Missed central claim") {
+    return {
+      title: "Rebuild the main point.",
+      body: "Start with what the author wanted you to believe, then attach the strongest reason or example.",
+      helper: "One clear sentence is better than a polished paragraph."
+    };
+  }
+  return {
+    title: "Use the evidence.",
+    body: "Return to the excerpt and explain the job it does in the chapter’s argument.",
+    helper: "Focus on meaning, not wording."
+  };
+}
+
+function renderEvaluation(showResults = true) {
+  const evaluation = state.evaluation;
+  const values = getValues();
+  const structured = evaluation.gradingResult || localStructuredFeedback(evaluation);
+  const progression = progressionForEvaluation(evaluation);
+  const remembered = cleanRememberedFeedback(structured.feedback?.what_you_remembered || []);
+  const rememberedItems = remembered.length ? remembered : [evaluation.strength || "You started from memory instead of copying from the source."];
+  const patternFeedback = formalRecallPatternFeedback(structured.recall_pattern_diagnosis || [])
+    || recallGapReminderFeedback(evaluation, structured);
+  const heldBody = `<p>${escapeHtml(whatHeldIntro(evaluation, structured))}</p>
+    ${feedbackConceptList("Key concepts", rememberedItems)}
+    ${sourceEvidenceBlock("Evidence for what came through", evaluation.strengthEvidence)}`;
+  const strengthenBody = patternFeedback
+    ? `<p>${escapeHtml(patternFeedback.intro || (evaluation.band === "Strong" ? "You can now go deeper by noticing the kind of detail that would make this idea easier to carry into a future conversation." : "This is the pattern most worth watching next time you read."))}</p>
+      ${feedbackConceptList(patternFeedback.title, patternFeedback.items)}
+      ${sourceEvidenceBlock("Text evidence to revisit", evaluation.gapEvidence, "revisit")}`
+    : "";
+  const strengthenStep = patternFeedback
+    ? `<article class="path-step path-step-warm">
+        <span class="path-marker">↗</span>
+        <div class="path-card feedback-card gap">
+          <header><span>↗</span><h3>${patternFeedback.title === "Reminder for next time" ? "Reminder for next time" : evaluation.band === "Strong" ? "Where to go deeper next time" : "What to look for next time"}</h3></header>
+          ${strengthenBody}
+        </div>
+      </article>`
+    : "";
   $("#evaluation").innerHTML = `
-    <div class="evaluation-grid">
-      <aside class="band-card">
-        <span class="band-icon">${icon}</span>
-        <strong>${escapeHtml(displayBand(evaluation.band))}</strong>
-        <small>${escapeHtml(bandDescriptions[evaluation.band])}</small>
-      </aside>
-      <div class="feedback-stack">
-        <article class="feedback-card">
-          <header><span>✓</span><h3>What you understood</h3></header>
-          <p>${escapeHtml(evaluation.strength)}</p>
-          <div class="evidence-block"><span>Source evidence · passage ${evaluation.strengthEvidence.index + 1}</span><blockquote>“${escapeHtml(evaluation.strengthEvidence.sentence)}”</blockquote></div>
+    <div class="evaluation-checkpoint ${evaluation.gradingResult ? "structured-evaluation" : ""}">
+      <div class="learning-path">
+        <article class="path-step path-step-quiet">
+          <span class="path-marker">1</span>
+          <div class="path-card path-card-compact">
+            <span class="eyebrow">Before feedback</span>
+            <h3>${escapeHtml(confidencePhrase(values.confidence))}</h3>
+            <p>This is your read on your own understanding before Margin checks the response against the source.</p>
+          </div>
         </article>
-        <article class="feedback-card gap">
-          <header><span>↗</span><h3>${escapeHtml(displayGapType(evaluation.gapType))}</h3></header>
-          <p>${escapeHtml(evaluation.gap)}</p>
-          <div class="evidence-block"><span>Source evidence · passage ${evaluation.gapEvidence.index + 1}</span><blockquote>“${escapeHtml(evaluation.gapEvidence.sentence)}”</blockquote></div>
+        <article class="path-step path-step-signal">
+          <span class="path-marker">${progression.progress >= 80 ? "✓" : "↗"}</span>
+          <div class="path-card checkpoint-hero">
+            <div>
+              <span class="eyebrow">Recall signal</span>
+              <h2>${escapeHtml(progression.title)}</h2>
+              <div class="progression-meter-row"><div class="progression-meter" style="--progression:${progression.progress}%"><span></span></div><strong>${progression.progress}%</strong></div>
+              <p>${escapeHtml(progression.signal)}</p>
+            </div>
+          </div>
+        </article>
+        <article class="path-step">
+          <span class="path-marker">✓</span>
+          <div class="path-card feedback-card">
+            <header><span>✓</span><h3>What held</h3></header>
+            ${heldBody}
+          </div>
+        </article>
+        ${strengthenStep}
+        <article class="path-step path-step-final">
+          <span class="path-marker">→</span>
+          <div class="path-card feedback-card next-move">
+            <header><span>?</span><h3>Next move</h3></header>
+            <p>${escapeHtml(readingStrategyFor(evaluation))}</p>
+            <div class="next-challenge-pill"><span>${escapeHtml(displayGapType(evaluation.gapType))}</span><strong>${escapeHtml(evaluation.prompt)}</strong></div>
+            <p class="path-card-note">${escapeHtml(challengeWhy(evaluation))}</p>
+          </div>
         </article>
       </div>
     </div>`;
+  if (showResults && $("#feedback-results")) $("#feedback-results").hidden = false;
+  if (showResults && $("#analysis-transition")) $("#analysis-transition").hidden = true;
   $("#repair-title").textContent = evaluation.band === "Strong" ? "Test the edge of the argument." : "Take on the idea that needs another pass.";
   $("#repair-prompt").textContent = evaluation.prompt;
-  $("#repair-evidence").textContent = `“${evaluation.gapEvidence.sentence}”`;
+  const guide = challengeGuideFor(evaluation);
+  $("#repair-guide").innerHTML = `<strong>${escapeHtml(guide.title)}</strong><p>${escapeHtml(guide.body)}</p><small>${escapeHtml(guide.helper)}</small>`;
+  $("#repair-evidence").innerHTML = `<span>${evaluation.band === "Strong" ? "Detail to test" : "Detail to rebuild"}</span><blockquote>“${escapeHtml(evaluation.gapEvidence.sentence)}”</blockquote>`;
   $('[data-action="to-repair"]').innerHTML = evaluation.band === "Strong"
     ? 'Take the challenge <span>→</span>'
     : 'Take the challenge <span>→</span>';
@@ -858,9 +1152,11 @@ function renderDashboard() {
     const latestBook = loadBookMetadata().find(book => (book.key || bookKey(book.title, book.author)) === latestBookKey);
     const latestCompleted = chapters.filter(chapter => bookKey(chapter.bookTitle, chapter.authorName || "") === latestBookKey).length;
 
-    $("#dashboard-message").textContent = due.length
-      ? `${due.length === 1 ? "One review is" : `${due.length} reviews are`} ready when you are. You’ve checked ${chapters.length} ${chapters.length === 1 ? "chapter" : "chapters"} so far.`
-      : `Nothing needs your attention right now. You’ve checked ${chapters.length} ${chapters.length === 1 ? "chapter" : "chapters"}${drafts.length ? ` and have ${drafts.length === 1 ? "a draft" : `${drafts.length} drafts`} waiting` : ""}.`;
+    if ($("#dashboard-message")) {
+      $("#dashboard-message").textContent = due.length
+        ? `${due.length === 1 ? "One review is" : `${due.length} reviews are`} ready when you are. You’ve checked ${chapters.length} ${chapters.length === 1 ? "chapter" : "chapters"} so far.`
+        : `Nothing needs your attention right now. You’ve checked ${chapters.length} ${chapters.length === 1 ? "chapter" : "chapters"}${drafts.length ? ` and have ${drafts.length === 1 ? "a draft" : `${drafts.length} drafts`} waiting` : ""}.`;
+    }
     $("#stat-chapters").textContent = chapters.length;
     $("#stat-reviews").textContent = completedReviews;
     $("#stat-repairs").textContent = repairs;
@@ -1475,6 +1771,7 @@ document.addEventListener("click", event => {
     setStep(1);
     setTimeout(() => $("#recall").focus(), 100);
   }
+  if (action === "back-source") setStep(0);
   if (action === "start-landing-check") startNew();
   if (action === "remove-pdf") removePdf();
   if (action === "reveal-source") {
@@ -1486,12 +1783,13 @@ document.addEventListener("click", event => {
     else setStep(2);
   }
   if (action === "back-recall") setStep(1);
+  if (action === "back-confidence") setStep(2);
   if (action === "evaluate") {
     const values = getValues();
     if (!values.confidence) { toast("Choose the confidence level that feels closest."); return; }
-    state.evaluation = evaluateResponse(values.sourceText, values.recall, values.sourceKind);
-    renderEvaluation();
     setStep(3);
+    state.evaluation = evaluateResponse(values.sourceText, values.recall, values.sourceKind);
+    renderEvaluation(true);
   }
   if (action === "inspect-source") showSource(getValues().sourceText, getValues().chapterTitle);
   if (action === "to-repair") setStep(4);
@@ -1588,7 +1886,7 @@ document.addEventListener("dragend", () => {
 });
 
 $("#hero-start").addEventListener("click", () => startNew());
-$("#dashboard-start").addEventListener("click", () => startNew());
+$("#dashboard-start")?.addEventListener("click", () => startNew());
 $("#open-book-insights").addEventListener("click", event => renderBookInsights(event.currentTarget.dataset.bookKey));
 $("#open-latest").addEventListener("click", event => openChapter(event.currentTarget.dataset.chapterId));
 $("#check-next").addEventListener("click", event => startNew({
@@ -1607,7 +1905,7 @@ $("#profile-menu").addEventListener("click", event => event.stopPropagation());
 $("#logout-button").addEventListener("click", () => setLoggedIn(false));
 $("#login-button").addEventListener("click", () => setLoggedIn(true));
 $("#signup-button").addEventListener("click", () => setLoggedIn(true));
-$("#save-entry-draft").addEventListener("click", saveEntryDraft);
+$("#save-entry-draft")?.addEventListener("click", saveEntryDraft);
 document.addEventListener("click", () => {
   $("#profile-menu").hidden = true;
   $("#profile-button").setAttribute("aria-expanded", "false");
@@ -1623,7 +1921,7 @@ $("#flow-exit").addEventListener("click", () => {
   setView("home");
   toast("Draft saved.");
 });
-$("#load-sample").addEventListener("click", () => {
+$("#load-sample")?.addEventListener("click", () => {
   setValues(sample);
   toast("Sample loaded. Begin when you are ready.");
 });

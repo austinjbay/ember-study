@@ -12,6 +12,21 @@ The experience therefore keeps a consistent structure while varying the prompt:
 
 The complete review should take approximately two to three minutes.
 
+## Initial question type: Free recall
+
+**Prompt:** What was the central claim, and which supporting ideas mattered most?
+
+Free recall is evaluated against four stable criteria:
+
+| Criterion | Definition |
+| --- | --- |
+| Central claim | Identifies what the author wants the reader to believe, rather than only naming the topic. |
+| Essential support | Recovers the reasons, evidence, or examples necessary to explain the claim. |
+| Idea relationships | Explains how important ideas connect, depend on, reinforce, or constrain one another. |
+| Source fidelity | Remains materially consistent with the supplied source while using the reader’s own words. |
+
+These criteria belong to the question type and should remain stable across books. Prompt wording may vary later, but a prompt should not be labeled Free recall if it changes the underlying cognitive job or evaluation rubric.
+
 ## Product principles
 
 - **Predictable structure, varied prompts.** Readers should understand what kind of thinking is expected without memorizing the test.

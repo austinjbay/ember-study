@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <a class="skip-link" href="#app">Skip to main content</a>
     <aside class="sidebar" aria-label="Reading library">
       <div class="brand-row">
-        <a class="brand" href="#" aria-label="Margin home">
+          <a class="brand" href="#" data-nav="home" aria-label="Margin home">
           <span class="brand-mark" aria-hidden="true">M</span>
           <span>Margin</span>
         </a>
@@ -61,7 +62,7 @@
       <div class="library-list" id="library-list">
         <div class="empty-library">
           <span aria-hidden="true">⌁</span>
-          <p>Your completed chapter checks will live here.</p>
+          <p>Create your first book, then add a chapter to begin your library.</p>
         </div>
       </div>
 
@@ -73,7 +74,7 @@
             <div><strong>Austin</strong><small>reader@example.com</small></div>
           </div>
           <button type="button" role="menuitem">Help</button>
-          <button type="button" role="menuitem">Account settings</button>
+          <button type="button" role="menuitem" data-nav="account">Account settings</button>
           <button class="logout-button" id="logout-button" type="button" role="menuitem">Log out</button>
         </div>
         <div class="signed-out-note">
@@ -86,6 +87,23 @@
     <div class="shell">
       <header class="topbar">
         <button class="mobile-menu icon-button" id="mobile-menu" type="button" aria-label="Open navigation">☰</button>
+        <nav class="marketing-nav" aria-label="Product information">
+          <button type="button" data-nav="how-it-works" data-marketing-nav="how-it-works">How it works</button>
+          <button type="button" data-nav="reading-skills" data-marketing-nav="reading-skills">Reading skills</button>
+          <button type="button" data-nav="why-it-works" data-marketing-nav="why-it-works">Why it works</button>
+          <button type="button" data-nav="examples" data-marketing-nav="examples">Examples</button>
+          <button type="button" data-nav="trust" data-marketing-nav="trust">Trust & privacy</button>
+        </nav>
+        <details class="marketing-mobile-menu" id="marketing-mobile-menu">
+          <summary>Explore</summary>
+          <div>
+            <button type="button" data-nav="how-it-works">How it works</button>
+            <button type="button" data-nav="reading-skills">Reading skills</button>
+            <button type="button" data-nav="why-it-works">Why it works</button>
+            <button type="button" data-nav="examples">Examples</button>
+            <button type="button" data-nav="trust">Trust & privacy</button>
+          </div>
+        </details>
         <div class="top-actions">
           <div class="auth-actions">
             <button class="text-button" id="login-button" type="button">Log in</button>
@@ -102,7 +120,10 @@
             <div>
               <h1 id="onboarding-title">Remember what you read.<br><em>Use it when it matters.</em></h1>
               <p id="onboarding-copy">For nonfiction readers whose highlights and notes still aren’t becoming usable knowledge.</p>
-              <button class="primary large" id="hero-start" type="button"><span id="hero-start-label">Start a chapter check</span> <span>→</span></button>
+              <div class="hero-actions">
+                <button class="primary large" id="hero-start" type="button"><span id="hero-start-label">Start a chapter check</span> <span>→</span></button>
+                <button class="text-button hero-secondary" type="button" data-nav="examples">See a worked example</button>
+              </div>
               <p class="hero-reassurance" id="hero-reassurance">Use it for the chapters worth remembering. A focused check takes about six minutes.</p>
             </div>
             <div class="loop-card" aria-label="Learning loop">
@@ -123,13 +144,17 @@
               <article><span>02</span><h3>Know whether you understood it</h3><p>Compare your explanation with the source and see the exact connection that needs work.</p></article>
               <article><span>03</span><h3>Use more of what you read</h3><p>Bring important ideas back when you’re ready to explain, recommend, decide, or lead.</p></article>
             </div>
+            <p class="audience-line"><strong>Built for people who already highlight, annotate, or keep notes</strong>—but still struggle to explain the book a month later.</p>
           </section>
 
           <section class="logged-out-section product-tour" aria-labelledby="product-tour-title">
             <header>
-              <span class="eyebrow">Beyond notes and highlights</span>
-              <h2 id="product-tour-title">Turn a finished chapter into knowledge you can explain.</h2>
-              <p>Margin adds the missing layer after reading: retrieval, evidence-grounded feedback, focused practice, and review.</p>
+              <div>
+                <span class="eyebrow">Beyond notes and highlights</span>
+                <h2 id="product-tour-title">Turn a finished chapter into knowledge you can explain.</h2>
+                <p>Margin adds the missing layer after reading: retrieval, evidence-grounded feedback, focused practice, and review.</p>
+              </div>
+              <button class="carousel-control" type="button" data-action="toggle-product-carousel" aria-pressed="false">Pause motion</button>
             </header>
             <div class="product-carousel-window">
               <div class="product-carousel-track">
@@ -211,22 +236,55 @@
             </div>
           </section>
 
+          <section class="logged-out-section skill-acquisition" aria-labelledby="skill-acquisition-title">
+            <header>
+              <span class="eyebrow">Build the skill—not just the memory</span>
+              <h2 id="skill-acquisition-title">Become a more precise, durable reader.</h2>
+              <p>Margin notices the kinds of comprehension work that repeatedly give you trouble, then reinforces one skill at a time until it holds up in your real reading.</p>
+            </header>
+            <div class="skill-acquisition-grid">
+              <article><span>01</span><h3>Find the central claim</h3><p>Separate what a chapter discusses from what the author actually wants you to believe.</p></article>
+              <article><span>02</span><h3>Connect ideas</h3><p>Explain how two concepts support, cause, limit, or contradict one another.</p></article>
+              <article><span>03</span><h3>Evaluate evidence</h3><p>Recognize which examples and reasons truly support an argument—and which merely sound related.</p></article>
+              <article><span>04</span><h3>Build clear explanations</h3><p>Move from claim to reason to example in language you can use in a meeting, memo, or decision.</p></article>
+              <article><span>05</span><h3>Calibrate your confidence</h3><p>Learn when your sense of understanding matches what you can actually retrieve and explain.</p></article>
+              <article><span>06</span><h3>Apply ideas with judgment</h3><p>Test where an argument is useful, where it breaks, and how it should change what you do.</p></article>
+            </div>
+            <div class="reinforcement-path">
+              <div><span>1</span><strong>Spot the pattern</strong><small>Chapter checks reveal a recurring gap.</small></div>
+              <i aria-hidden="true">→</i>
+              <div><span>2</span><strong>Practice daily</strong><small>One focused question builds the skill.</small></div>
+              <i aria-hidden="true">→</i>
+              <div><span>3</span><strong>Prove it holds</strong><small>Later chapters and reviews test transfer.</small></div>
+            </div>
+          </section>
+
+          <section class="logged-out-section landing-faq" aria-labelledby="landing-faq-title">
+            <div>
+              <span class="eyebrow">Questions serious readers ask</span>
+              <h2 id="landing-faq-title">Useful effort, without another complicated system.</h2>
+              <p>Margin is intentionally selective. It should earn the extra minutes it asks from you.</p>
+            </div>
+            <div class="faq-list">
+              <details open><summary>Do I need to check every chapter?</summary><p>No. Use Margin for high-value chapters containing ideas you want to remember, explain, or apply.</p></details>
+              <details><summary>Does this replace Kindle, Readwise, Notion, or Obsidian?</summary><p>No. Those tools help you capture and organize. Margin helps you test whether the captured ideas became usable knowledge.</p></details>
+              <details><summary>Is this an AI book-summary tool?</summary><p>No. You begin with your own recall. Feedback is compared with source material you provide and points back to its evidence.</p></details>
+              <details><summary>How much time does a chapter check take?</summary><p>The target is about six minutes. Daily skill practice takes roughly three minutes, and you can skip or reschedule reviews.</p></details>
+              <details><summary>Can I trust the evaluation?</summary><p>Treat it as directional guidance, not an objective grade. Margin exposes evidence, labels partial sources, and lets you disagree or edit.</p></details>
+            </div>
+          </section>
+
           <section class="logged-out-section landing-cta">
             <span class="eyebrow">For the books you want to change how you work</span>
             <h2>The next time a chapter matters, don’t just highlight it.</h2>
             <p>Find out whether you can explain it before it becomes another idea you know you read somewhere.</p>
-            <button class="primary large" type="button" data-action="start-landing-check">Try it on a chapter <span>→</span></button>
+            <div class="landing-cta-actions">
+              <button class="primary large" type="button" data-action="start-landing-check">Try it on a chapter <span>→</span></button>
+              <button class="text-button" type="button" data-nav="how-it-works">See exactly how it works</button>
+            </div>
           </section>
 
           <div class="returning-home" id="returning-home" hidden>
-            <header class="dashboard-hero">
-              <div>
-                <h1 data-local-greeting>Good morning.</h1>
-                <p id="dashboard-message">Let’s see what’s sticking.</p>
-              </div>
-              <button class="primary" id="dashboard-start" type="button">Add chapter <span>→</span></button>
-            </header>
-
             <section class="learning-snapshot" aria-label="Learning snapshot">
               <article><span>Chapters checked</span><strong id="stat-chapters">0</strong><small>Across your library</small></article>
               <article><span>Reviews completed</span><strong id="stat-reviews">0</strong><small>Delayed retrievals</small></article>
@@ -352,17 +410,198 @@
           </section>
         </section>
 
+        <section class="view marketing-view" data-view="how-it-works">
+          <div class="marketing-hero">
+            <span class="eyebrow">How it works</span>
+            <h1>A small learning loop for the chapters that matter.</h1>
+            <p>You do not need to process every page. Use Margin when a chapter contains an argument, framework, or idea you want to carry into your work.</p>
+          </div>
+          <div class="deep-dive-steps">
+            <article><span>01</span><div><h2>Recall before looking</h2><p>Close the book and explain the chapter in your own words. This reveals what you can retrieve—not merely recognize.</p></div></article>
+            <article><span>02</span><div><h2>Compare with the source</h2><p>Margin identifies the strongest part of your explanation and one consequential gap, with evidence from the text you supplied.</p></div></article>
+            <article><span>03</span><div><h2>Take a study challenge</h2><p>Work through one question aimed at the missing claim, connection, or evidence while the chapter is still fresh.</p></div></article>
+            <article><span>04</span><div><h2>Return without looking</h2><p>An adaptive review separately tests the previous gap and the chapter’s central claim.</p></div></article>
+            <article><span>05</span><div><h2>Strengthen the underlying skill</h2><p>If the same gap appears across chapters, daily practice helps build the transferable reading skill behind it.</p></div></article>
+          </div>
+          <div class="marketing-callout"><strong>Designed for selective effort</strong><p>The goal is not another daily obligation. It is a reliable process for the books and chapters worth remembering.</p></div>
+        </section>
+
+        <section class="view marketing-view" data-view="reading-skills">
+          <div class="marketing-hero">
+            <span class="eyebrow">Reading skills</span>
+            <h1>Build abilities that transfer beyond one book.</h1>
+            <p>Margin turns recurring comprehension gaps into a sequenced practice path. One skill remains active until it succeeds across multiple days.</p>
+          </div>
+          <div class="marketing-card-grid skills-deep-dive">
+            <article><span>01</span><h2>Find the central claim</h2><p>Distinguish the subject of a chapter from the argument the author wants you to accept.</p></article>
+            <article><span>02</span><h2>Connect ideas</h2><p>Explain whether one idea causes, supports, limits, or contradicts another.</p></article>
+            <article><span>03</span><h2>Evaluate evidence</h2><p>Recognize which examples genuinely support a claim and which are merely related.</p></article>
+            <article><span>04</span><h2>Build explanations</h2><p>Move clearly from claim to reason to example in language you can use at work.</p></article>
+            <article><span>05</span><h2>Calibrate confidence</h2><p>Compare how well you thought you understood something with what you could actually retrieve.</p></article>
+            <article><span>06</span><h2>Apply with judgment</h2><p>Identify where an argument is useful, where it breaks, and what it should change.</p></article>
+          </div>
+          <div class="proficiency-explainer"><div><strong>One daily question</strong><small>Focused practice stays lightweight.</small></div><i>→</i><div><strong>Three successful days</strong><small>Performance must hold up over time.</small></div><i>→</i><div><strong>Next skill unlocks</strong><small>Completed skills remain available.</small></div></div>
+        </section>
+
+        <section class="view marketing-view" data-view="why-it-works">
+          <div class="marketing-hero">
+            <span class="eyebrow">Why it works</span>
+            <h1>Saving an idea is not the same as learning it.</h1>
+            <p>Margin combines established learning principles in one practical workflow, without pretending every result is an objective grade.</p>
+          </div>
+          <div class="principles-list">
+            <article><h2>Retrieval practice</h2><p>Trying to reconstruct an idea strengthens access to it and reveals gaps that rereading can conceal.</p><span>Used in chapter recall and delayed review</span></article>
+            <article><h2>Spacing</h2><p>Returning after time has passed provides stronger evidence of durable memory than an immediate repeat.</p><span>Used in adaptive review timing</span></article>
+            <article><h2>Elaboration</h2><p>Explaining relationships, reasons, and examples gives an idea more meaningful connections.</p><span>Used in study challenges</span></article>
+            <article><h2>Metacognitive calibration</h2><p>Comparing confidence with demonstrated recall helps readers judge their own understanding more accurately.</p><span>Used in confidence tracking</span></article>
+            <article><h2>Transfer</h2><p>Practicing the same reading skill across new passages tests whether improvement extends beyond one chapter.</p><span>Used in daily skill practice</span></article>
+          </div>
+          <div class="marketing-callout"><strong>What Margin does not claim</strong><p>A text comparison cannot perfectly measure understanding. Results are directional, source-dependent, and designed to support the reader’s judgment.</p></div>
+        </section>
+
+        <section class="view marketing-view" data-view="examples">
+          <div class="marketing-hero">
+            <span class="eyebrow">Worked example</span>
+            <h1>See what a chapter check actually produces.</h1>
+            <p>This simplified example shows the difference between a summary tool and a source-grounded learning loop.</p>
+          </div>
+          <div class="example-flow">
+            <article><span>Your recall</span><blockquote>Deep work matters because focused effort helps people learn difficult things and produce more valuable work. Shallow tasks can feel productive but are easier to copy.</blockquote></article>
+            <article class="example-feedback"><span>What came through</span><h2>The central thread is intact.</h2><p>You connected focused effort with learning difficult skills and producing high-value work.</p></article>
+            <article class="example-gap"><span>Useful gap</span><h2>The relationship could be more explicit.</h2><p>Why does sustained concentration make deliberate practice more effective?</p></article>
+            <article><span>Study challenge</span><blockquote>Explain how concentration, deliberate practice, and valuable output depend on one another.</blockquote></article>
+            <article class="example-review"><span>Three days later</span><div><strong>Previous gap</strong><b>Recovered</b></div><div><strong>Central claim</strong><b>Developing</b></div><p>The weaker result determines when this chapter returns.</p></article>
+          </div>
+        </section>
+
+        <section class="view marketing-view" data-view="trust">
+          <div class="marketing-hero">
+            <span class="eyebrow">Trust & privacy</span>
+            <h1>AI feedback should show its work.</h1>
+            <p>Your reading is personal, and evaluative feedback can feel authoritative. Margin is designed to make its evidence, uncertainty, and limits visible.</p>
+          </div>
+          <div class="trust-grid">
+            <article><span>Evidence</span><h2>Feedback points back to the source.</h2><p>Strengths and gaps include the passage used in the comparison, so you can inspect the reasoning yourself.</p></article>
+            <article><span>Uncertainty</span><h2>Partial sources are labeled.</h2><p>Highlights and notes cannot represent a whole chapter. Margin reduces confidence rather than hiding that limitation.</p></article>
+            <article><span>Control</span><h2>Your interpretation remains yours.</h2><p>Edit responses, disagree with feedback, inspect the source, reschedule reviews, and remove material.</p></article>
+            <article><span>Privacy</span><h2>Clear handling before clever features.</h2><p>A production version should plainly disclose storage, model providers, training policy, export, and deletion before asking for source material.</p></article>
+          </div>
+          <div class="privacy-note"><strong>Prototype note</strong><p>This prototype stores reading data locally in your browser. A production privacy policy and account-level data controls are still required before launch.</p></div>
+        </section>
+
+        <section class="view account-view" data-view="account">
+          <header class="account-heading">
+            <button class="back-link" type="button" data-nav="home">← Back to home</button>
+            <span class="eyebrow">Account settings</span>
+            <h1>Identity and recovery</h1>
+            <p>Manage how you sign in and where important account notices reach you.</p>
+          </header>
+
+          <div class="account-settings-list">
+            <form class="account-setting" id="account-name-form">
+              <div>
+                <h2>Display name</h2>
+                <p>This is how Margin addresses you throughout the product. You can change it at any time.</p>
+              </div>
+              <div class="account-control">
+                <label class="field"><span>Name</span><input id="account-name" type="text" autocomplete="name" maxlength="80" placeholder="How should Margin address you?" required></label>
+                <p class="account-status" id="account-name-status" role="status"></p>
+                <button class="secondary" type="submit">Save display name</button>
+              </div>
+            </form>
+
+            <form class="account-setting" id="account-reading-context-form">
+              <div>
+                <h2>Reading context</h2>
+                <p>Optional context Margin can use when your library is still too small to personalize reflection notes.</p>
+              </div>
+              <div class="account-control">
+                <label class="field"><span>Location</span><input id="account-location" type="text" autocomplete="address-level2" maxlength="80" placeholder="City, region, or country"></label>
+                <p class="account-status" id="account-reading-context-status" role="status"></p>
+                <button class="secondary" type="submit">Save reading context</button>
+              </div>
+            </form>
+
+            <form class="account-setting" id="account-email-form">
+              <div>
+                <h2>Sign-in email</h2>
+                <p>This is your primary identity in Margin. Supabase may require confirmation from both your current and new addresses.</p>
+              </div>
+              <div class="account-control">
+                <label class="field"><span>Email address</span><input id="account-email" type="email" autocomplete="email" required></label>
+                <p class="account-status" id="account-email-status" role="status"></p>
+                <button class="secondary" type="submit">Update sign-in email</button>
+              </div>
+            </form>
+
+            <form class="account-setting" id="account-password-form">
+              <div>
+                <h2>Password</h2>
+                <p>Add or replace a password for this account. Magic-link and Google sign-in will continue to work.</p>
+              </div>
+              <div class="account-control">
+                <label class="field"><span>New password</span><input id="account-password" type="password" autocomplete="new-password" minlength="8" required></label>
+                <label class="field"><span>Confirm new password</span><input id="account-password-confirm" type="password" autocomplete="new-password" minlength="8" required></label>
+                <p class="account-status" id="account-password-status" role="status"></p>
+                <button class="secondary" type="submit">Update password</button>
+              </div>
+            </form>
+
+            <form class="account-setting" id="account-recovery-form">
+              <div>
+                <h2>Recovery email</h2>
+                <p>Save a secondary contact address. Supabase does not natively treat this as a verified recovery identity, so it cannot restore access yet.</p>
+              </div>
+              <div class="account-control">
+                <label class="field"><span>Secondary email</span><input id="account-recovery-email" type="email" autocomplete="email" placeholder="backup@example.com"></label>
+                <p class="account-status" id="account-recovery-status" role="status">Stored as private account metadata · Unverified</p>
+                <button class="secondary" type="submit">Save secondary email</button>
+              </div>
+            </form>
+
+            <section class="account-setting" aria-labelledby="account-sessions-title">
+              <div>
+                <h2 id="account-sessions-title">Sessions</h2>
+                <p>Margin keeps trusted devices signed in. Sensitive account changes may still require you to authenticate again.</p>
+              </div>
+              <div class="account-control">
+                <div class="session-policy">
+                  <span><strong>30 days</strong> inactivity limit</span>
+                  <span><strong>90 days</strong> maximum session age</span>
+                </div>
+                <p class="account-status" id="account-session-status">This prototype enforces a local companion check. Configure the matching server policy in Supabase before launch.</p>
+                <button class="secondary danger-button" id="logout-all-devices" type="button">Log out of all devices</button>
+              </div>
+            </section>
+
+            <section class="account-setting" aria-labelledby="account-local-data-title">
+              <div>
+                <h2 id="account-local-data-title">Prototype data recovery</h2>
+                <p>Books and chapters are currently stored in this browser. Export from the old tab, then import on the new local server tab if data appears missing.</p>
+              </div>
+              <div class="account-control">
+                <div class="local-data-actions">
+                  <button class="secondary" id="export-local-data" type="button">Export local data</button>
+                  <label class="secondary file-button" for="import-local-data">Import local data</label>
+                  <input id="import-local-data" type="file" accept="application/json,.json">
+                </div>
+                <p class="account-status" id="account-local-data-status">This only moves local prototype data between browser origins. It does not change your Supabase account.</p>
+              </div>
+            </section>
+          </div>
+        </section>
+
         <section class="view flow-view" data-view="flow">
           <div class="flow-top">
             <div class="flow-top-actions">
-              <button class="back-link" id="flow-exit" type="button">← Exit to home</button>
-              <button class="save-draft-button" id="save-entry-draft" type="button">Save draft</button>
+              <button class="back-link" id="flow-exit" type="button">Back</button>
+              <span class="autosave-state" id="autosave-state" role="status">Changes save automatically</span>
             </div>
             <ol class="progress" id="progress" aria-label="Chapter check progress">
-              <li class="is-active"><span>1</span> Source</li>
-              <li><span>2</span> Recall</li>
-              <li><span>3</span> Compare</li>
-              <li><span>4</span> Challenge</li>
+              <li class="is-active"><span>1</span> Add reading</li>
+              <li><span>2</span> Explain it</li>
+              <li><span>3</span> See feedback</li>
+              <li><span>4</span> Strengthen it</li>
               <li><span>5</span> Save</li>
             </ol>
           </div>
@@ -430,12 +669,10 @@
                   <textarea id="source-text" name="sourceText" rows="10" placeholder="Paste the chapter, excerpt, or detailed notes here…"></textarea>
                   <small id="source-status">Your text stays private in this prototype.</small>
                 </label>
-                <label class="check-row"><input id="wants-application" name="wantsApplication" type="checkbox"><span>Include an optional application prompt</span></label>
               </div>
 
-              <div class="flow-actions">
-                <button class="secondary" id="load-sample" type="button">Load sample</button>
-                <button class="primary" type="button" data-action="begin-recall">Hide source & begin recall <span>→</span></button>
+              <div class="flow-actions source-actions">
+                <button class="primary" type="button" data-action="begin-recall">Continue <span>→</span></button>
               </div>
             </section>
 
@@ -449,13 +686,22 @@
                 <h1>Explain the chapter in your own words.</h1>
                 <p>What was the central claim, and which supporting ideas mattered most? Bullets and fragments are fine.</p>
               </div>
+              <details class="recall-rubric">
+                <summary>How free recall is evaluated</summary>
+                <div>
+                  <p><strong>Central claim</strong><span>Measures your ability to capture what the author wanted you to believe, not just the topic.</span></p>
+                  <p><strong>Essential support</strong><span>Measures how well your answer recovered the reasons, examples, or evidence that made the claim work.</span></p>
+                  <p><strong>Idea relationships</strong><span>Measures whether your answer explained how the chapter’s important ideas connect or depend on one another.</span></p>
+                  <p><strong>Source fidelity</strong><span>Measures whether your answer stayed faithful to the source while using your own words.</span></p>
+                </div>
+              </details>
               <label class="answer-box">
                 <span class="sr-only">Your recall</span>
                 <textarea id="recall" name="recall" rows="10" placeholder="Start with what feels most important…"></textarea>
                 <small><span id="recall-words">0 words</span><span>There is no target length.</span></small>
               </label>
               <div class="flow-actions">
-                <button class="secondary" type="button" data-action="reveal-source">End recall & view source</button>
+                <button class="secondary" type="button" data-action="back-source">Back</button>
                 <button class="primary" type="button" data-action="to-confidence">Continue <span>→</span></button>
               </div>
             </section>
@@ -475,24 +721,50 @@
               </fieldset>
               <div class="flow-actions centered-actions">
                 <button class="secondary" type="button" data-action="back-recall">Back</button>
-                <button class="primary" type="button" data-action="evaluate">Compare with source <span>→</span></button>
+                <button class="primary" type="button" data-action="evaluate">Continue <span>→</span></button>
               </div>
             </section>
 
             <section class="flow-step feedback-step" data-step="3">
-              <div class="step-heading">
-                <span class="eyebrow">Compare · source grounded</span>
-                <h1 id="feedback-title">Here is what your answer shows.</h1>
-                <p id="feedback-intro"></p>
+              <div class="analysis-transition" id="analysis-transition" hidden aria-live="polite">
+                <div class="analysis-transition-head">
+                  <span class="eyebrow">Reading your answer</span>
+                  <h2>Measuring the parts of comprehension.</h2>
+                  <p>Margin is checking meaning, not writing style. Each signal becomes part of the feedback you’ll see next.</p>
+                </div>
+                <div class="analysis-meter-list">
+                  <article data-analysis-module="central-claim">
+                    <div><strong>Central claim</strong><span>Measures your ability to capture what the author wanted you to believe, not just the topic.</span></div>
+                    <em>Queued</em>
+                    <i><b></b></i>
+                  </article>
+                  <article data-analysis-module="supporting-ideas">
+                    <div><strong>Supporting ideas</strong><span>Measures how well your answer recovered the reasons, examples, or evidence that made the claim work.</span></div>
+                    <em>Queued</em>
+                    <i><b></b></i>
+                  </article>
+                  <article data-analysis-module="source-fidelity">
+                    <div><strong>Source fidelity</strong><span>Measures whether your answer stayed faithful to the source or added something the passage did not support.</span></div>
+                    <em>Queued</em>
+                    <i><b></b></i>
+                  </article>
+                  <article data-analysis-module="next-challenge">
+                    <div><strong>Next challenge</strong><span>Uses your strongest gap to choose the follow-up question most likely to strengthen your understanding.</span></div>
+                    <em>Queued</em>
+                    <i><b></b></i>
+                  </article>
+                </div>
               </div>
-              <div id="evaluation"></div>
-              <div class="feedback-controls">
-                <span>AI-assisted prototype feedback. Verify it against the source.</span>
-                <div><button class="text-button" type="button" data-action="disagree">I disagree</button><button class="text-button" type="button" data-action="unsupported">Evidence is unsupported</button></div>
-              </div>
-              <div class="flow-actions">
-                <button class="secondary" type="button" data-action="inspect-source">Inspect source</button>
-                <button class="primary" type="button" data-action="to-repair">Take the challenge <span>→</span></button>
+              <div id="feedback-results" hidden>
+                <div id="evaluation"></div>
+                <div class="feedback-controls">
+                  <span></span>
+                  <div><button class="text-button" type="button" data-action="disagree">I disagree</button><button class="text-button" type="button" data-action="unsupported">Evidence is unsupported</button></div>
+                </div>
+                <div class="flow-actions">
+                  <button class="secondary" type="button" data-action="back-confidence">Back</button>
+                  <button class="primary" type="button" data-action="to-repair">Take the challenge <span>→</span></button>
+                </div>
               </div>
             </section>
 
@@ -502,6 +774,7 @@
                 <h1 id="repair-title">Push this idea one step further.</h1>
                 <p id="repair-prompt"></p>
               </div>
+              <div class="challenge-guide" id="repair-guide"></div>
               <div class="evidence-mini" id="repair-evidence"></div>
               <label class="answer-box">
                 <span class="sr-only">Your challenge response</span>
@@ -509,7 +782,7 @@
               </label>
               <div class="flow-actions">
                 <button class="secondary" type="button" data-action="skip-repair">Skip challenge</button>
-                <button class="primary" type="button" data-action="submit-repair">Check my answer <span>→</span></button>
+                <button class="primary" type="button" data-action="submit-repair">Finish <span>→</span></button>
               </div>
             </section>
 
@@ -642,6 +915,52 @@
         <p class="dialog-caveat">Comparing confidence with demonstrated recall over time helps you judge your own understanding more accurately.</p>
       </div>
     </dialog>
+    <dialog id="auth-dialog" class="auth-dialog">
+      <div class="dialog-head">
+        <div><span class="eyebrow">Your reading system</span><h2 id="auth-dialog-title">Log in to Margin</h2></div>
+        <button class="icon-button" type="button" data-action="close-auth" aria-label="Close">×</button>
+      </div>
+      <div class="auth-dialog-body">
+        <p>Keep your chapter checks, scheduled reviews, and reading-skill progress connected to you.</p>
+        <button class="google-auth-button" id="google-auth-button" type="button">
+          <span aria-hidden="true">G</span> Continue with Google
+        </button>
+        <div class="auth-divider"><span>or continue with email</span></div>
+        <form id="email-auth-form">
+          <label class="field">
+            <span>Email address</span>
+            <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          </label>
+          <button class="primary" id="email-auth-button" type="submit">Email me a sign-in link</button>
+        </form>
+        <div id="magic-auth-options">
+          <p class="auth-note">No password required. We’ll send a one-time link to this address.</p>
+          <button class="auth-switch" id="show-password-auth" type="button">Use a password instead</button>
+        </div>
+        <form id="password-auth-form" hidden>
+          <label class="field">
+            <span>Email address</span>
+            <input id="password-auth-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input id="password-auth-password" type="password" autocomplete="current-password" required>
+          </label>
+          <button class="primary" id="password-auth-button" type="submit">Log in</button>
+          <div class="password-auth-links">
+            <button class="auth-switch" id="show-magic-auth" type="button">Use an email link</button>
+            <button class="auth-switch" id="forgot-password" type="button">Forgot password?</button>
+          </div>
+        </form>
+        <p class="shared-device-note">Using a shared or public device? Log out when you finish.</p>
+        <div class="auth-setup-note" id="auth-setup-note" hidden>
+          <strong>Supabase isn’t connected yet.</strong>
+          <p>Add your project URL and public anon key to <code>supabase-config.js</code>. Until then, the prototype continues to use its local demo login.</p>
+        </div>
+      </div>
+    </dialog>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
