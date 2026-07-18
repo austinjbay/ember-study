@@ -4003,15 +4003,15 @@ function renderSkillModule(vm) {
       </article>`).join("")}
     </div>
     <div class="skill-path-grid" aria-label="Available reading skills">
-      ${path.map(skill => `<article class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.days >= 3 ? " is-durable" : ""}">
+      ${path.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.days >= 3 ? " is-durable" : ""}" type="button" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.status)}. ${skill.days} of 3 successful days.">
         <span>${String(skill.index + 1).padStart(2, "0")}</span>
         <strong>${escapeHtml(skill.title)}</strong>
-        <p>${escapeHtml(skill.description)}</p>
+        <span class="skill-path-desc">${escapeHtml(skill.description)}</span>
         <div class="skill-path-progress" aria-label="${escapeHtml(skill.title)} progress: ${skill.days} of 3 successful days">
           <i style="width: ${skill.progress}%"></i>
         </div>
         <small>${escapeHtml(skill.status)}${skill.days ? ` · ${skill.days}/3` : ""}</small>
-      </article>`).join("")}
+      </button>`).join("")}
     </div>
     <button class="text-button" type="button" data-nav="practice">Open daily practice →</button>
   </section>`;
@@ -5246,6 +5246,13 @@ function revisitPractice(skillId) {
   toast("Skill reopened. Your proficiency remains saved.");
 }
 
+function openSkillBadge(skillId) {
+  setView("practice");
+  renderDailyPractice(skillId || "central-claim", false);
+  $("#practice-answer").scrollIntoView({ behavior: "smooth", block: "center" });
+  toast("Skill opened. Try it when you’re ready.");
+}
+
 document.addEventListener("click", async event => {
   const nav = event.target.closest("[data-nav]");
   if (nav) {
@@ -5385,6 +5392,7 @@ document.addEventListener("click", async event => {
   if (action === "check-practice") checkPracticeAnswer();
   if (action === "reset-practice") resetPractice();
   if (action === "revisit-practice") revisitPractice(event.target.closest("[data-practice-skill]")?.dataset.practiceSkill);
+  if (action === "open-skill-badge") openSkillBadge(event.target.closest("[data-practice-skill]")?.dataset.practiceSkill);
   if (action === "complete-review") completeReview();
   if (action === "start-review-session") {
     const ids = (event.target.closest("[data-review-session-ids]")?.dataset.reviewSessionIds || "").split(",").filter(Boolean);
