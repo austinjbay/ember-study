@@ -168,7 +168,8 @@ const MARKETING_ROUTES = {
   "reading-skills": "/reading-skills",
   "why-it-works": "/why-it-works",
   examples: "/examples",
-  trust: "/trust"
+  trust: "/trust",
+  account: "/settings"
 };
 const ROUTE_VIEWS = Object.fromEntries(Object.entries(MARKETING_ROUTES).map(([view, path]) => [path, view]));
 const PENDING_ROUTE_KEY = "ember-pending-route";
