@@ -1613,7 +1613,7 @@ function applyEmberWindowState(nextState = loadEmberWindowState()) {
     companion.style.right = "auto";
     companion.style.bottom = "auto";
   }
-  panel.style.height = `${windowState.height}px`;
+  panel.style.height = state.emberChatMessages.length ? `${windowState.height}px` : "auto";
   panel.hidden = Boolean(windowState.minimized);
   minimized.hidden = !windowState.minimized;
   saveEmberWindowState(windowState);
@@ -1760,9 +1760,8 @@ function renderSidebarGuide() {
     return;
   }
   panel.classList.remove("has-response");
-  const summary = sidebarGuideReplyFor("next");
   $("#sidebar-guide-state").textContent = "Reading companion";
-  $("#sidebar-guide-log").innerHTML = `<strong>${escapeHtml(summary.title)}</strong><p>${escapeHtml(summary.body)}</p>`;
+  $("#sidebar-guide-log").innerHTML = "";
 }
 
 function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
