@@ -4332,10 +4332,10 @@ function renderDiagnosticModule(vm) {
 function renderMemoryModule(vm) {
   const candidate = vm.memoryCandidates[0];
   if (!candidate) {
-    return `<section class="adaptive-module memory-module"><span class="eyebrow">Memory resurfacing</span><h2>Nothing to bring back yet.</h2><p>After a chapter check or delayed review, Ember can resurface an idea before revealing the source.</p>${renderWhy("Requires at least one completed chapter check.", "preview")}</section>`;
+    return `<section class="adaptive-module memory-module"><span class="eyebrow">Up For Review</span><h2>Nothing to bring back yet.</h2><p>After a chapter check or delayed review, Ember can resurface an idea before revealing the source.</p>${renderWhy("Requires at least one completed chapter check.", "preview")}</section>`;
   }
   return `<section class="adaptive-module memory-module" aria-labelledby="memory-resurfacing-title">
-    <span class="eyebrow">${vm.evidenceState === "establishing" ? "Example memory prompt" : "Memory resurfacing"}</span>
+    <span class="eyebrow">${vm.evidenceState === "establishing" ? "Example Review Prompt" : "Up For Review"}</span>
     <h2 id="memory-resurfacing-title">${escapeHtml(candidate.prompt)}</h2>
     <p><strong>${escapeHtml(candidate.title)}</strong>${candidate.bookTitle ? ` · ${escapeHtml(candidate.bookTitle)}` : ""}</p>
     <div class="memory-reveal">
@@ -4606,7 +4606,6 @@ function buildHomeModules(vm) {
     homeModule("skill-development", 40, true, confidenceForEvidence(vm.evidenceState), vm.skillSignals[0]?.basis, renderSkillModule(vm)),
     homeModule("today-practice", 45, true, confidenceForEvidence(vm.evidenceState), vm.practiceState?.skill?.title, renderTodayPracticeModule(vm)),
     homeModule("progress-over-time", 60, true, confidenceForEvidence(vm.evidenceState), `${vm.progress.reviews} delayed reviews`, renderProgressModule(vm)),
-    homeModule("library-activity", 70, true, confidenceForEvidence(vm.evidenceState), `${vm.activeBooks.length} active books`, renderLibraryActivityModule(vm)),
     homeModule("personalization-setup", 35, vm.evidenceState === "establishing", "preview", "Optional setup while evidence is sparse.", renderPersonalizationModule(vm)),
     homeModule("future-work", 80, vm.evidenceState === "established", "preview", "Unsupported diagnostics are marked as future work.", renderFutureWorkModule(vm))
   ].filter(module => module.visible && module.html).sort((a, b) => a.priority - b.priority);
@@ -4655,7 +4654,7 @@ function renderAdaptiveLoggedInHome(vm) {
   const zone = id => moduleById.get(id) ? `<div class="home-module-shell" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const topZone = id => moduleById.get(id) ? `<div class="home-top-module" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const supportModules = modules
-    .filter(module => !["primary-next-action", "skill-development", "progress-over-time", "library-carousel", "memory-resurfacing", "today-practice", "library-activity", "reader-diagnostic"].includes(module.id))
+    .filter(module => !["primary-next-action", "skill-development", "progress-over-time", "library-carousel", "memory-resurfacing", "today-practice", "reader-diagnostic"].includes(module.id))
     .map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`)
     .join("");
   $("#returning-home").innerHTML = `
@@ -4673,9 +4672,6 @@ function renderAdaptiveLoggedInHome(vm) {
         </section>
         <section class="reading-world-zone practice-zone" aria-label="Today’s practice">
           ${zone("today-practice")}
-        </section>
-        <section class="reading-world-zone library-zone" aria-label="Library activity">
-          ${zone("library-activity")}
         </section>
         <section class="reading-world-zone diagnostic-zone" aria-label="Reading profile">
           ${zone("reader-diagnostic")}
