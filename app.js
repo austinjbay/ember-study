@@ -3721,9 +3721,9 @@ function renderHomeInteractionPrototype(vm) {
 
     <div class="prototype-canvas" aria-label="Interactive homepage prototype">
       <section class="prototype-next-object" aria-labelledby="prototype-next-title">
-        <div class="review-slip" aria-hidden="true"><span>3m</span></div>
+        <div class="prototype-ember" aria-hidden="true"><span></span><small>Cooling</small></div>
         <div>
-          <p class="object-kicker">Ready to try</p>
+          <p class="object-kicker">Today’s challenge · about 3 minutes</p>
           <h3 id="prototype-next-title">Connect the missing relationship.</h3>
           <p>${escapeHtml(vm.nextAction.copy)}</p>
           <dl>
@@ -3731,11 +3731,24 @@ function renderHomeInteractionPrototype(vm) {
             <div><dt>Evidence</dt><dd>${supportingChecks} checks</dd></div>
           </dl>
         </div>
-        <details class="prototype-action-preview">
-          <summary>Preview the prompt</summary>
-          <p>Explain one relationship the chapter relies on: what does the supporting idea prove, complicate, or make possible?</p>
-        </details>
+        <div class="prototype-mission-control">
+          <label for="prototype-mission-answer">What comes back?</label>
+          <textarea id="prototype-mission-answer" rows="3" placeholder="The supporting idea matters because..."></textarea>
+          <button class="primary" type="button" data-action="prototype-complete-mission">Check mission <span>→</span></button>
+        </div>
       </section>
+
+      <div class="prototype-choice-row" aria-label="Choose another path">
+        <span>Choose another path</span>
+        <button type="button" data-action="prototype-choice" data-prototype-choice="memory">Recover a memory · 2m</button>
+        <button type="button" data-action="prototype-choice" data-prototype-choice="skill">Strengthen a skill · 4m</button>
+        <button type="button" data-action="prototype-choice" data-prototype-choice="book">Inspect a book · 5m</button>
+      </div>
+
+      <div class="prototype-consequence" role="status" aria-live="polite" hidden>
+        <strong>That connection held.</strong>
+        <span>Connect ideas moved forward. One earlier weak spot is now recovered.</span>
+      </div>
 
       <section class="prototype-memory-card" aria-labelledby="prototype-memory-title">
         <div class="book-spine-object" aria-hidden="true"><span>${escapeHtml(book?.title || memory?.bookTitle || "Deep Work")}</span></div>
@@ -3760,7 +3773,7 @@ function renderHomeInteractionPrototype(vm) {
           <span>A pattern is forming</span>
         </div>
         <div class="skill-map-grid">
-          ${skillNodes.map((skill, index) => `<button class="skill-node${skill.active ? " is-active" : ""}" type="button" aria-describedby="skill-node-${index}">
+          ${skillNodes.map((skill, index) => `<button class="skill-node${skill.active ? " is-active" : ""}" type="button" data-prototype-skill="${skill.title === "Connect ideas" ? "connect" : ""}" aria-describedby="skill-node-${index}">
             <strong>${escapeHtml(skill.title)}</strong>
             <span>${escapeHtml(skill.state)}</span>
             <small id="skill-node-${index}">${escapeHtml(skill.evidence)}</small>
@@ -3802,7 +3815,7 @@ function renderHomeInteractionPrototype(vm) {
           <li><button type="button"><span></span>First chapter explained</button></li>
           <li><button type="button"><span></span>First delayed recall</button></li>
           <li><button type="button"><span></span>Gap recovered once</button></li>
-          <li><button type="button"><span></span>Connection skill selected</button></li>
+          <li><button type="button" data-prototype-trail="mission"><span></span>Connection skill selected</button></li>
         </ol>
         <details class="evidence-drawer">
           <summary>Prototype behavior notes</summary>
@@ -3811,6 +3824,65 @@ function renderHomeInteractionPrototype(vm) {
       </section>
     </div>
   </section>`;
+}
+
+function completePrototypeMission() {
+  const answer = $("#prototype-mission-answer")?.value.trim() || "";
+  if (wordCount(answer) < 5) {
+    toast("Give the mission one complete sentence before checking it.");
+    $("#prototype-mission-answer")?.focus();
+    return;
+  }
+  const prototype = $(".home-interaction-prototype");
+  if (!prototype) return;
+  prototype.classList.add("is-mission-complete");
+  const skillNode = $('[data-prototype-skill="connect"]');
+  if (skillNode) {
+    skillNode.classList.add("is-advanced");
+    skillNode.querySelector("span").textContent = "Strengthening";
+    skillNode.querySelector("small").textContent = "Mission complete";
+  }
+  const trailEvent = $('[data-prototype-trail="mission"]');
+  if (trailEvent) trailEvent.classList.add("is-complete");
+  const consequence = $(".prototype-consequence");
+  if (consequence) consequence.hidden = false;
+  const button = $('[data-action="prototype-complete-mission"]');
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = "Mission complete <span>✓</span>";
+  }
+  toast("Mission complete. Connect ideas moved forward.");
+}
+
+function choosePrototypePath(choice = "") {
+  const missionTitle = $("#prototype-next-title");
+  const answer = $("#prototype-mission-answer");
+  const support = $(".prototype-next-object dd");
+  if (!missionTitle || !answer) return;
+  const paths = {
+    memory: {
+      title: "Recover the idea before opening it.",
+      placeholder: "What survived from the chapter is...",
+      support: "Memory retrieval"
+    },
+    skill: {
+      title: "Connect the missing relationship.",
+      placeholder: "The supporting idea matters because...",
+      support: "Connect ideas"
+    },
+    book: {
+      title: "Inspect what this book is teaching you.",
+      placeholder: "This book keeps asking me to notice...",
+      support: "Book world"
+    }
+  };
+  const path = paths[choice] || paths.skill;
+  missionTitle.textContent = path.title;
+  answer.placeholder = path.placeholder;
+  if (support) support.textContent = path.support;
+  $$(".prototype-choice-row button").forEach(button => {
+    button.classList.toggle("is-selected", button.dataset.prototypeChoice === choice);
+  });
 }
 
 function renderPrimaryNextActionModule(vm) {
@@ -5124,6 +5196,8 @@ document.addEventListener("click", async event => {
     state.homeFixture = event.target.closest("[data-fixture-state]")?.dataset.fixtureState || "";
     renderDashboard();
   }
+  if (action === "prototype-complete-mission") completePrototypeMission();
+  if (action === "prototype-choice") choosePrototypePath(event.target.closest("[data-prototype-choice]")?.dataset.prototypeChoice || "");
   if (action === "remove-pdf") removePdf();
   if (action === "reveal-source") {
     showSource(getValues().sourceText, getValues().chapterTitle);
