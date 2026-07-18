@@ -1050,7 +1050,6 @@ function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
   $("#profile-button").setAttribute("aria-expanded", "false");
   if (updateUrl && (MARKETING_ROUTES[name] || name === "home")) syncUrlForView(name, replaceUrl ? "replace" : "push");
   window.scrollTo({ top: 0, behavior: "smooth" });
-  $("#app").focus({ preventScroll: true });
   if (name === "home" || name === "reviews") renderDashboard();
   if (name === "account") hydrateAccountSettings();
 }
