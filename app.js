@@ -4622,6 +4622,7 @@ $("#focus-book-select")?.addEventListener("change", event => {
   renderDashboard();
 });
 $("#new-check").addEventListener("click", () => startNew());
+$("#mobile-new-check")?.addEventListener("click", () => startNew());
 $("#profile-button").addEventListener("click", event => {
   event.stopPropagation();
   const menu = $("#profile-menu");
