@@ -219,13 +219,13 @@ main:focus { outline: 0; }
 .ember-companion-panel h2 { margin: 0; font-family: var(--serif); font-size: 1.05rem; font-weight: 650; }
 .ember-companion-panel p { margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.5; }
 .ember-guide-head p { color: var(--faint); font-size: .66rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-.ember-guide-log { display: grid; gap: 8px; min-height: 180px; max-height: 340px; overflow: auto; border-left: 0; padding: 0 2px 2px; }
+.ember-guide-log { display: grid; gap: 16px; min-height: 180px; max-height: 340px; overflow: auto; border-left: 0; padding: 2px 4px 4px; }
 .ember-guide-log strong { display: block; margin-bottom: 4px; color: var(--ink); font-family: var(--serif); font-size: .96rem; font-weight: 650; }
-.ember-chat-message { display: grid; max-width: 92%; gap: 4px; border-radius: 7px; padding: 8px 10px; }
+.ember-chat-message { display: grid; max-width: 92%; gap: 4px; border-radius: 7px; padding: 2px 0; }
 .ember-chat-message p { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
-.ember-chat-message.is-user { justify-self: end; background: color-mix(in srgb, var(--white), var(--paper) 18%); border: 1px solid var(--line); }
+.ember-chat-message.is-user { justify-self: end; background: transparent; border: 0; }
 .ember-chat-message.is-user p { color: var(--ink); }
-.ember-chat-message.is-assistant { justify-self: start; background: var(--white); border: 1px solid color-mix(in srgb, var(--line), transparent 16%); }
+.ember-chat-message.is-assistant { justify-self: start; background: transparent; border: 0; }
 .ember-guide-actions { display: flex; flex-wrap: wrap; gap: 7px; }
 .ember-guide-actions button { min-height: 30px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); padding: 0 10px; font-size: .68rem; font-weight: 800; }
 .ember-guide-actions button:hover { border-color: var(--green); color: var(--green); }
