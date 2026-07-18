@@ -3778,13 +3778,13 @@ function buildAdaptiveNextAction({ evidenceState, entries, chapters, drafts, due
     };
   }
   return {
-    kind: "first-check",
-    label: "First meaningful result",
+    kind: "first-book",
+    label: "First step",
     marker: "01",
-    title: "Add a chapter worth remembering.",
-    copy: "Ember becomes personal after you complete a chapter check and later review what lasted.",
-    text: "Add a chapter",
-    why: evidenceState === "establishing" ? "Recommended because Ember needs one chapter check to begin learning your patterns." : "Recommended because there is no active reading activity.",
+    title: "Create your first book.",
+    copy: "Start by adding the book you’re reading. Then Ember can help you review chapters from that source.",
+    text: "Create book",
+    why: evidenceState === "establishing" ? "Recommended because Ember needs a book before it can organize chapter reviews." : "Recommended because there is no active reading activity.",
     attrs: 'data-action="home-start-new-book"'
   };
 }
@@ -3907,6 +3907,7 @@ function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
       due: due.length,
       scheduled: scheduled.length,
       drafts: drafts.length,
+      hasReading: entries.length > 0,
       skillTitle: practiceState?.skill?.title || skillSignals[0]?.title || "Find the central claim",
       practiceDone: Boolean(practiceState?.completedToday)
     },
@@ -4287,7 +4288,7 @@ function renderLibraryCarouselModule(vm) {
     <div class="library-carousel-heading">
       <div>
         <span class="eyebrow">Your library</span>
-        <h2 id="library-carousel-title">${books.length ? "Keep your reading in view." : "Start your reading shelf."}</h2>
+        <h2 id="library-carousel-title">${books.length ? "Keep your reading in view." : "Create your first book."}</h2>
       </div>
     </div>
     ${books.length ? `<div class="library-carousel-track" aria-label="Books in your library">
@@ -4304,8 +4305,8 @@ function renderLibraryCarouselModule(vm) {
         </article>`;
       }).join("")}
     </div>` : `<button class="library-carousel-empty" type="button" data-action="home-start-new-book">
-      <strong>Add your first chapter</strong>
-      <span>Ember will turn it into progress, practice, and reviews.</span>
+      <strong>Create a book</strong>
+      <span>Start with a title and author. You can add the first chapter next.</span>
     </button>`}
   </section>`;
 }
@@ -4393,6 +4394,15 @@ function renderHomeFixtureSwitcher(activeState) {
 
 function renderAdaptiveHomeStateHeader(vm) {
   const today = vm.todayState || {};
+  if (!today.hasReading) {
+    return `<header class="adaptive-home-state is-empty" aria-label="Start in Ember">
+      <h1>Create your first book</h1>
+      <div class="adaptive-home-state-list" aria-label="Current reading state">
+        <span>No book yet</span>
+        <span>Add a book to start chapter reviews</span>
+      </div>
+    </header>`;
+  }
   const reviewLabel = today.due
     ? `${today.due} review${today.due === 1 ? "" : "s"} due`
     : today.scheduled
