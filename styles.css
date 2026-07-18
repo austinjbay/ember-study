@@ -52,8 +52,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .brand-mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50% 50% 50% 5px; background: var(--ink); color: var(--paper); font-size: .9rem; }
 .icon-button { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid transparent; border-radius: 50%; background: transparent; color: var(--muted); }
 .icon-button:hover { border-color: var(--line-dark); background: rgba(255,255,255,.45); color: var(--ink); }
-.new-check { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 42px; border: 1px solid var(--line-dark); border-radius: 7px; background: rgba(255,255,255,.42); color: var(--ink); padding: 0 10px; font-size: .8rem; font-weight: 750; text-align: left; transition: border-color .15s ease, color .22s cubic-bezier(.2, .8, .2, 1); }
-.new-check:hover { border-color: var(--line-dark); background: rgba(255,255,255,.42); color: var(--ink); }
+.new-check { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 42px; border: 1px solid var(--line-dark); border-radius: 7px; background: rgba(255,255,255,.42); color: var(--ink); padding: 0 10px; font-size: .8rem; font-weight: 750; text-align: left; transition: background .15s ease, border-color .15s ease; }
+.new-check:hover { border-color: #aaa498; background: rgba(255,255,255,.75); }
 .new-check-icon { display: grid; flex: 0 0 auto; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: white; }
 .new-check-icon svg { display: block; width: 15px; height: 15px; }
 .new-check-label { min-width: 0; }
@@ -97,9 +97,9 @@ body:not(.sidebar-collapsed) .nav-item:hover .nav-item-content {
 .book-progress-track span { display: block; width: var(--book-progress); height: 100%; background: var(--green); }
 .book-progress small { color: var(--muted); font-size: .6rem; white-space: nowrap; }
 .book-insights-link { display: flex; align-items: center; justify-content: space-between; width: calc(100% - 16px); margin: 0 8px 5px; border: 0; border-radius: 4px; background: rgba(54,91,74,.08); color: var(--green); padding: 7px 8px; font-size: .67rem; font-weight: 800; text-align: left; }
-.book-insights-link:hover { background: rgba(54,91,74,.08); color: var(--ink); }
+.book-insights-link:hover { background: var(--green-soft); }
 .chapter-link { display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; width: calc(100% - 8px); margin-left: 8px; border: 0; border-left: 2px solid transparent; background: transparent; padding: 8px 9px; color: var(--muted); text-align: left; }
-.chapter-link:hover { border-left-color: transparent; background: transparent; color: var(--ink); }
+.chapter-link:hover { border-left-color: var(--green); background: rgba(255,255,255,.42); color: var(--ink); }
 .chapter-link.is-draft { border-left-color: var(--amber); background: rgba(245,233,216,.45); }
 .chapter-link.is-draft small { color: var(--amber); font-weight: 800; }
 .chapter-link strong { overflow: hidden; font-size: .76rem; text-overflow: ellipsis; white-space: nowrap; }
