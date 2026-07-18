@@ -3666,7 +3666,7 @@ function fixtureHomeViewModel(evidenceState) {
       nextAction: { label: "Recommended next", marker: "3m", title: "Practice connecting supporting ideas.", copy: "This relationship was missing in a recent explanation.", text: "Start practice", why: "Fixture preview based on four checks.", attrs: 'data-nav="practice"' },
       diagnostic: { confidence: "early", title: "Early patterns are beginning to show.", copy: "You are recovering central claims, while support-to-argument links are still developing.", basis: "Early signal across 4 checks and 1 delayed review." },
       skillSignals: [{ title: "Central claims are coming back.", copy: "You recovered the main claim in most early checks.", basis: "4 completed checks.", confidence: "early" }, { title: "Connecting ideas is the growth area.", copy: "The same relationship gap appeared twice.", basis: "2 related gaps.", confidence: "early" }],
-      memoryCandidates: [{ chapterId: "", title: "Deep Work Is Valuable", bookTitle: "Deep Work", prompt: "Before opening it: why did this chapter argue depth matters?", preview: "", reason: "Example resurfacing from a recent chapter." }],
+      memoryCandidates: [{ chapterId: "", title: "Deep Work Is Valuable", bookTitle: "Deep Work", prompt: "Before opening it: why did this chapter argue depth matters?", preview: "Depth creates rare value because it lets you produce at the edge of your ability while avoiding the shallow work that fragments attention.", reason: "Example resurfacing from a recent chapter." }],
       progress: { chapters: 4, reviews: 1, recovered: 1, practiced: 2, durableLevel: "Recalled after delay" },
       activeBooks: [{ title: "Deep Work", author: "Cal Newport", completed: 4, total: 12 }]
     },
@@ -3694,6 +3694,120 @@ function homeModule(id, priority, visible, confidence, reason, html) {
 
 function renderWhy(reason = "", confidence = "") {
   return `<details class="why-this"><summary>Why this?</summary><p>${escapeHtml(reason || confidence || "Shown because it is relevant to your current reading state.")}</p></details>`;
+}
+
+function renderHomeInteractionPrototype(vm) {
+  if (!isHomeFixtureEnabled() || state.homeFixture !== "emerging") return "";
+  const memory = vm.memoryCandidates[0];
+  const book = vm.activeBooks[0];
+  const supportingChecks = vm.metrics.completedChecks || 4;
+  const delayedReviews = vm.metrics.delayedReviews || 1;
+  const skillNodes = [
+    { title: "Central claim", state: "Developing", evidence: "4 checks", active: true },
+    { title: "Connect ideas", state: "Emerging", evidence: "2 gaps", active: true },
+    { title: "Evaluate evidence", state: "Unmeasured", evidence: "Future signal", active: false },
+    { title: "Clear explanations", state: "Developing", evidence: "3 attempts", active: true },
+    { title: "Confidence", state: "Unmeasured", evidence: "Future signal", active: false },
+    { title: "Apply ideas", state: "Emerging", evidence: "1 transfer", active: true }
+  ];
+  return `<section class="home-interaction-prototype" aria-labelledby="home-prototype-title">
+    <header class="prototype-head">
+      <div>
+        <span class="eyebrow">Interaction prototype · local fixture</span>
+        <h2 id="home-prototype-title">Momentum reader</h2>
+      </div>
+      <p>Try the interaction model before it replaces the live homepage modules.</p>
+    </header>
+
+    <div class="prototype-canvas" aria-label="Interactive homepage prototype">
+      <section class="prototype-next-object" aria-labelledby="prototype-next-title">
+        <div class="review-slip" aria-hidden="true"><span>3m</span></div>
+        <div>
+          <p class="object-kicker">Ready to try</p>
+          <h3 id="prototype-next-title">Connect the missing relationship.</h3>
+          <p>${escapeHtml(vm.nextAction.copy)}</p>
+          <dl>
+            <div><dt>Supports</dt><dd>Connect ideas</dd></div>
+            <div><dt>Evidence</dt><dd>${supportingChecks} checks</dd></div>
+          </dl>
+        </div>
+        <button class="primary" type="button" data-nav="practice">Open practice <span>→</span></button>
+      </section>
+
+      <section class="prototype-memory-card" aria-labelledby="prototype-memory-title">
+        <div class="book-spine-object" aria-hidden="true"><span>${escapeHtml(book?.title || memory?.bookTitle || "Deep Work")}</span></div>
+        <div class="memory-card-face">
+          <p class="object-kicker">${escapeHtml(memory?.title || "Chapter memory")} · ${delayedReviews ? "after delay" : "fresh"}</p>
+          <h3 id="prototype-memory-title">${escapeHtml(memory?.prompt || "What comes back?")}</h3>
+          <fieldset class="memory-choice">
+            <legend>Mark what happened before revealing the answer</legend>
+            <label><input type="radio" name="prototype-memory-return" value="remembered"> I remember</label>
+            <label><input type="radio" name="prototype-memory-return" value="cue"> Give me a cue</label>
+          </fieldset>
+          <details class="unfold-drawer">
+            <summary>Reveal saved context</summary>
+            <p>${escapeHtml(memory?.preview || "Sample context appears here after a real chapter check.")}</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="prototype-skill-map" aria-labelledby="prototype-skill-title">
+        <div class="prototype-section-label">
+          <h3 id="prototype-skill-title">Skill map</h3>
+          <span>A pattern is forming</span>
+        </div>
+        <div class="skill-map-grid">
+          ${skillNodes.map((skill, index) => `<button class="skill-node${skill.active ? " is-active" : ""}" type="button" aria-describedby="skill-node-${index}">
+            <strong>${escapeHtml(skill.title)}</strong>
+            <span>${escapeHtml(skill.state)}</span>
+            <small id="skill-node-${index}">${escapeHtml(skill.evidence)}</small>
+          </button>`).join("")}
+        </div>
+        <details class="evidence-drawer">
+          <summary>See what contributed</summary>
+          <p>Central-claim recovery appears in ${supportingChecks} fixture checks. The missing-connection pattern appears twice, so the next activity points there.</p>
+        </details>
+      </section>
+
+      <section class="prototype-diagnostic-lens" aria-labelledby="prototype-diagnostic-title">
+        <h3 id="prototype-diagnostic-title">Reader lens</h3>
+        <div class="lens-tabs" aria-label="Prototype diagnostic lenses">
+          <input class="sr-only" type="radio" name="prototype-lens" id="prototype-lens-strength" checked>
+          <label for="prototype-lens-strength">Strength</label>
+          <input class="sr-only" type="radio" name="prototype-lens" id="prototype-lens-pattern">
+          <label for="prototype-lens-pattern">Pattern</label>
+          <input class="sr-only" type="radio" name="prototype-lens" id="prototype-lens-next">
+          <label for="prototype-lens-next">Next</label>
+          <div class="lens-panel lens-strength">
+            <strong>Central claims return first.</strong>
+            <p>${supportingChecks} checks across ${vm.metrics.books || 1} book point to reliable main-idea recall.</p>
+          </div>
+          <div class="lens-panel lens-pattern">
+            <strong>Relationships need naming.</strong>
+            <p>The answer often names ideas without explaining how one supports the other.</p>
+          </div>
+          <div class="lens-panel lens-next">
+            <strong>Try the missing connection.</strong>
+            <p>The next practice asks for one sentence that joins a claim to its evidence.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-progress-trail" aria-labelledby="prototype-trail-title">
+        <h3 id="prototype-trail-title">Progress trail</h3>
+        <ol>
+          <li><button type="button"><span></span>First chapter explained</button></li>
+          <li><button type="button"><span></span>First delayed recall</button></li>
+          <li><button type="button"><span></span>Gap recovered once</button></li>
+          <li><button type="button"><span></span>Connection skill selected</button></li>
+        </ol>
+        <details class="evidence-drawer">
+          <summary>Prototype behavior notes</summary>
+          <p>Keyboard users can tab through every object. Drawers use native disclosure controls. Motion is reduced to immediate state changes when reduced motion is requested. Insufficient evidence falls back to clearly labeled sample objects.</p>
+        </details>
+      </section>
+    </div>
+  </section>`;
 }
 
 function renderPrimaryNextActionModule(vm) {
@@ -3841,6 +3955,7 @@ function renderAdaptiveLoggedInHome(vm) {
           ? "Find out what stayed with you—and strengthen what didn’t."
           : "Your homepage is organized around the highest-value next step, the strongest available evidence, and the ideas worth bringing back."}</p>
       </header>
+      ${renderHomeInteractionPrototype(vm)}
       <div class="adaptive-module-stack">
         ${modules.map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`).join("")}
       </div>
