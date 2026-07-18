@@ -2167,6 +2167,224 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   line-height: 1.68;
 }
 
+/* OpenAI-inspired control pass: quiet surfaces, neutral selection states, and
+   restrained motion for buttons and choice controls. */
+:root {
+  --control-hover: rgba(32,34,31,.055);
+  --control-active: rgba(32,34,31,.085);
+  --control-selected: rgba(32,34,31,.07);
+  --focus-ring: rgba(16,163,127,.42);
+  --text-selection: rgba(16,163,127,.22);
+}
+
+::selection {
+  background: var(--text-selection);
+}
+
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+.book-path input:focus-visible + span,
+.source-kind input:focus-visible + span,
+.confidence-options input:focus-visible + span,
+.color-theme-option:has(input:focus-visible),
+.color-mode-option:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.primary,
+.secondary,
+.google-auth-button,
+.reschedule-options button,
+.preview-reading-card button,
+.account-control .secondary {
+  border-radius: 8px;
+  font-weight: 650;
+  letter-spacing: 0;
+  box-shadow: none;
+  transform: none;
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+}
+
+.primary:hover,
+.secondary:hover,
+.google-auth-button:hover,
+.preview-reading-card button:hover,
+.account-control .secondary:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.primary,
+.preview-reading-card button {
+  border-color: var(--ink);
+  background: var(--ink);
+}
+
+.primary:hover,
+.preview-reading-card button:hover {
+  background: color-mix(in srgb, var(--ink), white 8%);
+}
+
+.primary:active,
+.preview-reading-card button:active {
+  background: color-mix(in srgb, var(--ink), black 8%);
+  box-shadow: none;
+  transform: none;
+}
+
+.secondary,
+.google-auth-button,
+.reschedule-options button,
+.account-control .secondary {
+  border-color: var(--line-dark);
+  background: rgba(255,254,250,.66);
+}
+
+.secondary:hover,
+.google-auth-button:hover,
+.reschedule-options button:hover,
+.account-control .secondary:hover {
+  border-color: color-mix(in srgb, var(--line-dark), var(--ink) 18%);
+  background: var(--control-hover);
+  color: var(--ink);
+}
+
+.secondary:active,
+.google-auth-button:active,
+.reschedule-options button:active,
+.account-control .secondary:active {
+  background: var(--control-active);
+  box-shadow: none;
+  transform: none;
+}
+
+.text-button,
+.save-draft-button,
+.back-link,
+.landing-footer button {
+  font-weight: 600;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.text-button:hover,
+.save-draft-button:hover,
+.back-link:hover,
+.landing-footer button:hover {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
+
+.nav-item,
+.marketing-nav button,
+.profile-menu > button,
+.chapter-link {
+  border-radius: 8px;
+  transition: background-color .16s ease, color .16s ease, border-color .16s ease;
+}
+
+.nav-item:hover,
+.nav-item.is-active,
+.marketing-nav button:hover,
+.marketing-nav button.is-active,
+.profile-menu > button:hover {
+  background: var(--control-hover);
+  color: var(--ink);
+}
+
+.chapter-link:hover {
+  border-left-color: transparent;
+  background: var(--control-hover);
+  color: var(--ink);
+}
+
+.book-path label > span,
+.source-kind label > span,
+.confidence-options label > span,
+.color-theme-option {
+  border-radius: 8px;
+  background: rgba(255,254,250,.62);
+  box-shadow: none;
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+}
+
+.book-path label:hover > span,
+.source-kind label:hover > span,
+.confidence-options label:hover > span,
+.color-theme-option:hover {
+  border-color: color-mix(in srgb, var(--line-dark), var(--ink) 18%);
+  background: var(--control-hover);
+  box-shadow: none;
+}
+
+.book-path input:checked + span,
+.source-kind input:checked + span,
+.confidence-options input:checked + span,
+.color-theme-option.is-selected {
+  border-color: color-mix(in srgb, var(--ink), var(--line-dark) 18%);
+  background: var(--control-selected);
+  box-shadow: none;
+}
+
+.confidence-options input:checked + span b {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--white);
+}
+
+.pdf-upload:hover,
+.pdf-source.has-file .pdf-upload {
+  border-color: color-mix(in srgb, var(--line-dark), var(--ink) 20%);
+  background: var(--control-hover);
+}
+
+.chapter-tabs,
+.color-mode-options {
+  border-color: var(--line);
+  border-radius: 10px;
+  background: var(--control-hover);
+  box-shadow: none;
+}
+
+.chapter-tabs button,
+.color-mode-option {
+  border-radius: 7px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.chapter-tabs button.is-active,
+.color-mode-option.is-selected {
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(32,34,31,.08);
+}
+
+:root[data-color-mode="dark"] {
+  --control-hover: color-mix(in srgb, var(--white), var(--ink) 5%);
+  --control-active: color-mix(in srgb, var(--white), var(--ink) 9%);
+  --control-selected: color-mix(in srgb, var(--white), var(--ink) 7%);
+  --focus-ring: rgba(16,163,127,.52);
+}
+
+:root[data-color-mode="dark"] .primary:hover,
+:root[data-color-mode="dark"] .preview-reading-card button:hover {
+  background: color-mix(in srgb, var(--ink), var(--white) 8%);
+}
+
+:root[data-color-mode="dark"] .chapter-tabs button.is-active,
+:root[data-color-mode="dark"] .color-mode-option.is-selected {
+  background: color-mix(in srgb, var(--white), var(--paper) 18%);
+  color: var(--ink);
+  box-shadow: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
   .product-carousel-track { transform: none; }
