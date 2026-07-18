@@ -3610,10 +3610,11 @@ function buildSkillSignals(chapters = [], evidenceState = "establishing") {
     });
   }
   if (!signals.length) {
+    const firstSkill = practiceSequence[0] || { title: "Find the central claim", description: "Separate the topic from the author’s argument." };
     signals.push({
-      title: "No personal reading signal yet.",
-      copy: "Complete one chapter check and Ember can begin separating recall, understanding, synthesis, and transfer.",
-      basis: "Preview only.",
+      title: `${firstSkill.title} is the best place to start.`,
+      copy: firstSkill.description,
+      basis: "Recommended from Ember’s practice sequence.",
       confidence: "preview"
     });
   }
@@ -3984,6 +3985,13 @@ function renderMemoryModule(vm) {
 }
 
 function renderSkillModule(vm) {
+  const practice = vm.practiceState || currentPracticeSkillState();
+  const path = practiceSequence.map((skill, index) => {
+    const days = successfulPracticeDays(skill);
+    const status = days >= 3 ? "Durable" : skill.id === practice.skill.id ? "Recommended" : days > 0 ? "Developing" : "Available";
+    const progress = Math.min(100, Math.round(Math.min(3, days) / 3 * 100));
+    return { ...skill, index, days, status, progress };
+  });
   return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
     <span class="eyebrow">Skill development</span>
     <h2 id="skill-development-title">${escapeHtml(vm.skillSignals[0]?.title || "Build your first signal.")}</h2>
@@ -3992,6 +4000,17 @@ function renderSkillModule(vm) {
         <span>${escapeHtml(confidenceCopy(signal.confidence, signal.basis))}</span>
         <strong>${escapeHtml(signal.title)}</strong>
         <p>${escapeHtml(signal.copy)}</p>
+      </article>`).join("")}
+    </div>
+    <div class="skill-path-grid" aria-label="Available reading skills">
+      ${path.map(skill => `<article class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.days >= 3 ? " is-durable" : ""}">
+        <span>${String(skill.index + 1).padStart(2, "0")}</span>
+        <strong>${escapeHtml(skill.title)}</strong>
+        <p>${escapeHtml(skill.description)}</p>
+        <div class="skill-path-progress" aria-label="${escapeHtml(skill.title)} progress: ${skill.days} of 3 successful days">
+          <i style="width: ${skill.progress}%"></i>
+        </div>
+        <small>${escapeHtml(skill.status)}${skill.days ? ` · ${skill.days}/3` : ""}</small>
       </article>`).join("")}
     </div>
     <button class="text-button" type="button" data-nav="practice">Open daily practice →</button>
