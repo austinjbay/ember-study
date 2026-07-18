@@ -58,11 +58,18 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .new-check-icon svg { display: block; width: 15px; height: 15px; }
 .new-check-label { min-width: 0; }
 .side-nav { display: grid; gap: 3px; margin: 22px 0; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
-.nav-item { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 8px; min-height: 39px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); padding: 0 10px; font-size: .85rem; text-align: left; }
-.nav-item:hover, .nav-item.is-active { background: rgba(255,255,255,.58); color: var(--ink); }
+.nav-item { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 8px; min-height: 39px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); padding: 0 10px; font-size: .85rem; text-align: left; transition: color .22s cubic-bezier(.2, .8, .2, 1); }
+.nav-item:hover { background: transparent; color: var(--ink); }
+.nav-item.is-active { background: rgba(255,255,255,.58); color: var(--ink); }
 .nav-item.is-active { font-weight: 700; }
 .notification-icon, .home-icon, .practice-icon { display: grid; place-items: center; }
-.notification-icon svg, .home-icon svg, .practice-icon svg { display: block; width: 17px; height: 17px; }
+.notification-icon svg, .home-icon svg, .practice-icon svg { display: block; width: 17px; height: 17px; transform-origin: center; transition: color .22s cubic-bezier(.2, .8, .2, 1), filter .22s cubic-bezier(.2, .8, .2, 1), transform .22s cubic-bezier(.2, .8, .2, 1); will-change: transform, filter; }
+.nav-item:hover .notification-icon svg,
+.nav-item:hover .home-icon svg,
+.nav-item:hover .practice-icon svg {
+  filter: drop-shadow(0 6px 5px rgba(47,49,45,.22));
+  transform: translateY(-3px) scale(1.05);
+}
 .nav-item em { min-width: 21px; border-radius: 10px; background: rgba(73,101,83,.12); color: var(--green); padding: 2px 6px; font-size: .68rem; font-style: normal; text-align: center; }
 .nav-item em.is-due { background: var(--amber-soft); color: var(--amber); }
 .nav-item em.has-scheduled { background: var(--green-soft); color: var(--green); }
@@ -566,7 +573,6 @@ body.logged-out .landing-footer { display: flex; }
 :root[data-color-mode="dark"] select { background: var(--white); color: var(--ink); }
 :root[data-color-mode="dark"] .icon-button:hover,
 :root[data-color-mode="dark"] .new-check,
-:root[data-color-mode="dark"] .nav-item:hover,
 :root[data-color-mode="dark"] .nav-item.is-active,
 :root[data-color-mode="dark"] .insights-stats article,
 :root[data-color-mode="dark"] .insights-panel,
@@ -1657,6 +1663,9 @@ body.sidebar-collapsed .brand:hover .brand-mark {
   .google-auth-button:active {
     transform: none;
   }
+  .nav-item .notification-icon svg,
+  .nav-item .home-icon svg,
+  .nav-item .practice-icon svg,
   body.sidebar-collapsed .brand-mark,
   body.sidebar-collapsed .new-check-icon,
   body.sidebar-collapsed .nav-item .notification-icon svg,
@@ -1666,6 +1675,9 @@ body.sidebar-collapsed .brand:hover .brand-mark {
   body.sidebar-collapsed .signed-out-mark {
     transition: color .01ms linear, filter .01ms linear;
   }
+  .nav-item:hover .notification-icon svg,
+  .nav-item:hover .home-icon svg,
+  .nav-item:hover .practice-icon svg,
   body.sidebar-collapsed .brand:hover .brand-mark,
   body.sidebar-collapsed .new-check:hover .new-check-icon,
   body.sidebar-collapsed .nav-item:hover .notification-icon svg,
