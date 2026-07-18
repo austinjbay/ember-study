@@ -4166,6 +4166,9 @@ function renderAdaptiveLoggedInHome(vm) {
       </header>
       ${renderHomeInteractionPrototype(vm)}
       <div class="reading-world-layout" aria-label="Logged-in reading home">
+        <section class="reading-world-zone journey-zone" aria-label="Reading journey">
+          ${zone("progress-over-time")}
+        </section>
         <section class="reading-world-zone skill-progression-zone" aria-label="Skill progression">
           ${zone("skill-development")}
         </section>
@@ -4181,9 +4184,6 @@ function renderAdaptiveLoggedInHome(vm) {
         </section>
         <section class="reading-world-zone practice-zone" aria-label="Today’s practice">
           ${zone("today-practice")}
-        </section>
-        <section class="reading-world-zone journey-zone" aria-label="Reading journey">
-          ${zone("progress-over-time")}
         </section>
         ${supportModules ? `<section class="reading-world-zone support-zone" aria-label="Additional setup">${supportModules}</section>` : ""}
       </div>
