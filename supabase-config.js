@@ -6,6 +6,6 @@
  * Never place a service_role key in this file.
  */
 window.MARGIN_SUPABASE_CONFIG = {
-  url: "https://jwjcjpjbdhchmcocmkby.supabase.co",
+  url: "https://auth.ember.study",
   anonKey: "sb_publishable_JoE4UTRkDSCmm_9Ic75iQA_3bE4On3W"
 };
