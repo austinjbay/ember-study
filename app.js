@@ -4025,6 +4025,23 @@ function renderLibraryActivityModule(vm) {
   </section>`;
 }
 
+function renderTodayPracticeModule(vm) {
+  const practice = vm.practiceState || currentPracticeSkillState();
+  const complete = Boolean(practice.completedToday);
+  return `<section class="adaptive-module today-practice-module" aria-labelledby="today-practice-title">
+    <span class="eyebrow">${complete ? "Practice complete" : "Today’s practice"}</span>
+    <h2 id="today-practice-title">${escapeHtml(practice.skill.title)}</h2>
+    <p>${complete
+      ? "Today’s practice is logged. You can review the skill, or let the next question return tomorrow."
+      : "A short exercise keeps the current reading skill active without starting a full chapter check."}</p>
+    <div class="today-practice-progress" aria-label="Skill progress">
+      <span><i style="width: ${practice.progressPercent}%"></i></span>
+      <small>${practice.successfulDays} of 3 successful days</small>
+    </div>
+    <button class="text-button" type="button" data-nav="practice">${complete ? "View practice" : "Start practice"} →</button>
+  </section>`;
+}
+
 function renderPersonalizationModule(vm) {
   if (vm.evidenceState !== "establishing") return "";
   return `<section class="adaptive-module personalization-module" aria-labelledby="personalization-title">
@@ -4055,6 +4072,7 @@ function buildHomeModules(vm) {
     homeModule("reader-diagnostic", 20, true, vm.diagnostic?.confidence, vm.diagnostic?.basis, renderDiagnosticModule(vm)),
     homeModule("memory-resurfacing", vm.evidenceState === "establishing" ? 50 : 30, true, confidenceForEvidence(vm.evidenceState), vm.memoryCandidates[0]?.reason, renderMemoryModule(vm)),
     homeModule("skill-development", 40, true, confidenceForEvidence(vm.evidenceState), vm.skillSignals[0]?.basis, renderSkillModule(vm)),
+    homeModule("today-practice", 45, true, confidenceForEvidence(vm.evidenceState), vm.practiceState?.skill?.title, renderTodayPracticeModule(vm)),
     homeModule("progress-over-time", 60, true, confidenceForEvidence(vm.evidenceState), `${vm.progress.reviews} delayed reviews`, renderProgressModule(vm)),
     homeModule("library-activity", 70, true, confidenceForEvidence(vm.evidenceState), `${vm.activeBooks.length} active books`, renderLibraryActivityModule(vm)),
     homeModule("personalization-setup", 35, vm.evidenceState === "establishing", "preview", "Optional setup while evidence is sparse.", renderPersonalizationModule(vm)),
@@ -4072,6 +4090,12 @@ function renderHomeFixtureSwitcher(activeState) {
 
 function renderAdaptiveLoggedInHome(vm) {
   const modules = buildHomeModules(vm);
+  const moduleById = new Map(modules.map(module => [module.id, module.html]));
+  const zone = id => moduleById.get(id) ? `<div class="home-module-shell" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
+  const supportModules = modules
+    .filter(module => !["skill-development", "primary-next-action", "reader-diagnostic", "library-activity", "memory-resurfacing", "today-practice", "progress-over-time"].includes(module.id))
+    .map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`)
+    .join("");
   $("#returning-home").innerHTML = `
     ${renderHomeFixtureSwitcher(state.homeFixture)}
     <div class="adaptive-home" data-evidence-state="${escapeHtml(vm.evidenceState)}">
@@ -4083,8 +4107,27 @@ function renderAdaptiveLoggedInHome(vm) {
           : "Your homepage is organized around the highest-value next step, the strongest available evidence, and the ideas worth bringing back."}</p>
       </header>
       ${renderHomeInteractionPrototype(vm)}
-      <div class="adaptive-module-stack">
-        ${modules.map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`).join("")}
+      <div class="reading-world-layout" aria-label="Logged-in reading home">
+        <section class="reading-world-zone skill-progression-zone" aria-label="Skill progression">
+          ${zone("skill-development")}
+        </section>
+        <section class="reading-world-zone mission-zone" aria-label="Mission and guide">
+          ${zone("primary-next-action")}
+          ${zone("reader-diagnostic")}
+        </section>
+        <section class="reading-world-zone library-zone" aria-label="Library">
+          ${zone("library-activity")}
+        </section>
+        <section class="reading-world-zone memory-zone" aria-label="Memory recovery">
+          ${zone("memory-resurfacing")}
+        </section>
+        <section class="reading-world-zone practice-zone" aria-label="Today’s practice">
+          ${zone("today-practice")}
+        </section>
+        <section class="reading-world-zone journey-zone" aria-label="Reading journey">
+          ${zone("progress-over-time")}
+        </section>
+        ${supportModules ? `<section class="reading-world-zone support-zone" aria-label="Additional setup">${supportModules}</section>` : ""}
       </div>
     </div>`;
 }

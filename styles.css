@@ -490,6 +490,31 @@ body.logged-out .landing-footer { display: flex; }
 .home-module-shell[data-module-id="progress-over-time"] { grid-column: 1 / -1; }
 .home-module-shell[data-module-id="memory-resurfacing"] { grid-column: span 7; }
 .home-module-shell[data-module-id="skill-development"] { grid-column: span 5; }
+.reading-world-layout { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 28px 34px; align-items: start; }
+.reading-world-zone { min-width: 0; }
+.skill-progression-zone { grid-column: 1 / -1; }
+.mission-zone { display: grid; grid-column: span 4; grid-row: span 2; gap: 24px; align-content: start; }
+.library-zone { grid-column: span 8; }
+.memory-zone { grid-column: span 4; }
+.practice-zone { grid-column: span 4; }
+.journey-zone,
+.support-zone { grid-column: 1 / -1; }
+.skill-progression-zone .adaptive-module { border-top: 1px solid var(--line-dark); background: color-mix(in srgb, var(--white), var(--paper) 40%); padding: clamp(22px, 3vw, 34px); box-shadow: 12px 12px 0 rgba(47,49,45,.06); }
+.skill-progression-zone .skill-signal-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; }
+.mission-zone .next-action-card { grid-template-columns: 1fr; gap: 18px; min-height: 0; margin: 0; padding: 26px; box-shadow: 9px 9px 0 #d8d2c7; }
+.mission-zone .next-action-card::after { display: none; }
+.mission-zone .next-action-marker { right: 22px; bottom: 18px; font-size: clamp(3.8rem, 8vw, 5.8rem); }
+.mission-zone .next-action-copy h2 { font-size: clamp(1.75rem, 3vw, 2.55rem); }
+.mission-zone .next-action-card .primary { width: 100%; }
+.mission-zone .diagnostic-module { padding: 22px; box-shadow: none; border-top: 1px solid var(--line-dark); background: transparent; }
+.mission-zone .diagnostic-module h2 { font-size: clamp(1.35rem, 2.2vw, 1.85rem); }
+.library-zone .library-activity-module { min-height: 100%; }
+.memory-zone .memory-module,
+.practice-zone .today-practice-module { min-height: 100%; }
+.today-practice-progress { display: grid; gap: 8px; margin: 16px 0 12px; }
+.today-practice-progress span { display: block; height: 5px; overflow: hidden; border-radius: 999px; background: var(--line); }
+.today-practice-progress i { display: block; height: 100%; border-radius: inherit; background: var(--green); }
+.today-practice-progress small { color: var(--muted); font-size: .7rem; }
 .adaptive-module { border-top: 1px solid var(--line-dark); padding-top: 18px; }
 .adaptive-module h2 { margin: 8px 0 11px; font-family: var(--serif); font-size: clamp(1.35rem, 2.3vw, 2.05rem); font-weight: 500; line-height: 1.16; }
 .adaptive-module p { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.65; }
@@ -2216,6 +2241,15 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .report-grid { grid-template-columns: 1fr; }
   .calibration-card { grid-template-columns: 1fr 1fr; }
   .calibration-card p { grid-column: 1 / -1; }
+  .reading-world-layout { grid-template-columns: 1fr; gap: 26px; }
+  .skill-progression-zone,
+  .mission-zone,
+  .library-zone,
+  .memory-zone,
+  .practice-zone,
+  .journey-zone,
+  .support-zone { grid-column: 1; grid-row: auto; }
+  .skill-progression-zone .skill-signal-list { grid-template-columns: 1fr; }
   .prototype-head,
   .prototype-next-object,
   .prototype-memory-card,
