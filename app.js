@@ -3973,9 +3973,8 @@ function buildSkillSignals(chapters = [], evidenceState = "establishing") {
 }
 
 function chooseMemoryCandidate(chapters = [], scheduled = []) {
-  const reviewed = chapters.filter(chapter => chapter.delayedAttempts?.length);
   const due = scheduled.find(reviewIsDue);
-  const candidate = due || reviewed[0] || chapters[0];
+  const candidate = due || scheduled[0];
   if (!candidate) return null;
   const latestReview = candidate.delayedAttempts?.at?.(-1);
   return {
@@ -3984,7 +3983,7 @@ function chooseMemoryCandidate(chapters = [], scheduled = []) {
     bookTitle: candidate.bookTitle,
     prompt: latestReview?.gapResponse ? "Before opening it: what earlier gap did you recover here?" : "Before opening it: what was the central idea?",
     preview: latestReview?.gapResponse || candidate.recall || candidate.summary || "",
-    reason: due ? "Returning now because this chapter is due for review." : latestReview ? "Resurfaced because you recovered this after a delay." : "Resurfaced from your recent reading history."
+    reason: due ? "Returning now because this chapter is due for review." : "Scheduled for a future review."
   };
 }
 
@@ -4047,7 +4046,7 @@ function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
     nextAction: buildAdaptiveNextAction({ evidenceState, entries, chapters, drafts, due, currentReading, practiceState }),
     diagnostic: buildReaderDiagnostic({ evidenceState, chapters, metrics, skillSignals }),
     skillSignals,
-    memoryCandidates: [chooseMemoryCandidate(chapters, scheduled)].filter(Boolean),
+    memoryCandidates: scheduled.length ? [chooseMemoryCandidate(chapters, scheduled)].filter(Boolean) : [],
     progress: progressSummary(chapters),
     libraryBooks,
     activeBooks: books.slice(0, 3),
@@ -4602,7 +4601,7 @@ function buildHomeModules(vm) {
     homeModule("library-carousel", 5, true, confidenceForEvidence(vm.evidenceState), `${vm.libraryBooks.length} books`, renderLibraryCarouselModule(vm)),
     homeModule("primary-next-action", 10, true, confidenceForEvidence(vm.evidenceState), vm.nextAction?.why, renderPrimaryNextActionModule(vm)),
     homeModule("reader-diagnostic", 20, true, vm.diagnostic?.confidence, vm.diagnostic?.basis, renderDiagnosticModule(vm)),
-    homeModule("memory-resurfacing", vm.evidenceState === "establishing" ? 50 : 30, true, confidenceForEvidence(vm.evidenceState), vm.memoryCandidates[0]?.reason, renderMemoryModule(vm)),
+    homeModule("memory-resurfacing", vm.evidenceState === "establishing" ? 50 : 30, vm.memoryCandidates.length > 0, confidenceForEvidence(vm.evidenceState), vm.memoryCandidates[0]?.reason, renderMemoryModule(vm)),
     homeModule("skill-development", 40, true, confidenceForEvidence(vm.evidenceState), vm.skillSignals[0]?.basis, renderSkillModule(vm)),
     homeModule("today-practice", 45, true, confidenceForEvidence(vm.evidenceState), vm.practiceState?.skill?.title, renderTodayPracticeModule(vm)),
     homeModule("progress-over-time", 60, true, confidenceForEvidence(vm.evidenceState), `${vm.progress.reviews} delayed reviews`, renderProgressModule(vm)),
@@ -4653,6 +4652,7 @@ function renderAdaptiveLoggedInHome(vm) {
   const moduleById = new Map(modules.map(module => [module.id, module.html]));
   const zone = id => moduleById.get(id) ? `<div class="home-module-shell" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const topZone = id => moduleById.get(id) ? `<div class="home-top-module" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
+  const hasMemoryResurfacing = moduleById.has("memory-resurfacing");
   const hasLibraryActivity = moduleById.has("library-activity");
   const supportModules = modules
     .filter(module => !["primary-next-action", "skill-development", "progress-over-time", "library-carousel", "memory-resurfacing", "today-practice", "reader-diagnostic"].includes(module.id))
@@ -4667,10 +4667,10 @@ function renderAdaptiveLoggedInHome(vm) {
       ${topZone("progress-over-time")}
       ${topZone("library-carousel")}
       ${renderHomeInteractionPrototype(vm)}
-      <div class="reading-world-layout${hasLibraryActivity ? " has-library-activity" : ""}" aria-label="Logged-in reading home">
-        <section class="reading-world-zone memory-zone" aria-label="Memory recovery">
+      <div class="reading-world-layout${hasLibraryActivity ? " has-library-activity" : ""}${hasMemoryResurfacing ? " has-memory-resurfacing" : ""}" aria-label="Logged-in reading home">
+        ${hasMemoryResurfacing ? `<section class="reading-world-zone memory-zone" aria-label="Memory recovery">
           ${zone("memory-resurfacing")}
-        </section>
+        </section>` : ""}
         <section class="reading-world-zone practice-zone" aria-label="Today’s practice">
           ${zone("today-practice")}
         </section>
