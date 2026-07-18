@@ -69,15 +69,6 @@ body:not(.sidebar-collapsed) .nav-item:hover .nav-item-content {
   filter: drop-shadow(0 6px 5px rgba(47,49,45,.22));
   transform: translateY(-3px) scale(1.03);
 }
-body:not(.sidebar-collapsed) .nav-item:active .nav-item-content {
-  filter: drop-shadow(0 1px 2px rgba(47,49,45,.12));
-  transform: translateY(1px) scale(.97);
-  transition-duration: 90ms;
-  transition-timing-function: cubic-bezier(.2, 0, .2, 1);
-}
-body:not(.sidebar-collapsed) .nav-item.is-rebounding .nav-item-content {
-  animation: sidebar-content-rebound .24s cubic-bezier(.2, .9, .2, 1);
-}
 .nav-item em { min-width: 21px; border-radius: 10px; background: rgba(73,101,83,.12); color: var(--green); padding: 2px 6px; font-size: .68rem; font-style: normal; text-align: center; }
 .nav-item em.is-due { background: var(--amber-soft); color: var(--amber); }
 .nav-item em.has-scheduled { background: var(--green-soft); color: var(--green); }
@@ -1665,50 +1656,9 @@ body.sidebar-collapsed .signed-out-note:hover .signed-out-mark {
   filter: drop-shadow(0 6px 5px rgba(47,49,45,.22));
   transform: translateY(-3px) scale(1.05);
 }
-body.sidebar-collapsed .nav-item:active .notification-icon svg,
-body.sidebar-collapsed .nav-item:active .home-icon svg,
-body.sidebar-collapsed .nav-item:active .practice-icon svg {
-  filter: drop-shadow(0 1px 2px rgba(47,49,45,.12));
-  transform: translateY(1px) scale(.97);
-  transition-duration: 90ms;
-  transition-timing-function: cubic-bezier(.2, 0, .2, 1);
-}
-body.sidebar-collapsed .nav-item.is-rebounding .notification-icon svg,
-body.sidebar-collapsed .nav-item.is-rebounding .home-icon svg,
-body.sidebar-collapsed .nav-item.is-rebounding .practice-icon svg {
-  animation: sidebar-icon-rebound .24s cubic-bezier(.2, .9, .2, 1);
-}
 body.sidebar-collapsed .new-check:hover .new-check-icon,
 body.sidebar-collapsed .brand:hover .brand-mark {
   color: var(--paper);
-}
-@keyframes sidebar-content-rebound {
-  0% {
-    filter: drop-shadow(0 1px 2px rgba(47,49,45,.12));
-    transform: translateY(1px) scale(.97);
-  }
-  48% {
-    filter: drop-shadow(0 7px 6px rgba(47,49,45,.2));
-    transform: translateY(-4px) scale(1.035);
-  }
-  100% {
-    filter: drop-shadow(0 6px 5px rgba(47,49,45,.22));
-    transform: translateY(-3px) scale(1.03);
-  }
-}
-@keyframes sidebar-icon-rebound {
-  0% {
-    filter: drop-shadow(0 1px 2px rgba(47,49,45,.12));
-    transform: translateY(1px) scale(.97);
-  }
-  48% {
-    filter: drop-shadow(0 7px 6px rgba(47,49,45,.2));
-    transform: translateY(-4px) scale(1.065);
-  }
-  100% {
-    filter: drop-shadow(0 6px 5px rgba(47,49,45,.22));
-    transform: translateY(-3px) scale(1.05);
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .primary,
@@ -1741,23 +1691,14 @@ body.sidebar-collapsed .brand:hover .brand-mark {
   .nav-item:hover .notification-icon svg,
   .nav-item:hover .home-icon svg,
   .nav-item:hover .practice-icon svg,
-  body:not(.sidebar-collapsed) .nav-item:active .nav-item-content,
-  body:not(.sidebar-collapsed) .nav-item.is-rebounding .nav-item-content,
   body.sidebar-collapsed .brand:hover .brand-mark,
   body.sidebar-collapsed .new-check:hover .new-check-icon,
   body.sidebar-collapsed .nav-item:hover .notification-icon svg,
   body.sidebar-collapsed .nav-item:hover .home-icon svg,
   body.sidebar-collapsed .nav-item:hover .practice-icon svg,
-  body.sidebar-collapsed .nav-item:active .notification-icon svg,
-  body.sidebar-collapsed .nav-item:active .home-icon svg,
-  body.sidebar-collapsed .nav-item:active .practice-icon svg,
-  body.sidebar-collapsed .nav-item.is-rebounding .notification-icon svg,
-  body.sidebar-collapsed .nav-item.is-rebounding .home-icon svg,
-  body.sidebar-collapsed .nav-item.is-rebounding .practice-icon svg,
   body.sidebar-collapsed .sidebar-foot button:hover .avatar,
   body.sidebar-collapsed .signed-out-note:hover .signed-out-mark {
     transform: none;
-    animation: none;
   }
 }
 body.logged-out .new-check,

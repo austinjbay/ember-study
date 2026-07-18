@@ -978,15 +978,6 @@ function setView(name) {
   if (name === "account") hydrateAccountSettings();
 }
 
-function reboundSidebarNavItem(item) {
-  if (!item || window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return;
-  item.classList.remove("is-rebounding");
-  void item.offsetWidth;
-  item.classList.add("is-rebounding");
-  clearTimeout(item.reboundTimer);
-  item.reboundTimer = setTimeout(() => item.classList.remove("is-rebounding"), 260);
-}
-
 function setStep(step) {
   state.step = Math.max(0, Math.min(5, step));
   $$(".flow-step").forEach(panel => panel.classList.toggle("is-active", Number(panel.dataset.step) === state.step));
@@ -4006,14 +3997,6 @@ document.addEventListener("click", async event => {
     const button = event.target.closest("[data-manage-review-id]");
     cancelManagedReview(button.dataset.manageReviewId);
   }
-});
-
-document.addEventListener("pointerup", event => {
-  const navItem = event.target.closest(".side-nav .nav-item");
-  if (navItem) reboundSidebarNavItem(navItem);
-});
-document.addEventListener("pointercancel", event => {
-  event.target.closest(".side-nav .nav-item")?.classList.remove("is-rebounding");
 });
 
 document.addEventListener("toggle", event => {
