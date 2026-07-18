@@ -3721,7 +3721,23 @@ function practiceReasonForGap(gap = "") {
   return "Recommended because it gives every later reading skill a stronger foundation.";
 }
 
+function firstBookNextAction(evidenceState = "establishing", why = "") {
+  return {
+    kind: "first-book",
+    label: "First step",
+    marker: "01",
+    title: "Create your first book.",
+    copy: "Start by adding the book you’re reading. Then Ember can help you review chapters from that source.",
+    text: "Create book",
+    why: why || (evidenceState === "establishing" ? "Recommended because Ember needs a book before it can organize chapter reviews." : "Recommended because there is no active reading activity."),
+    attrs: 'data-action="home-start-new-book"'
+  };
+}
+
 function buildAdaptiveNextAction({ evidenceState, entries, chapters, drafts, due, currentReading, practiceState }) {
+  if (!chapters.length) {
+    return firstBookNextAction(evidenceState);
+  }
   if (due.length) {
     const review = due[0];
     return {
@@ -3777,16 +3793,7 @@ function buildAdaptiveNextAction({ evidenceState, entries, chapters, drafts, due
         : `data-action="home-start-next-chapter" data-book-title="${escapeHtml(book?.title || latest.bookTitle || "")}" data-author-name="${escapeHtml(book?.author || latest.authorName || "")}"`
     };
   }
-  return {
-    kind: "first-book",
-    label: "First step",
-    marker: "01",
-    title: "Create your first book.",
-    copy: "Start by adding the book you’re reading. Then Ember can help you review chapters from that source.",
-    text: "Create book",
-    why: evidenceState === "establishing" ? "Recommended because Ember needs a book before it can organize chapter reviews." : "Recommended because there is no active reading activity.",
-    attrs: 'data-action="home-start-new-book"'
-  };
+  return firstBookNextAction(evidenceState);
 }
 
 function buildSkillSignals(chapters = [], evidenceState = "establishing") {
@@ -3907,7 +3914,7 @@ function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
       due: due.length,
       scheduled: scheduled.length,
       drafts: drafts.length,
-      hasReading: entries.length > 0,
+      hasReading: chapters.length > 0,
       skillTitle: practiceState?.skill?.title || skillSignals[0]?.title || "Find the central claim",
       practiceDone: Boolean(practiceState?.completedToday)
     },
@@ -3919,9 +3926,9 @@ function fixtureHomeViewModel(evidenceState) {
   const base = {
     establishing: {
       metrics: { books: 0, completedChecks: 0, completedReviews: 0, delayedReviews: 0, representedSkills: 0 },
-      nextAction: { label: "First meaningful result", marker: "01", title: "Add a chapter worth remembering.", copy: "Start with one chapter check. Ember gets smarter after your first delayed review.", text: "Add a chapter", why: "Fixture preview: no personal evidence yet.", attrs: 'data-action="home-start-new-book"' },
-      diagnostic: { confidence: "preview", title: "Ember is ready to learn how you read.", copy: "After a few checks, this space will show what you recall reliably and what needs another pass.", basis: "Example insight only." },
-      skillSignals: [{ title: "No personal reading signal yet.", copy: "Complete one check to begin the diagnostic profile.", basis: "Fixture preview.", confidence: "preview" }],
+      nextAction: firstBookNextAction("establishing", "Fixture preview: no book or chapter evidence yet."),
+      diagnostic: { confidence: "preview", title: "Ember is ready to organize your first book.", copy: "Create a book first, then add chapters as you read so Ember can build reviews around that source.", basis: "Example insight only." },
+      skillSignals: [{ title: "No personal reading signal yet.", copy: "Create a book and complete one chapter check to begin the diagnostic profile.", basis: "Fixture preview.", confidence: "preview" }],
       memoryCandidates: [],
       progress: { chapters: 0, reviews: 0, recovered: 0, practiced: 0, durableLevel: "Not enough evidence" },
       libraryBooks: [],
