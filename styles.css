@@ -968,7 +968,23 @@ label > span i { margin-left: 5px; color: var(--faint); font-size: .62rem; font-
 input, textarea, select { width: 100%; border: 1px solid var(--line-dark); border-radius: 3px; background: #fff; color: var(--ink); padding: 13px 14px; }
 input::placeholder, textarea::placeholder { color: #aaa89f; }
 textarea { resize: vertical; line-height: 1.6; }
-.source-card { display: grid; gap: 21px; }
+.source-card { display: grid; gap: 30px; }
+.intake-progress { display: flex; align-items: center; gap: 8px; margin: 0; border-bottom: 1px solid var(--line); padding: 0 0 18px; list-style: none; }
+.intake-progress li { display: flex; align-items: center; gap: 7px; color: var(--faint); font-size: var(--font-small); font-weight: 800; }
+.intake-progress li:not(:last-child)::after { content: ""; width: 34px; height: 1px; margin-left: 4px; background: var(--line-dark); }
+.intake-progress span { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--line-dark); border-radius: 50%; font-size: .68rem; }
+.intake-progress li.is-active { color: var(--ink); }
+.intake-progress li.is-active span { border-color: var(--green); background: var(--green); color: var(--white); }
+.intake-progress li.is-complete { color: var(--green); }
+.intake-progress li.is-complete span { border-color: var(--green); background: var(--green-soft); color: var(--green); }
+.guided-intake-section { display: grid; gap: 18px; }
+.guided-intake-section[hidden] { display: none; }
+.guided-intake-section + .guided-intake-section { border-top: 1px solid var(--line); padding-top: 28px; }
+.guided-intake-heading { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; }
+.guided-intake-heading > span { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--green); border-radius: 50%; color: var(--green); font-size: .78rem; font-weight: 850; }
+.guided-intake-heading h2 { margin: 0; font-family: var(--serif); font-size: 1.22rem; font-weight: 500; }
+.guided-intake-heading p { max-width: 620px; margin: 4px 0 0; color: var(--muted); font-size: var(--font-small); line-height: 1.55; }
+.intake-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
 .book-path { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 0; border: 0; padding: 0; }
 .book-path legend { grid-column: 1 / -1; margin-bottom: 1px; }
 .book-path label { cursor: pointer; }
@@ -978,6 +994,10 @@ textarea { resize: vertical; line-height: 1.6; }
 .book-path label > span small { margin-top: 5px; color: var(--muted); font-size: .65rem; font-weight: 500; }
 .book-path input:checked + span { border-color: var(--green); background: var(--green-soft); box-shadow: inset 0 0 0 1px var(--green); }
 .book-path input:disabled + span { cursor: not-allowed; opacity: .48; }
+.book-details { border-top: 1px solid var(--line); padding-top: 3px; }
+.book-details[hidden] { display: none; }
+.book-details summary { width: fit-content; color: var(--green); cursor: pointer; font-size: var(--font-small); font-weight: 850; }
+.book-details-body { display: grid; gap: 17px; padding-top: 16px; }
 .book-path-panel[hidden] { display: none; }
 .book-path-panel > p { margin: 7px 0 0; color: var(--muted); font-size: .66rem; }
 .chapter-total-field > small { color: var(--muted); font-size: .64rem; }
@@ -1970,6 +1990,10 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .progress li span { width: 21px; height: 21px; }
   .flow-step { padding-top: 42px; }
   .field-grid, .book-path, .source-kind, .confidence-options, .evaluation-grid, .completion-summary, .schedule-card { grid-template-columns: 1fr; }
+  .intake-progress { align-items: flex-start; flex-direction: column; }
+  .intake-progress li:not(:last-child)::after { display: none; }
+  .intake-actions { align-items: stretch; flex-direction: column-reverse; }
+  .intake-actions button { width: 100%; }
   .confidence-options { grid-template-columns: 1fr 1fr; }
   .confidence-options label > span { min-height: 125px; }
   .band-card { position: static; }

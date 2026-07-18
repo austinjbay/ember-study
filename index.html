@@ -854,43 +854,23 @@
                 <p>Add the chapter and enough source material for feedback to stay anchored to the text.</p>
               </div>
 
-              <div class="paper-card source-card">
-                <fieldset class="book-path">
-                  <legend>Where should this chapter live?</legend>
-                  <label>
-                    <input type="radio" name="bookPath" value="existing">
-                    <span><strong>Existing book</strong><small>Add another chapter to your library</small></span>
-                  </label>
-                  <label>
-                    <input type="radio" name="bookPath" value="new">
-                    <span><strong>New book</strong><small>Create a book and its first chapter</small></span>
-                  </label>
-                </fieldset>
+              <div class="paper-card source-card" data-intake-shell>
+                <ol class="intake-progress" aria-label="Reading intake progress">
+                  <li class="is-active" data-intake-progress="0"><span>1</span> Name it</li>
+                  <li data-intake-progress="1"><span>2</span> Add context</li>
+                  <li data-intake-progress="2"><span>3</span> Add source</li>
+                </ol>
 
-                <div class="book-path-panel" id="existing-book-panel" hidden>
-                  <label>
-                    <span>Choose a book <b>Required</b></span>
-                    <select id="existing-book" name="existingBook" required aria-describedby="existing-book-help">
-                      <option value="">Select from your library</option>
-                    </select>
-                  </label>
-                  <p id="existing-book-help">The author and book title will be carried forward automatically.</p>
-                </div>
-
-                <div class="book-path-panel" id="new-book-panel" hidden>
-                  <div class="field-grid">
-                    <label><span>Book or source title <b>Required</b></span><input id="book-title" name="bookTitle" placeholder="e.g. Deep Work or The Art of Noticing" autocomplete="off" required></label>
-                    <label><span>Author <i>Optional</i></span><input id="author-name" name="authorName" placeholder="e.g. Cal Newport" autocomplete="off"></label>
+                <section class="guided-intake-section is-active" data-intake-panel="0">
+                  <div class="guided-intake-heading">
+                    <span>1</span>
+                    <div>
+                      <h2>Name the reading.</h2>
+                      <p>Give Ember just enough to know what you are trying to recall.</p>
+                    </div>
                   </div>
-                </div>
-                <label class="chapter-total-field">
-                  <span>Total chapters in this book <i>Optional</i></span>
-                  <input id="book-total-chapters" name="bookTotalChapters" type="number" min="1" step="1" placeholder="e.g. 12">
-                  <small>Used only to show your progress through the book.</small>
-                </label>
-                <label><span>Chapter or section <b>Required</b></span><input id="chapter-title" name="chapterTitle" placeholder="e.g. Deep Work Is Valuable" autocomplete="off" required></label>
-                <div class="field-grid reading-context-grid">
-                  <label>
+                  <div class="field-grid reading-context-grid">
+                    <label>
                     <span>Reading format <i>Optional</i></span>
                     <select id="reading-type" name="readingType">
                       <option value="book">Book</option>
@@ -901,36 +881,109 @@
                       <option value="webpage">Web page</option>
                       <option value="other">Something else</option>
                     </select>
-                  </label>
-                  <label>
-                    <span>Source URL <i>Optional</i></span>
-                    <input id="source-url" name="sourceUrl" type="url" placeholder="https://example.com/article" autocomplete="url">
-                  </label>
-                </div>
-                <fieldset class="source-kind">
-                  <legend>What are you adding?</legend>
-                  <label><input type="radio" name="sourceKind" value="full" checked><span><strong>Chapter text</strong><small>Best evidence</small></span></label>
-                  <label><input type="radio" name="sourceKind" value="notes"><span><strong>Detailed notes</strong><small>Limited feedback</small></span></label>
-                  <label><input type="radio" name="sourceKind" value="highlights"><span><strong>Highlights</strong><small>Partial view</small></span></label>
-                  <label><input type="radio" name="sourceKind" value="pdf"><span><strong>PDF upload</strong><small>Text-based files</small></span></label>
-                </fieldset>
-                <div class="pdf-source" id="pdf-source" hidden>
-                  <label class="pdf-upload" for="pdf-file">
-                    <input id="pdf-file" type="file" accept="application/pdf,.pdf">
-                    <span class="pdf-upload-icon" aria-hidden="true">PDF</span>
-                    <span><strong id="pdf-upload-title">Choose a PDF</strong><small id="pdf-upload-copy">Text-based PDF · up to 10 MB</small></span>
-                  </label>
-                  <button class="text-button pdf-remove" type="button" data-action="remove-pdf" hidden>Remove PDF</button>
-                </div>
-                <label class="source-input">
-                  <span>Source material <b>Required</b></span>
-                  <textarea id="source-text" name="sourceText" rows="10" placeholder="Paste the chapter, excerpt, or detailed notes here." required aria-describedby="source-status"></textarea>
-                  <small id="source-status">Your text stays private in this prototype.</small>
-                </label>
-              </div>
+                    </label>
+                    <label>
+                      <span id="book-title-label">Book title <b>Required</b></span>
+                      <input id="book-title" name="bookTitle" placeholder="e.g. Deep Work" autocomplete="off" required>
+                    </label>
+                  </div>
+                  <div class="field-grid">
+                    <label><span id="chapter-title-label">Chapter or section <b>Required</b></span><input id="chapter-title" name="chapterTitle" placeholder="e.g. Deep Work Is Valuable" autocomplete="off" required></label>
+                  </div>
+                  <div class="intake-actions">
+                    <button class="primary" type="button" data-action="next-intake">Add context <span>→</span></button>
+                  </div>
+                </section>
 
-              <div class="flow-actions source-actions">
-                <button class="primary" type="button" data-action="begin-recall">Continue <span>→</span></button>
+                <section class="guided-intake-section" data-intake-panel="1" hidden>
+                  <div class="guided-intake-heading">
+                    <span>2</span>
+                    <div>
+                      <h2>Add useful context.</h2>
+                      <p>These details help organize your library, but you can skip anything that slows you down.</p>
+                    </div>
+                  </div>
+                  <div class="field-grid reading-context-grid">
+                    <label><span>Author <i>Optional</i></span><input id="author-name" name="authorName" placeholder="e.g. Cal Newport" autocomplete="off"></label>
+                    <label>
+                      <span>Source URL <i>Optional</i></span>
+                      <input id="source-url" name="sourceUrl" type="url" placeholder="https://example.com/article" autocomplete="url">
+                    </label>
+                  </div>
+                  <details class="book-details" id="book-details">
+                    <summary>Add book details</summary>
+                    <div class="book-details-body">
+                      <fieldset class="book-path" id="book-path-options">
+                        <legend>Where should this chapter live?</legend>
+                        <label>
+                          <input type="radio" name="bookPath" value="existing">
+                          <span><strong>Existing book</strong><small>Add another chapter to your library</small></span>
+                        </label>
+                        <label>
+                          <input type="radio" name="bookPath" value="new">
+                          <span><strong>New book</strong><small>Create a book and its first chapter</small></span>
+                        </label>
+                      </fieldset>
+
+                      <div class="book-path-panel" id="existing-book-panel" hidden>
+                        <label>
+                          <span>Choose a book <b>Required</b></span>
+                          <select id="existing-book" name="existingBook" required aria-describedby="existing-book-help">
+                            <option value="">Select from your library</option>
+                          </select>
+                        </label>
+                        <p id="existing-book-help">The author and book title will be carried forward automatically.</p>
+                      </div>
+
+                      <div class="book-path-panel" id="new-book-panel" hidden>
+                        <p>Use the title and author above to create a new book record.</p>
+                      </div>
+                      <label class="chapter-total-field">
+                        <span>Total chapters in this book <i>Optional</i></span>
+                        <input id="book-total-chapters" name="bookTotalChapters" type="number" min="1" step="1" placeholder="e.g. 12">
+                        <small>Used only to show your progress through the book.</small>
+                      </label>
+                    </div>
+                  </details>
+                  <div class="intake-actions">
+                    <button class="secondary" type="button" data-action="previous-intake">Back</button>
+                    <button class="primary" type="button" data-action="next-intake">Add source material <span>→</span></button>
+                  </div>
+                </section>
+
+                <section class="guided-intake-section source-material-section" data-intake-panel="2" hidden>
+                  <div class="guided-intake-heading">
+                    <span>3</span>
+                    <div>
+                      <h2>Add enough source material for feedback.</h2>
+                      <p>Full text gives Ember the clearest evidence. Notes and highlights still work, but feedback will be more limited.</p>
+                    </div>
+                  </div>
+                  <fieldset class="source-kind">
+                    <legend>What are you adding?</legend>
+                    <label><input type="radio" name="sourceKind" value="full" checked><span><strong>Chapter text</strong><small>Best evidence</small></span></label>
+                    <label><input type="radio" name="sourceKind" value="notes"><span><strong>Detailed notes</strong><small>Limited feedback</small></span></label>
+                    <label><input type="radio" name="sourceKind" value="highlights"><span><strong>Highlights</strong><small>Partial view</small></span></label>
+                    <label><input type="radio" name="sourceKind" value="pdf"><span><strong>PDF upload</strong><small>Text-based files</small></span></label>
+                  </fieldset>
+                  <div class="pdf-source" id="pdf-source" hidden>
+                    <label class="pdf-upload" for="pdf-file">
+                      <input id="pdf-file" type="file" accept="application/pdf,.pdf">
+                      <span class="pdf-upload-icon" aria-hidden="true">PDF</span>
+                      <span><strong id="pdf-upload-title">Choose a PDF</strong><small id="pdf-upload-copy">Text-based PDF · up to 10 MB</small></span>
+                    </label>
+                    <button class="text-button pdf-remove" type="button" data-action="remove-pdf" hidden>Remove PDF</button>
+                  </div>
+                  <label class="source-input">
+                    <span>Source material <b>Required</b></span>
+                    <textarea id="source-text" name="sourceText" rows="10" placeholder="Paste the chapter, excerpt, or detailed notes here." required aria-describedby="source-status"></textarea>
+                    <small id="source-status">Your text stays private in this prototype.</small>
+                  </label>
+                  <div class="intake-actions">
+                    <button class="secondary" type="button" data-action="previous-intake">Back</button>
+                    <button class="primary" type="button" data-action="begin-recall">Begin recall <span>→</span></button>
+                  </div>
+                </section>
               </div>
             </section>
 

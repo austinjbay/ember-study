@@ -130,6 +130,7 @@ const COLOR_PALETTES = {
 const state = {
   view: "home",
   step: 0,
+  intakeStep: 0,
   currentId: null,
   evaluation: null,
   repairResolved: false,
@@ -919,6 +920,7 @@ function setValues(values = {}) {
   $("#chapter-title").value = values.chapterTitle || "";
   if ($("#reading-type")) $("#reading-type").value = values.readingType || "book";
   if ($("#source-url")) $("#source-url").value = values.sourceUrl || "";
+  syncReadingType();
   $("#source-text").value = values.sourceText || "";
   setPdfStatus(values.pdfName || "", values.pdfSize || 0, Boolean(values.pdfName));
   $("#recall").value = values.recall || "";
@@ -961,18 +963,20 @@ function renderBookOptions(preferredTitle = "", preferredAuthor = "") {
   state.availableBooks.map((book, index) => `<option value="${index}">${escapeHtml(book.title)}${book.author ? ` by ${escapeHtml(book.author)}` : ""} · ${book.completedChapters}${book.totalChapters ? ` of ${book.totalChapters}` : ""} completed</option>`).join("");
   const existingRadio = $('[name="bookPath"][value="existing"]');
   existingRadio.disabled = state.availableBooks.length === 0;
+  existingRadio.closest("label").hidden = state.availableBooks.length === 0;
 
   const preferredIndex = state.availableBooks.findIndex(book => book.title === preferredTitle && book.author === (preferredAuthor || ""));
   if (preferredIndex >= 0) {
     $("#existing-book").value = String(preferredIndex);
     existingRadio.checked = true;
+    $("#book-details").open = true;
   } else if (state.availableBooks.length) {
     existingRadio.checked = true;
     $("#existing-book").value = "0";
   } else {
     $('[name="bookPath"][value="new"]').checked = true;
   }
-  syncBookPath();
+  syncReadingType();
 }
 
 function syncBookPath() {
@@ -990,13 +994,75 @@ function syncBookPath() {
   }
 }
 
+function syncReadingType() {
+  const type = $("#reading-type")?.value || "book";
+  const isBook = type === "book";
+  const typeNames = {
+    article: "Article",
+    essay: "Essay",
+    paper: "Paper",
+    newsletter: "Newsletter",
+    webpage: "Web page",
+    other: "Source"
+  };
+  const sourceName = typeNames[type] || "Source";
+  $("#book-title-label").innerHTML = isBook ? 'Book title <b>Required</b>' : `${sourceName} title <b>Required</b>`;
+  $("#book-title").placeholder = isBook ? "e.g. Deep Work" : "e.g. The Art of Noticing";
+  $("#chapter-title-label").innerHTML = isBook ? 'Chapter or section <b>Required</b>' : 'Section or focus <b>Required</b>';
+  $("#chapter-title").placeholder = isBook ? "e.g. Deep Work Is Valuable" : "e.g. Main argument, introduction, or section title";
+  $("#book-details").hidden = !isBook;
+  if (!isBook) {
+    $('[name="bookPath"][value="new"]').checked = true;
+    $("#book-total-chapters").value = "";
+  }
+  syncBookPath();
+}
+
+function setIntakeStep(step, { focus = true } = {}) {
+  state.intakeStep = Math.max(0, Math.min(2, Number(step) || 0));
+  $$("[data-intake-panel]").forEach(panel => {
+    const active = Number(panel.dataset.intakePanel) === state.intakeStep;
+    panel.classList.toggle("is-active", active);
+    panel.hidden = !active;
+  });
+  $$("[data-intake-progress]").forEach(item => {
+    const index = Number(item.dataset.intakeProgress);
+    item.classList.toggle("is-active", index === state.intakeStep);
+    item.classList.toggle("is-complete", index < state.intakeStep);
+  });
+  if (!focus) return;
+  const focusTargets = ["#reading-type", "#author-name", "#source-text"];
+  setTimeout(() => $(focusTargets[state.intakeStep])?.focus(), 80);
+}
+
+function validateIntakeStep() {
+  const values = getValues();
+  ["#book-title", "#chapter-title", "#source-url"].forEach(selector => $(selector)?.removeAttribute("aria-invalid"));
+  if (state.intakeStep === 0 && (!values.bookTitle || !values.chapterTitle)) {
+    const isBook = values.readingType === "book";
+    toast(`Add a ${isBook ? "book" : "source"} title and ${isBook ? "chapter" : "section"} first.`);
+    const field = !values.bookTitle ? $("#book-title") : $("#chapter-title");
+    field.setAttribute("aria-invalid", "true");
+    field.focus();
+    return false;
+  }
+  if (state.intakeStep === 1 && values.sourceUrl && !safeHttpUrl(values.sourceUrl)) {
+    toast("Add a valid source URL beginning with http or https, or leave it blank.");
+    $("#source-url").setAttribute("aria-invalid", "true");
+    $("#source-url").focus();
+    return false;
+  }
+  return true;
+}
+
 function saveDraft() {
   if (!isLoggedIn()) return;
   const values = getValues();
   localStorage.setItem(DRAFT_KEY, JSON.stringify({
     ...values,
     id: state.currentId,
-    draftStep: state.step
+    draftStep: state.step,
+    draftIntakeStep: state.intakeStep
   }));
   autosaveVisibleDraft(values);
 }
@@ -1014,6 +1080,7 @@ function restoreSavedDraft() {
       state.currentId = draft.id || null;
       renderBookOptions(draft.bookTitle, draft.authorName);
       setValues(draft);
+      setIntakeStep(draft.draftIntakeStep || 0, { focus: false });
       return true;
     }
   } catch {
@@ -1203,6 +1270,7 @@ function startNew(prefill = null) {
   state.currentId = null;
   state.evaluation = null;
   state.repairResolved = false;
+  state.intakeStep = 0;
   $("#check-form").reset();
   renderBookOptions(prefill?.bookTitle, prefill?.authorName);
   const bookPath = prefill?.bookPath || (prefill?.bookTitle && state.availableBooks.length ? "existing" : "new");
@@ -1211,6 +1279,7 @@ function startNew(prefill = null) {
     renderBookOptions(prefill.bookTitle, prefill.authorName);
   }
   localStorage.removeItem(DRAFT_KEY);
+  setIntakeStep(0, { focus: false });
   setStep(0);
   setView("flow");
   setTimeout(() => {
@@ -1323,7 +1392,7 @@ function validateSource() {
     return false;
   }
   if (!values.bookTitle || !values.chapterTitle || !values.sourceText) {
-    toast("Add a book title, chapter, and source material first.");
+    toast(`Add a ${values.readingType === "book" ? "book" : "source"} title, ${values.readingType === "book" ? "chapter" : "section"}, and source material first.`);
     const field = !values.bookTitle ? $("#book-title") : !values.chapterTitle ? $("#chapter-title") : $("#source-text");
     field.setAttribute("aria-invalid", "true");
     field.focus();
@@ -4246,11 +4315,23 @@ document.addEventListener("click", async event => {
 
   const action = event.target.closest("[data-action]")?.dataset.action;
   if (!action) return;
+  if (action === "next-intake") {
+    if (!validateIntakeStep()) return;
+    setIntakeStep(state.intakeStep + 1);
+    saveDraft();
+  }
+  if (action === "previous-intake") {
+    setIntakeStep(state.intakeStep - 1);
+    saveDraft();
+  }
   if (action === "begin-recall" && validateSource()) {
     setStep(1);
     setTimeout(() => $("#recall").focus(), 100);
   }
-  if (action === "back-source") setStep(0);
+  if (action === "back-source") {
+    setStep(0);
+    setIntakeStep(2, { focus: false });
+  }
   if (action === "start-landing-check") startNew();
   if (action === "remove-pdf") removePdf();
   if (action === "reveal-source") {
@@ -4536,6 +4617,10 @@ $("#check-form").addEventListener("input", event => {
 });
 $("#check-form").addEventListener("change", event => {
   event.target?.removeAttribute?.("aria-invalid");
+  saveDraft();
+});
+$("#reading-type")?.addEventListener("change", () => {
+  syncReadingType();
   saveDraft();
 });
 $$('[name="bookPath"]').forEach(input => input.addEventListener("change", () => {
