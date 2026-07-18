@@ -7,6 +7,8 @@ const BOOK_ORDER_KEY = "margin-book-order-v1";
 const PRACTICE_KEY = "margin-practice-v1";
 const PROFILE_KEY = "margin-profile-v1";
 const FOCUS_BOOK_KEY = "margin-focus-book-v1";
+const LOGIN_PROMPT_KEY = "ember-login-prompt-index";
+const SESSION_PROMPT_KEY = "ember-session-login-prompt";
 const DEFAULT_COLOR_THEME = "moss-paper";
 const DEFAULT_COLOR_MODE = "light";
 
@@ -379,8 +381,8 @@ function renderAuthState() {
   setSidebarCollapsed(!loggedIn);
   updateProfileUI();
   if (loggedIn) {
-    $("#onboarding-title").innerHTML = `<span data-local-greeting>${localGreeting()}</span><br><em>What stayed with you?</em>`;
-    $("#onboarding-copy").textContent = "Turn the chapter you just finished into something you can explain, question, and use.";
+    $("#onboarding-title").innerHTML = `<span data-local-greeting>${localGreeting()}</span><br><em data-login-prompt>${activeLoggedInPrompt()}</em>`;
+    $("#onboarding-copy").textContent = "Add the reading you want to understand well enough to explain, question, and use.";
     $("#hero-start-label").textContent = "Start a chapter check";
     $("#hero-reassurance").textContent = "No perfect summary required. Start with what you remember.";
   } else {
@@ -397,6 +399,7 @@ function renderAuthState() {
 function setLoggedIn(loggedIn) {
   localStorage.setItem(AUTH_KEY, String(loggedIn));
   if (!loggedIn) {
+    sessionStorage.removeItem(SESSION_PROMPT_KEY);
     state.currentId = null;
     state.reviewId = null;
     setView("home");
@@ -728,6 +731,26 @@ function localGreeting(date = new Date()) {
   if (hour >= 5 && hour < 12) return "Good morning.";
   if (hour >= 12 && hour < 17) return "Good afternoon.";
   return "Good evening.";
+}
+
+const loggedInReadingPrompts = [
+  "What are you reading today?",
+  "What chapter is worth keeping?",
+  "What idea should Ember help you hold onto?",
+  "What did today’s reading ask you to notice?",
+  "Which page deserves a second life?",
+  "What are you trying to understand next?"
+];
+
+function activeLoggedInPrompt() {
+  const sessionPrompt = sessionStorage.getItem(SESSION_PROMPT_KEY);
+  if (sessionPrompt) return sessionPrompt;
+  const index = Number.parseInt(localStorage.getItem(LOGIN_PROMPT_KEY) || "0", 10);
+  const safeIndex = Number.isFinite(index) ? index : 0;
+  const prompt = loggedInReadingPrompts[Math.abs(safeIndex) % loggedInReadingPrompts.length];
+  localStorage.setItem(LOGIN_PROMPT_KEY, String(safeIndex + 1));
+  sessionStorage.setItem(SESSION_PROMPT_KEY, prompt);
+  return prompt;
 }
 
 function topTerms(text, limit = 14) {
