@@ -146,6 +146,10 @@ select[aria-invalid="true"] {
 .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: flex-end; min-height: 54px; border-bottom: 1px solid var(--line); background: rgba(244,241,234,.91); padding: 8px clamp(24px, 4vw, 62px); backdrop-filter: blur(12px); }
 .eyebrow { color: var(--green); font-size: .66rem; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
 .top-actions { display: flex; align-items: center; gap: 18px; }
+.mobile-profile-actions { display: none; position: relative; margin-left: auto; }
+.mobile-profile-button { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; padding: 0; }
+.mobile-profile-button .avatar { width: 32px; height: 32px; }
+.mobile-profile-menu { position: absolute; right: 0; top: calc(100% + 10px); bottom: auto; }
 .marketing-nav { display: none; align-items: center; gap: 3px; margin-right: auto; }
 .marketing-nav a { display: inline-flex; align-items: center; min-height: 34px; border: 0; border-radius: 4px; background: transparent; color: var(--muted); padding: 0 9px; font-size: .68rem; font-weight: 700; text-decoration: none; }
 .marketing-nav a:hover, .marketing-nav a.is-active { background: rgba(255,255,255,.62); color: var(--ink); }
@@ -1915,8 +1919,8 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .mobile-menu { display: none; }
   body.logged-out .marketing-nav { display: none; }
   body.logged-out .marketing-mobile-menu { display: none !important; }
-  body.logged-out .mobile-top-logo { display: flex; }
-  body.logged-out .mobile-top-logo span:not(.brand-mark) { display: none; }
+  .mobile-top-logo { display: flex; }
+  .mobile-top-logo span:not(.brand-mark) { display: none; }
   body.logged-out main { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
   body.logged-out .marketing-bottom-nav {
     position: fixed;
@@ -1955,8 +1959,12 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
     outline: 2px solid var(--green);
     outline-offset: 3px;
   }
-  body:not(.logged-out) .topbar { display: none; }
-  body:not(.logged-out) main { min-height: 100vh; padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+  body:not(.logged-out) .topbar {
+    display: flex;
+    justify-content: space-between;
+  }
+  body:not(.logged-out) .mobile-profile-actions { display: block; }
+  body:not(.logged-out) main { min-height: calc(100vh - 54px); padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
   body:not(.logged-out) .mobile-bottom-nav {
     position: fixed;
     right: 12px;

@@ -330,12 +330,15 @@ function updateProfileUI() {
   const email = currentUserEmail();
   const label = name || "Reader profile";
   renderProfileAvatar($("#profile-button .avatar"), name, email);
-  renderProfileAvatar($(".profile-menu-head .avatar"), name, email);
+  renderProfileAvatar($("#mobile-profile-button .avatar"), name, email);
+  $$(".profile-menu-head .avatar").forEach(node => renderProfileAvatar(node, name, email));
   $("#profile-button span:nth-child(2)").textContent = label;
-  const menuName = $(".profile-menu-head strong");
-  const menuEmail = $(".profile-menu-head small");
-  if (menuName) menuName.textContent = label;
-  if (menuEmail) menuEmail.textContent = email || "Prototype account";
+  $$(".profile-menu-head strong").forEach(node => {
+    node.textContent = label;
+  });
+  $$(".profile-menu-head small").forEach(node => {
+    node.textContent = email || "Prototype account";
+  });
 }
 
 function setSidebarCollapsed(collapsed) {
@@ -1283,8 +1286,7 @@ function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
   $$("[data-marketing-nav]").forEach(item => item.classList.toggle("is-active", item.dataset.marketingNav === name));
   document.body.classList.remove("mobile-nav-open");
   $("#marketing-mobile-menu")?.removeAttribute("open");
-  $("#profile-menu").hidden = true;
-  $("#profile-button").setAttribute("aria-expanded", "false");
+  closeProfileMenu();
   if (updateUrl && (MARKETING_ROUTES[name] || name === "home")) syncUrlForView(name, replaceUrl ? "replace" : "push");
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (name === "home" || name === "reviews") renderDashboard();
@@ -1305,13 +1307,19 @@ function setStep(step) {
 }
 
 function closeProfileMenu({ returnFocus = false } = {}) {
-  const menu = $("#profile-menu");
-  const button = $("#profile-button");
-  if (!menu || !button) return;
-  const wasOpen = !menu.hidden;
-  menu.hidden = true;
-  button.setAttribute("aria-expanded", "false");
-  if (returnFocus && wasOpen) button.focus();
+  const pairs = [
+    [$("#profile-menu"), $("#profile-button")],
+    [$("#mobile-profile-menu"), $("#mobile-profile-button")]
+  ];
+  let focusTarget = null;
+  pairs.forEach(([menu, button]) => {
+    if (!menu || !button) return;
+    const wasOpen = !menu.hidden;
+    menu.hidden = true;
+    button.setAttribute("aria-expanded", "false");
+    if (returnFocus && wasOpen && !focusTarget) focusTarget = button;
+  });
+  focusTarget?.focus();
 }
 
 function resetAnalysisTransition() {
@@ -4649,18 +4657,29 @@ $("#mobile-new-check")?.addEventListener("click", () => startNew());
 $("#profile-button").addEventListener("click", event => {
   event.stopPropagation();
   const menu = $("#profile-menu");
+  $("#mobile-profile-menu").hidden = true;
+  $("#mobile-profile-button")?.setAttribute("aria-expanded", "false");
   menu.hidden = !menu.hidden;
   $("#profile-button").setAttribute("aria-expanded", String(!menu.hidden));
 });
-$("#profile-menu").addEventListener("click", event => {
+$("#mobile-profile-button")?.addEventListener("click", event => {
+  event.stopPropagation();
+  const menu = $("#mobile-profile-menu");
+  $("#profile-menu").hidden = true;
+  $("#profile-button")?.setAttribute("aria-expanded", "false");
+  menu.hidden = !menu.hidden;
+  $("#mobile-profile-button").setAttribute("aria-expanded", String(!menu.hidden));
+});
+[$("#profile-menu"), $("#mobile-profile-menu")].forEach(menu => menu?.addEventListener("click", event => {
   event.stopPropagation();
   const nav = event.target.closest("[data-nav]");
   if (nav) {
     closeProfileMenu();
     setView(nav.dataset.nav);
   }
-});
+}));
 $("#logout-button").addEventListener("click", () => logOut());
+$("#mobile-logout-button")?.addEventListener("click", () => logOut());
 $("#login-button").addEventListener("click", () => openAuthDialog("login"));
 $("#signed-out-login")?.addEventListener("click", () => openAuthDialog("login"));
 $("#signup-button").addEventListener("click", () => openAuthDialog("signup"));

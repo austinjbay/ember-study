@@ -122,6 +122,20 @@
             <button class="primary compact" id="signup-button" type="button">Create account</button>
           </div>
         </div>
+        <div class="mobile-profile-actions">
+          <button class="mobile-profile-button" id="mobile-profile-button" type="button" title="Reader profile" aria-haspopup="menu" aria-controls="mobile-profile-menu" aria-expanded="false">
+            <span class="avatar">A</span>
+          </button>
+          <div class="profile-menu mobile-profile-menu" id="mobile-profile-menu" role="menu" hidden>
+            <div class="profile-menu-head">
+              <span class="avatar">A</span>
+              <div><strong>Reader</strong><small>reader@example.com</small></div>
+            </div>
+            <button type="button" role="menuitem">Help</button>
+            <button type="button" role="menuitem" data-nav="account">Account settings</button>
+            <button class="logout-button" id="mobile-logout-button" type="button" role="menuitem">Log out</button>
+          </div>
+        </div>
       </header>
 
       <main id="app" tabindex="-1">
