@@ -4075,7 +4075,6 @@ function renderPrimaryNextActionModule(vm) {
       <span class="eyebrow">${escapeHtml(action.label)}</span>
       <h2 id="next-action-title">${escapeHtml(action.title)}</h2>
       <p>${escapeHtml(action.copy)}</p>
-      ${renderWhy(action.why, confidenceCopy(confidenceForEvidence(vm.evidenceState)))}
     </div>
     <button class="primary" type="button" ${action.attrs}>${escapeHtml(action.text)}</button>
   </section>`;
