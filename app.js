@@ -4402,14 +4402,13 @@ function renderHomeFixtureSwitcher(activeState) {
 function renderAdaptiveHomeStateHeader(vm) {
   const today = vm.todayState || {};
   if (!today.hasReading) {
-    return `<header class="adaptive-home-state is-empty" aria-label="Start in Ember">
-      <h1>Create your first book</h1>
-      <div class="adaptive-home-state-list" aria-label="Current reading state">
-        <span>No book yet</span>
-        <span>Add a book to start chapter reviews</span>
-      </div>
-    </header>`;
+    return "";
   }
+  const hasReviewTask = today.due > 0;
+  const hasDraftTask = today.drafts > 0;
+  const hasPracticeTask = !today.practiceDone;
+  const taskCount = [hasReviewTask, hasDraftTask, hasPracticeTask].filter(Boolean).length;
+  if (taskCount <= 1) return "";
   const reviewLabel = today.due
     ? `${today.due} review${today.due === 1 ? "" : "s"} due`
     : today.scheduled
@@ -4422,9 +4421,9 @@ function renderAdaptiveHomeStateHeader(vm) {
   return `<header class="adaptive-home-state" aria-label="Today in Ember">
     <h1>Today in Ember</h1>
     <div class="adaptive-home-state-list" aria-label="Current reading state">
-      <span>${escapeHtml(reviewLabel)}</span>
-      <span>${escapeHtml(draftLabel)}</span>
-      <span>${escapeHtml(practiceLabel)}</span>
+      ${hasReviewTask ? `<span>${escapeHtml(reviewLabel)}</span>` : ""}
+      ${hasDraftTask ? `<span>${escapeHtml(draftLabel)}</span>` : ""}
+      ${hasPracticeTask ? `<span>${escapeHtml(practiceLabel)}</span>` : ""}
     </div>
   </header>`;
 }
