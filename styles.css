@@ -958,6 +958,7 @@ body.logged-out .landing-footer { display: flex; }
 .step-heading.centered > p { margin-right: auto; margin-left: auto; }
 .paper-card { border: 1px solid var(--line-dark); background: var(--white); padding: clamp(22px, 4vw, 38px); box-shadow: 8px 8px 0 #e5e0d6; }
 .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.reading-context-grid { align-items: end; }
 label { display: grid; gap: 8px; }
 label > span, legend { color: var(--ink); font-size: .72rem; font-weight: 800; }
 label > span b { margin-left: 5px; color: var(--green); font-size: .56rem; letter-spacing: .08em; text-transform: uppercase; }

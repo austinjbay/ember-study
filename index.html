@@ -893,7 +893,7 @@
 
                 <div class="book-path-panel" id="new-book-panel" hidden>
                   <div class="field-grid">
-                    <label><span>Book title <b>Required</b></span><input id="book-title" name="bookTitle" placeholder="e.g. Deep Work" autocomplete="off" required></label>
+                    <label><span>Book or source title <b>Required</b></span><input id="book-title" name="bookTitle" placeholder="e.g. Deep Work or The Art of Noticing" autocomplete="off" required></label>
                     <label><span>Author <i>Optional</i></span><input id="author-name" name="authorName" placeholder="e.g. Cal Newport" autocomplete="off"></label>
                   </div>
                 </div>
@@ -903,6 +903,24 @@
                   <small>Used only to show your progress through the book.</small>
                 </label>
                 <label><span>Chapter or section <b>Required</b></span><input id="chapter-title" name="chapterTitle" placeholder="e.g. Deep Work Is Valuable" autocomplete="off" required></label>
+                <div class="field-grid reading-context-grid">
+                  <label>
+                    <span>Reading format <i>Optional</i></span>
+                    <select id="reading-type" name="readingType">
+                      <option value="book">Book</option>
+                      <option value="article">Article</option>
+                      <option value="essay">Essay</option>
+                      <option value="paper">Paper</option>
+                      <option value="newsletter">Newsletter</option>
+                      <option value="webpage">Web page</option>
+                      <option value="other">Something else</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Source URL <i>Optional</i></span>
+                    <input id="source-url" name="sourceUrl" type="url" placeholder="https://example.com/article" autocomplete="url">
+                  </label>
+                </div>
                 <fieldset class="source-kind">
                   <legend>What are you adding?</legend>
                   <label><input type="radio" name="sourceKind" value="full" checked><span><strong>Chapter text</strong><small>Best evidence</small></span></label>

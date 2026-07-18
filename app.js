@@ -661,6 +661,29 @@ function escapeHtml(value = "") {
   return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
 }
 
+function safeHttpUrl(value = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
+function readingTypeLabel(type = "book") {
+  return {
+    book: "Book",
+    article: "Article",
+    essay: "Essay",
+    paper: "Paper",
+    newsletter: "Newsletter",
+    webpage: "Web page",
+    other: "Something else"
+  }[type] || "Book";
+}
+
 function displayBand(band = "") {
   return band === "Needs repair" ? "Needs another pass" : band;
 }
@@ -875,6 +898,8 @@ function getValues() {
     authorName: $("#author-name").value.trim(),
     bookTotalChapters: $("#book-total-chapters").value,
     chapterTitle: $("#chapter-title").value.trim(),
+    readingType: $("#reading-type")?.value || "book",
+    sourceUrl: $("#source-url")?.value.trim() || "",
     sourceKind: $('[name="sourceKind"]:checked')?.value || "full",
     sourceText: $("#source-text").value.trim(),
     pdfName: $("#pdf-source").dataset.fileName || "",
@@ -891,6 +916,8 @@ function setValues(values = {}) {
   $("#author-name").value = values.authorName || "";
   $("#book-total-chapters").value = values.bookTotalChapters || "";
   $("#chapter-title").value = values.chapterTitle || "";
+  if ($("#reading-type")) $("#reading-type").value = values.readingType || "book";
+  if ($("#source-url")) $("#source-url").value = values.sourceUrl || "";
   $("#source-text").value = values.sourceText || "";
   setPdfStatus(values.pdfName || "", values.pdfSize || 0, Boolean(values.pdfName));
   $("#recall").value = values.recall || "";
@@ -1281,7 +1308,13 @@ function removePdf() {
 
 function validateSource() {
   const values = getValues();
-  ["#book-title", "#chapter-title", "#source-text", "#pdf-file"].forEach(selector => $(selector)?.removeAttribute("aria-invalid"));
+  ["#book-title", "#chapter-title", "#source-text", "#pdf-file", "#source-url"].forEach(selector => $(selector)?.removeAttribute("aria-invalid"));
+  if (values.sourceUrl && !safeHttpUrl(values.sourceUrl)) {
+    toast("Add a valid source URL beginning with http or https, or leave it blank.");
+    $("#source-url").setAttribute("aria-invalid", "true");
+    $("#source-url").focus();
+    return false;
+  }
   if (values.sourceKind === "pdf" && !values.pdfName) {
     toast("Attach a PDF before beginning recall.");
     $("#pdf-file").setAttribute("aria-invalid", "true");
@@ -3467,8 +3500,13 @@ function renderSavedChapterFeedback(chapter) {
 
 function renderSavedChapterEntry(chapter) {
   const latest = chapter.delayedAttempts?.at(-1);
+  const sourceUrl = safeHttpUrl(chapter.sourceUrl);
   return `
     <div class="history chapter-entry-history">
+      <article class="history-card">
+        <header><h2>Reading source</h2><span class="status-tag">${escapeHtml(readingTypeLabel(chapter.readingType))}</span></header>
+        <p class="response-quote">${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceUrl)}</a>` : "No source URL saved."}</p>
+      </article>
       <article class="history-card">
         <header><h2>Your recall</h2><time>${new Date(chapter.createdAt).toLocaleDateString()}</time></header>
         <p class="response-quote">${escapeHtml(chapter.recall || "No recall response saved.")}</p>
@@ -3547,6 +3585,18 @@ function editChapter(id) {
         <span>Chapter title</span>
         <input id="edit-chapter-title" type="text" value="${escapeHtml(chapter.chapterTitle)}" required>
       </label>
+      <div class="field-grid reading-context-grid">
+        <label class="field">
+          <span>Reading format</span>
+          <select id="edit-reading-type">
+            ${["book", "article", "essay", "paper", "newsletter", "webpage", "other"].map(type => `<option value="${type}"${(chapter.readingType || "book") === type ? " selected" : ""}>${escapeHtml(readingTypeLabel(type))}</option>`).join("")}
+          </select>
+        </label>
+        <label class="field">
+          <span>Source URL</span>
+          <input id="edit-source-url" type="url" value="${escapeHtml(chapter.sourceUrl || "")}" placeholder="https://example.com/article" autocomplete="url">
+        </label>
+      </div>
       <label class="field">
         <span>Initial recall</span>
         <textarea id="edit-chapter-recall" rows="12" required>${escapeHtml(chapter.recall)}</textarea>
@@ -3579,8 +3629,16 @@ function editChapter(id) {
 function saveChapterEdit(id) {
   const title = $("#edit-chapter-title")?.value.trim();
   const recall = $("#edit-chapter-recall")?.value.trim();
+  const sourceUrl = $("#edit-source-url")?.value.trim() || "";
   if (!title || !recall) {
     toast("Add both a chapter title and your response.");
+    return;
+  }
+  $("#edit-source-url")?.removeAttribute("aria-invalid");
+  if (sourceUrl && !safeHttpUrl(sourceUrl)) {
+    $("#edit-source-url").setAttribute("aria-invalid", "true");
+    $("#edit-source-url").focus();
+    toast("Add a valid source URL beginning with http or https, or leave it blank.");
     return;
   }
   const chapters = loadChapters();
@@ -3588,6 +3646,8 @@ function saveChapterEdit(id) {
   if (index < 0) return;
   const chapter = chapters[index];
   chapter.chapterTitle = title;
+  chapter.readingType = $("#edit-reading-type")?.value || "book";
+  chapter.sourceUrl = sourceUrl;
   chapter.recall = recall;
   chapter.evaluation = evaluateResponse(chapter.sourceText, recall, chapter.sourceKind);
   chapter.repair = $("#edit-chapter-challenge")?.value.trim() || "";
@@ -4295,6 +4355,10 @@ $("#load-sample")?.addEventListener("click", () => {
 $("#check-form").addEventListener("input", event => {
   event.target?.removeAttribute?.("aria-invalid");
   updateCounts();
+  saveDraft();
+});
+$("#check-form").addEventListener("change", event => {
+  event.target?.removeAttribute?.("aria-invalid");
   saveDraft();
 });
 $$('[name="bookPath"]').forEach(input => input.addEventListener("change", () => {
