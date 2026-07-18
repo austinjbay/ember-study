@@ -290,13 +290,14 @@ main:focus { outline: 0; }
 .home-hero[hidden] { display: none; }
 .returning-home { width: min(1140px, 100%); margin: 0 auto 52px; }
 .returning-home[hidden] { display: none; }
-.next-action-card { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: clamp(24px, 5vw, 72px); min-height: 248px; overflow: hidden; margin: 0 0 34px; background: var(--ink); color: white; padding: clamp(28px, 5vw, 54px); box-shadow: 16px 16px 0 #d8d2c7; animation: homeRise .38s ease both; }
+.next-action-card { position: relative; display: grid; min-height: 248px; overflow: hidden; margin: 0 0 34px; background: var(--ink); color: white; padding: clamp(28px, 5vw, 54px); box-shadow: 16px 16px 0 #d8d2c7; animation: homeRise .38s ease both; }
 .next-action-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, rgba(255,255,255,.08), transparent 38%), repeating-linear-gradient(90deg, rgba(255,255,255,.055) 0 1px, transparent 1px 58px); pointer-events: none; }
 .next-action-card::after { content: ""; position: absolute; right: clamp(24px, 7vw, 90px); top: 50%; width: 1px; height: 72%; background: rgba(255,255,255,.18); transform: translateY(-50%); }
 .next-action-marker { position: absolute; right: clamp(30px, 6vw, 88px); bottom: clamp(20px, 4vw, 42px); color: rgba(255,255,255,.13); font-family: var(--serif); font-size: clamp(4rem, 11vw, 8.5rem); line-height: .8; pointer-events: none; }
 .next-action-copy { min-width: 0; }
 .next-action-copy .eyebrow { color: #a9c8b4; }
 .next-action-copy h2 { max-width: 760px; margin: 14px 0 14px; font-family: var(--serif); font-size: clamp(2.15rem, 5vw, 4.45rem); font-weight: 500; line-height: .98; }
+.next-action-subrow { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 620px) auto; align-items: center; gap: clamp(20px, 4vw, 56px); }
 .next-action-copy p { max-width: 620px; margin: 0; color: rgba(255,255,255,.68); font-size: .86rem; line-height: 1.65; }
 .next-action-card .primary { position: relative; z-index: 1; align-self: center; border-color: white; background: white; color: var(--ink); white-space: nowrap; box-shadow: 0 12px 30px rgba(0,0,0,.14); }
 .next-action-card .primary:hover { transform: translateY(-1px); }
@@ -2428,6 +2429,7 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .next-action-card { grid-template-columns: 1fr; min-height: 0; box-shadow: 9px 9px 0 #d8d2c7; }
   .next-action-card::after { display: none; }
   .next-action-marker { position: static; color: rgba(255,255,255,.28); font-size: 2.4rem; order: -1; }
+  .next-action-subrow { grid-template-columns: 1fr; gap: 18px; }
   .next-action-card .primary { width: 100%; }
   .adaptive-home .next-action-card .primary { justify-self: end; width: auto; }
   .continue-card { grid-template-columns: 1fr; align-items: stretch; }
