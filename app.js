@@ -150,7 +150,9 @@ const state = {
   supabaseSession: null,
   draftRestored: false,
   authMode: "login",
-  homeFixture: ""
+  homeFixture: "",
+  emberChatMessages: [],
+  pendingEmberAssistantIndex: null
 };
 
 const sample = {
@@ -1526,15 +1528,28 @@ function setSidebarGuideStatus(title, body = "") {
 }
 
 function setSidebarChatMessages(userMessage = "", assistantMessage = "", { loading = false } = {}) {
+  if (loading) {
+    state.emberChatMessages.push({ role: "user", text: userMessage });
+    state.emberChatMessages.push({ role: "assistant", text: assistantMessage || "Thinking...", loading: true });
+    state.pendingEmberAssistantIndex = state.emberChatMessages.length - 1;
+  } else if (state.pendingEmberAssistantIndex !== null && state.emberChatMessages[state.pendingEmberAssistantIndex]) {
+    state.emberChatMessages[state.pendingEmberAssistantIndex] = { role: "assistant", text: assistantMessage || "Unable to ask Ember." };
+    state.pendingEmberAssistantIndex = null;
+  } else {
+    state.emberChatMessages.push({ role: "user", text: userMessage });
+    state.emberChatMessages.push({ role: "assistant", text: assistantMessage || "Unable to ask Ember." });
+  }
+  renderSidebarChatMessages();
+}
+
+function renderSidebarChatMessages() {
   const log = $("#sidebar-guide-log");
-  if (!log) return;
+  if (!log || !state.emberChatMessages.length) return;
   $("#ember-companion-panel")?.classList.add("has-response");
-  log.innerHTML = `<div class="ember-chat-message is-user">
-    <p>${escapeHtml(userMessage)}</p>
-  </div>
-  <div class="ember-chat-message is-assistant">
-    <p>${escapeHtml(assistantMessage || (loading ? "Thinking..." : ""))}</p>
-  </div>`;
+  log.innerHTML = state.emberChatMessages.map(message => `<div class="ember-chat-message is-${message.role}${message.loading ? " is-loading" : ""}">
+    <p>${escapeHtml(message.text)}</p>
+  </div>`).join("");
+  log.scrollTop = log.scrollHeight;
 }
 
 function buildEmberChatContext() {
@@ -1600,9 +1615,15 @@ function renderSidebarGuide() {
   companion.hidden = !isLoggedIn();
   if (!isLoggedIn()) {
     panel.hidden = true;
+    state.emberChatMessages = [];
+    state.pendingEmberAssistantIndex = null;
     return;
   }
   panel.hidden = false;
+  if (state.emberChatMessages.length) {
+    renderSidebarChatMessages();
+    return;
+  }
   panel.classList.remove("has-response");
   const summary = sidebarGuideReplyFor("next");
   $("#sidebar-guide-state").textContent = "Reading companion";
