@@ -1514,7 +1514,70 @@ function sidebarGuideReplyFor(intent = "next", rawText = "") {
 function setSidebarGuideReply(reply) {
   const log = $("#sidebar-guide-log");
   if (!log) return;
+  $("#ember-companion-panel")?.classList.add("has-response");
   log.innerHTML = `<strong>${escapeHtml(reply.title)}</strong><p>${escapeHtml(reply.body)}</p>`;
+}
+
+function setSidebarGuideStatus(title, body = "") {
+  const log = $("#sidebar-guide-log");
+  if (!log) return;
+  $("#ember-companion-panel")?.classList.add("has-response");
+  log.innerHTML = `<strong>${escapeHtml(title)}</strong>${body ? `<p>${escapeHtml(body)}</p>` : ""}`;
+}
+
+function buildEmberChatContext() {
+  const entries = ensureUpNextChapterDrafts(migrateReviewsToFsrs(loadChapters()));
+  const chapters = entries.filter(chapter => chapter.status !== "Draft");
+  const drafts = entries.filter(chapter => chapter.status === "Draft");
+  const scheduled = chapters.filter(reviewIsScheduled).sort((a, b) => new Date(a.reviewDue) - new Date(b.reviewDue));
+  const due = scheduled.filter(reviewIsDue);
+  const practice = currentPracticeSkillState();
+  const books = groupBooks(entries).slice(0, 8).map(group => ({
+    title: group.book.title,
+    author: group.book.author || "",
+    chapters: group.entries.filter(chapter => chapter.status !== "Draft").length,
+    drafts: group.entries.filter(chapter => chapter.status === "Draft").length,
+    total_chapters: group.book.totalChapters || null,
+  }));
+  const chapterSummary = chapter => ({
+    book: chapter.bookTitle || "",
+    author: chapter.authorName || "",
+    chapter: chapter.chapterTitle || "",
+    status: chapter.status || "",
+    score: chapter.evaluation?.band || chapter.evaluation?.gradingResult?.overall_score || "",
+    gap: chapter.evaluation?.gapType || chapter.evaluation?.gap || "",
+    updated_at: chapter.updatedAt || chapter.createdAt || "",
+  });
+  return {
+    active_skill: practice?.skill?.title || "",
+    books,
+    drafts: drafts.slice(0, 4).map(chapterSummary),
+    due_reviews: due.slice(0, 6).map(chapter => ({ ...chapterSummary(chapter), due_at: chapter.reviewDue || "" })),
+    scheduled_reviews: scheduled.slice(0, 6).map(chapter => ({ ...chapterSummary(chapter), due_at: chapter.reviewDue || "" })),
+    recent_chapters: chapters
+      .slice()
+      .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0))
+      .slice(0, 6)
+      .map(chapterSummary),
+  };
+}
+
+async function askEmber(message) {
+  const client = getSupabaseClient();
+  if (!client) throw new Error("Supabase is not configured.");
+  const session = await refreshSupabaseSession(false);
+  if (!session?.access_token) throw new Error("Sign in before asking Ember.");
+  const { data, error } = await client.functions.invoke("ask-ember", {
+    body: {
+      message,
+      context: buildEmberChatContext(),
+    },
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
+  if (error) throw error;
+  return data?.answer || "I could not generate a response.";
 }
 
 function renderSidebarGuide() {
@@ -1527,8 +1590,9 @@ function renderSidebarGuide() {
     return;
   }
   panel.hidden = false;
+  panel.classList.remove("has-response");
   const summary = sidebarGuideReplyFor("next");
-  $("#sidebar-guide-state").textContent = "Reading companion · local model";
+  $("#sidebar-guide-state").textContent = "Reading companion";
   $("#sidebar-guide-log").innerHTML = `<strong>${escapeHtml(summary.title)}</strong><p>${escapeHtml(summary.body)}</p>`;
 }
 
@@ -5931,16 +5995,29 @@ $("#focus-book-select")?.addEventListener("change", event => {
 });
 $("#new-check")?.addEventListener("click", () => startNew());
 $("#mobile-new-check")?.addEventListener("click", () => startNew());
-$("#sidebar-guide-form")?.addEventListener("submit", event => {
+$("#sidebar-guide-form")?.addEventListener("submit", async event => {
   event.preventDefault();
   const input = $("#sidebar-guide-input");
+  const button = event.currentTarget.querySelector("button");
   const text = input.value.trim();
   if (!text) {
     input.focus();
     return;
   }
-  setSidebarGuideReply(sidebarGuideReplyFor("freeform", text));
-  input.value = "";
+  input.disabled = true;
+  if (button) button.disabled = true;
+  setSidebarGuideStatus("Thinking...", "Looking across your reading state.");
+  try {
+    const answer = await withTimeout(askEmber(text), 30000, "Ember took too long to respond. Try again in a moment.");
+    setSidebarGuideStatus("Ember", answer);
+    input.value = "";
+  } catch (error) {
+    setSidebarGuideStatus("Ember is not connected yet", error instanceof Error ? error.message : "Unable to ask Ember.");
+  } finally {
+    input.disabled = false;
+    if (button) button.disabled = false;
+    input.focus();
+  }
 });
 $("#ember-companion-button")?.addEventListener("click", event => {
   event.stopPropagation();

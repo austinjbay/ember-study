@@ -212,6 +212,8 @@ main:focus { outline: 0; }
 .ember-companion-panel .ember-guide-head,
 .ember-companion-panel .ember-guide-log,
 .ember-companion-panel .ember-guide-actions { display: none; }
+.ember-companion-panel.has-response { gap: 10px; border: 1px solid var(--line-dark); background: color-mix(in srgb, var(--white), var(--paper) 10%); padding: 10px; }
+.ember-companion-panel.has-response .ember-guide-log { display: block; }
 .ember-guide-head { display: grid; grid-template-columns: auto 1fr; gap: 11px; align-items: center; }
 .ember-guide-mark { display: block; width: 28px; height: 25px; border: 1px solid var(--line-dark); clip-path: polygon(13% 43%, 30% 13%, 61% 8%, 84% 27%, 91% 57%, 72% 85%, 42% 94%, 16% 75%, 7% 55%); background: radial-gradient(circle at 63% 64%, rgba(199,135,63,.7) 0 8%, rgba(105,72,47,.42) 9% 18%, transparent 19%), linear-gradient(145deg, rgba(255,253,247,.13), transparent 22%), linear-gradient(112deg, #4b4e48, #272a25 46%, #11130f 100%); box-shadow: inset 4px 4px 7px rgba(255,253,247,.08), inset -7px -7px 10px rgba(8,9,7,.5), 0 0 11px rgba(154,100,44,.18); }
 .ember-companion-panel h2 { margin: 0; font-family: var(--serif); font-size: 1.05rem; font-weight: 650; }
