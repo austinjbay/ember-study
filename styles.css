@@ -1902,8 +1902,9 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   body.mobile-nav-open .sidebar { transform: none; }
   .mobile-menu { display: none; }
   body.logged-out .marketing-nav { display: none; }
-  body.logged-out .marketing-mobile-menu { display: none; }
+  body.logged-out .marketing-mobile-menu { display: none !important; }
   body.logged-out .mobile-top-logo { display: flex; }
+  body.logged-out .mobile-top-logo span:not(.brand-mark) { display: none; }
   body.logged-out main { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
   body.logged-out .marketing-bottom-nav {
     position: fixed;
