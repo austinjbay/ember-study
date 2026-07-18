@@ -4102,7 +4102,7 @@ function renderLibraryCarouselModule(vm) {
           <small>${escapeHtml(book.author || "Unknown author")}</small>
           ${book.latestChapter ? `<p>${escapeHtml(book.latestChapter)}</p>` : ""}
           <i aria-hidden="true"><b style="width: ${progress}%"></b></i>
-          <button class="library-card-action" type="button" data-action="home-start-next-chapter" data-book-title="${escapeHtml(book.title)}" data-author-name="${escapeHtml(book.author || "")}">Add chapter →</button>
+          <button class="library-card-action" type="button" data-action="home-start-next-chapter" data-book-title="${escapeHtml(book.title)}" data-author-name="${escapeHtml(book.author || "")}">Add chapter</button>
         </article>`;
       }).join("")}
     </div>` : `<button class="library-carousel-empty" type="button" data-action="home-start-new-book">
