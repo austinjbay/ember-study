@@ -347,7 +347,7 @@ function setLoggedIn(loggedIn) {
     state.currentId = null;
     state.reviewId = null;
     setView("home");
-    toast("You’re logged out. Your prototype reading data is still here.");
+    toast("You successfully logged out.");
   } else {
     setView("home");
     toast("Welcome back. Your reading dashboard is restored.");
