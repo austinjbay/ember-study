@@ -197,7 +197,6 @@ main:focus { outline: 0; }
 .toast.is-visible { opacity: 1; transform: translateY(0); }
 .ember-companion { position: fixed; right: 26px; bottom: 24px; z-index: 46; display: grid; justify-items: stretch; width: min(390px, calc(100vw - 24px)); pointer-events: auto; }
 .ember-companion[hidden] { display: none; }
-.ember-companion.is-dragging, .ember-companion.is-resizing { user-select: none; }
 .ember-companion-minimized { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 100%; min-height: 72px; border: 1px solid color-mix(in srgb, var(--green), var(--line-dark) 46%); border-radius: 8px; background: var(--white); color: color-mix(in srgb, var(--muted), var(--paper) 38%); padding: 18px 18px 16px 24px; box-shadow: 0 12px 34px rgba(47,49,45,.09), 0 0 0 4px rgba(93,111,100,.08); font-size: .92rem; font-weight: 500; text-align: left; pointer-events: auto; }
 .ember-companion-minimized[hidden] { display: none; }
 .ember-companion-minimized span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -215,8 +214,7 @@ main:focus { outline: 0; }
 .ember-companion-icon::after { content: ""; position: absolute; left: 12px; top: 9px; width: 15px; height: 11px; clip-path: polygon(9% 60%, 32% 30%, 49% 46%, 68% 18%, 91% 48%, 68% 75%, 43% 64%, 22% 86%); background: linear-gradient(125deg, transparent 0 33%, rgba(246,210,148,.8) 34% 39%, transparent 40% 100%), linear-gradient(20deg, transparent 0 52%, rgba(199,135,63,.75) 53% 60%, transparent 61% 100%); filter: drop-shadow(0 0 5px rgba(199,135,63,.32)); opacity: .88; }
 .ember-companion-panel { display: grid; grid-template-rows: auto auto auto; gap: 10px; width: 100%; min-height: 0; max-height: calc(100vh - 24px); border: 0; border-radius: 8px; background: transparent; padding: 0; box-shadow: none; pointer-events: auto; transform-origin: bottom right; animation: emberPanelIn .2s cubic-bezier(.2,.8,.2,1) both; }
 .ember-companion-panel[hidden] { display: none; }
-.ember-guide-windowbar { display: flex; align-items: center; justify-content: flex-end; gap: 14px; min-width: 0; padding: 0 4px; cursor: grab; touch-action: none; }
-.ember-guide-windowbar:active { cursor: grabbing; }
+.ember-guide-windowbar { display: flex; align-items: center; justify-content: flex-end; gap: 14px; min-width: 0; padding: 0 4px; }
 .ember-guide-windowbar h2 { margin: 0; font-family: var(--sans); font-size: .78rem; font-weight: 850; letter-spacing: 0; }
 .ember-guide-windowbar button { display: grid; place-items: center; width: 24px; height: 24px; min-height: 24px; border: 0; border-radius: 4px; background: transparent; color: var(--muted); padding: 0; font-size: .95rem; font-weight: 850; }
 .ember-guide-windowbar button:hover { color: var(--ink); }
@@ -247,8 +245,6 @@ main:focus { outline: 0; }
 .ember-guide-form input:focus { outline: 0; }
 .ember-guide-form button { justify-self: end; display: inline-grid; place-items: center; width: auto; height: auto; min-height: 0; border: 0; border-radius: 0; background: transparent; color: var(--green); padding: 0 2px; font-size: .86rem; font-weight: 850; line-height: 1; }
 .ember-guide-form button:hover { color: var(--ink); }
-.ember-guide-resize { justify-self: stretch; height: 12px; margin: -2px 24px -8px; cursor: ns-resize; touch-action: none; position: relative; }
-.ember-guide-resize::before { content: ""; position: absolute; left: 50%; top: 4px; width: 44px; height: 2px; border-radius: 999px; background: var(--line-dark); transform: translateX(-50%); opacity: .72; }
 @keyframes emberPanelIn {
   from { opacity: 0; transform: translateY(8px) scale(.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
