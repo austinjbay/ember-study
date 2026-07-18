@@ -261,6 +261,14 @@ function updateProfileUI() {
   if (menuEmail) menuEmail.textContent = email || "Prototype account";
 }
 
+function setSidebarCollapsed(collapsed) {
+  document.body.classList.toggle("sidebar-collapsed", collapsed);
+  const toggle = $("#toggle-sidebar");
+  if (!toggle) return;
+  toggle.setAttribute("aria-label", collapsed ? "Expand library" : "Collapse library");
+  toggle.title = collapsed ? "Expand library" : "Collapse library";
+}
+
 function getSupabaseClient() {
   if (state.supabaseClient) return state.supabaseClient;
   const config = window.MARGIN_SUPABASE_CONFIG;
@@ -293,6 +301,7 @@ function renderAuthState() {
   const loggedIn = isLoggedIn();
   applyColorTheme();
   document.body.classList.toggle("logged-out", !loggedIn);
+  setSidebarCollapsed(!loggedIn);
   updateProfileUI();
   if (loggedIn) {
     $("#onboarding-title").innerHTML = `<span data-local-greeting>${localGreeting()}</span><br><em>What stayed with you?</em>`;
@@ -4167,9 +4176,8 @@ $("#existing-book").addEventListener("change", () => {
 });
 $("#check-form").addEventListener("submit", event => event.preventDefault());
 $("#toggle-sidebar").addEventListener("click", () => {
-  const collapsed = document.body.classList.toggle("sidebar-collapsed");
-  $("#toggle-sidebar").setAttribute("aria-label", collapsed ? "Expand library" : "Collapse library");
-  $("#toggle-sidebar").title = collapsed ? "Expand library" : "Collapse library";
+  if (!isLoggedIn()) return;
+  setSidebarCollapsed(!document.body.classList.contains("sidebar-collapsed"));
 });
 $("#mobile-menu").addEventListener("click", () => document.body.classList.toggle("mobile-nav-open"));
 $("#source-dialog").addEventListener("click", event => {
