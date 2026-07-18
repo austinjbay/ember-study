@@ -1490,7 +1490,7 @@ body.sidebar-collapsed { --sidebar: 68px; }
 body.sidebar-collapsed .sidebar {
   align-items: center;
   padding: 16px 10px 12px;
-  overflow: hidden;
+  overflow: visible;
 }
 body.sidebar-collapsed .brand-row {
   flex-direction: column;
@@ -1607,6 +1607,7 @@ body.sidebar-collapsed .sidebar-foot .avatar {
   font-size: .78rem;
 }
 body.sidebar-collapsed .profile-menu {
+  z-index: 80;
   right: auto;
   left: calc(100% + 10px);
   bottom: 0;
