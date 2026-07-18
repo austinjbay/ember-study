@@ -143,6 +143,7 @@ const state = {
   availableBooks: [],
   supabaseClient: null,
   supabaseSession: null,
+  draftRestored: false,
   authMode: "login"
 };
 
@@ -906,6 +907,7 @@ function syncBookPath() {
 }
 
 function saveDraft() {
+  if (!isLoggedIn()) return;
   const values = getValues();
   localStorage.setItem(DRAFT_KEY, JSON.stringify({
     ...values,
@@ -913,6 +915,29 @@ function saveDraft() {
     draftStep: state.step
   }));
   autosaveVisibleDraft(values);
+}
+
+function restoreSavedDraft({ notify = true } = {}) {
+  if (state.draftRestored) return true;
+  if (!isLoggedIn()) {
+    renderBookOptions();
+    return false;
+  }
+  try {
+    const draft = JSON.parse(localStorage.getItem(DRAFT_KEY));
+    if (draft && Object.values(draft).some(Boolean)) {
+      state.draftRestored = true;
+      state.currentId = draft.id || null;
+      renderBookOptions(draft.bookTitle, draft.authorName);
+      setValues(draft);
+      if (notify) toast("Your earlier draft is ready when you are.");
+      return true;
+    }
+  } catch {
+    localStorage.removeItem(DRAFT_KEY);
+  }
+  renderBookOptions();
+  return false;
 }
 
 function autosaveVisibleDraft(values = getValues()) {
@@ -4216,28 +4241,21 @@ $("#confidence-info-dialog").addEventListener("click", event => {
   if (event.target === $("#confidence-info-dialog")) $("#confidence-info-dialog").close();
 });
 
-renderAuthState();
-const bootSupabaseClient = getSupabaseClient();
-if (bootSupabaseClient) {
-  bootSupabaseClient.auth.onAuthStateChange((_event, session) => {
-    state.supabaseSession = session || null;
-    if (session) localStorage.setItem(AUTH_KEY, "true");
-    renderAuthState();
-  });
-  refreshSupabaseSession(true);
-}
 window.matchMedia?.("(prefers-color-scheme: dark)")?.addEventListener?.("change", handleSystemColorSchemeChange);
-try {
-  const draft = JSON.parse(localStorage.getItem(DRAFT_KEY));
-  if (draft && Object.values(draft).some(Boolean)) {
-    state.currentId = draft.id || null;
-    renderBookOptions(draft.bookTitle, draft.authorName);
-    setValues(draft);
-    toast("Your earlier draft is ready when you are.");
-  } else {
-    renderBookOptions();
+
+async function bootApp() {
+  renderAuthState();
+  const bootSupabaseClient = getSupabaseClient();
+  if (bootSupabaseClient) {
+    bootSupabaseClient.auth.onAuthStateChange((_event, session) => {
+      state.supabaseSession = session || null;
+      if (session) localStorage.setItem(AUTH_KEY, "true");
+      renderAuthState();
+      if (session) restoreSavedDraft();
+    });
+    await refreshSupabaseSession(true);
   }
-} catch {
-  localStorage.removeItem(DRAFT_KEY);
-  renderBookOptions();
+  restoreSavedDraft();
 }
+
+bootApp();
