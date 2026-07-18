@@ -2052,9 +2052,21 @@ function buildCompletion(skipped = false) {
     <div class="summary-cell"><span class="summary-label">Confidence <button class="stat-info-button" type="button" data-action="open-confidence-info" aria-label="About confidence">i</button></span><strong>${escapeHtml(values.confidence || "Not recorded")}</strong></div>
     <div class="summary-cell"><span>Challenge</span><strong>${state.repairResolved ? "Completed" : skipped ? "Skipped" : "Attempted"}</strong></div>`;
   const schedule = initialReviewSchedule(state.evaluation, values.confidence, state.repairResolved);
+  const snapshot = scheduleReasonSnapshot(schedule, "initial", {
+    evaluation: state.evaluation,
+    confidence: values.confidence,
+    inputs: initialScheduleInputs(state.evaluation, values.confidence, state.repairResolved)
+  });
   $("#adaptive-review-when").textContent = `Returns ${reviewTimingCopy(schedule.days)}`;
   $("#adaptive-review-reason").textContent = `Because ${schedule.reason}.`;
-  $("#adaptive-review-copy").textContent = "Ember uses the official FSRS scheduler with your answer quality and confidence.";
+  $("#adaptive-review-explanation").textContent = snapshot.plain;
+  $("#adaptive-review-inputs").innerHTML = `
+    <div><dt>Recall signal</dt><dd>${Math.round(snapshot.score || 0)}%</dd></div>
+    <div><dt>Confidence</dt><dd>${escapeHtml(snapshot.confidence || "Not recorded")}</dd></div>
+    <div><dt>Gap</dt><dd>${escapeHtml(snapshot.gapType ? displayGapType(snapshot.gapType) : "Review timing")}</dd></div>
+    <div><dt>Rating</dt><dd>${escapeHtml(snapshot.rating ? `FSRS ${snapshot.rating}` : "FSRS pending")}</dd></div>`;
+  $("#adaptive-review-note").textContent = snapshot.earlyReviewNote;
+  $("#adaptive-review-copy").textContent = snapshot.earlyReviewNote;
   setStep(5);
   saveDraft();
 }
@@ -2220,6 +2232,124 @@ function initialScheduleInputs(evaluation, confidence, repairResolved) {
   };
 }
 
+function scheduleReasonSnapshot(schedule, context, source = {}) {
+  const inputs = source.inputs || {};
+  const evaluation = source.evaluation || {};
+  const due = schedule?.due ? new Date(schedule.due) : source.reviewDue ? new Date(source.reviewDue) : null;
+  const scheduledAt = source.scheduledAt ? new Date(source.scheduledAt) : new Date();
+  const days = Number(schedule?.days || source.days || dateDiffInDays(scheduledAt, due || addDays(scheduledAt, 1)));
+  const score = Number(inputs.score ?? evaluationScore(evaluation || {}));
+  const confidence = inputs.confidence || source.confidence || "";
+  const gapType = inputs.gapType || evaluation?.gapType || source.gapType || "";
+  const rating = schedule?.ratingLabel || source.rating || "";
+  const reason = schedule?.reason || source.reason || fsrsReasonForRating(schedule?.rating, context);
+  return {
+    context,
+    score,
+    confidence,
+    gapType,
+    reason,
+    rating,
+    nextReviewLabel: reviewTimingCopy(days),
+    plain: scheduleExplanationSentence({ reason, days, score, confidence, gapType, context, rating }),
+    earlyReviewNote: days <= 1
+      ? "New or fragile chapters often get an early first review. After Ember sees what lasts, future reviews spread out more naturally."
+      : "Future spacing adapts after Ember sees what still comes back later.",
+    createdAt: new Date().toISOString()
+  };
+}
+
+function scheduleExplanationSentence({ reason = "", days = 1, score, confidence = "", gapType = "", context = "initial" } = {}) {
+  const timing = reviewTimingCopy(days);
+  const parts = [];
+  const normalizedReason = reason.replace(/\.$/, "");
+  if (normalizedReason) parts.push(normalizedReason);
+  if (confidence) parts.push(`you marked your confidence as ${confidence}`);
+  if (gapType) parts.push(`the main gap was ${displayGapType(gapType).toLowerCase()}`);
+  if (Number.isFinite(score) && score > 0) parts.push(`the recall signal was ${Math.round(score)}%`);
+  const basis = parts.length ? parts.join(", ") : context === "review" ? "the review response showed what still needs another pass" : "the first check showed what needs another pass";
+  return `Scheduled ${timing} because ${basis}.`;
+}
+
+function scheduleInputsForChapter(chapter = {}) {
+  return chapter.reviewSchedule?.inputs || initialScheduleInputs(chapter.evaluation || {}, chapter.confidence, chapter.repairResolved);
+}
+
+function scheduleReasonForChapter(chapter = {}) {
+  const schedule = chapter.reviewSchedule || {};
+  const inputs = scheduleInputsForChapter(chapter);
+  const due = chapter.reviewDue ? new Date(chapter.reviewDue) : null;
+  const scheduledAt = schedule.scheduledAt ? new Date(schedule.scheduledAt) : new Date(chapter.updatedAt || chapter.createdAt || Date.now());
+  const days = Number(schedule.days || (due ? dateDiffInDays(scheduledAt, due) : 1));
+  const score = Number(inputs.score ?? evaluationScore(chapter.evaluation || {}));
+  const gapType = inputs.gapType || chapter.evaluation?.gapType || "";
+  const confidence = inputs.confidence || chapter.confidence || "";
+  const reason = schedule.reasonSnapshot?.reason || schedule.reason || displayGapType(gapType || "this idea needs another pass").toLowerCase();
+  return {
+    context: schedule.reasonSnapshot?.context || (chapter.delayedAttempts?.length ? "review" : "initial"),
+    score,
+    confidence,
+    gapType,
+    reason,
+    rating: schedule.rating || "",
+    days,
+    nextReviewLabel: due ? reviewTimingCopy(days) : "later",
+    plain: schedule.reasonSnapshot?.plain || scheduleExplanationSentence({ reason, days, score, confidence, gapType, context: chapter.delayedAttempts?.length ? "review" : "initial" }),
+    earlyReviewNote: schedule.reasonSnapshot?.earlyReviewNote || (days <= 1
+      ? "New or fragile chapters often get an early first review. After Ember sees what lasts, future reviews spread out more naturally."
+      : "Future spacing adapts after Ember sees what still comes back later.")
+  };
+}
+
+function formatReviewDate(value) {
+  if (!value) return "Not scheduled";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not scheduled";
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function renderScheduleWhy(chapter, { compact = false } = {}) {
+  if (!chapter?.reviewDue) return "";
+  const reason = scheduleReasonForChapter(chapter);
+  const details = [
+    ["Recall signal", Number.isFinite(reason.score) && reason.score > 0 ? `${Math.round(reason.score)}%` : "Not scored"],
+    ["Confidence", reason.confidence || "Not recorded"],
+    ["Gap", reason.gapType ? displayGapType(reason.gapType) : "Review timing"],
+    ["Rating", reason.rating ? `FSRS ${reason.rating}` : "FSRS pending"]
+  ];
+  return `
+    <details class="schedule-why${compact ? " compact" : ""}">
+      <summary>Why this review?</summary>
+      <p>${escapeHtml(reason.plain)}</p>
+      <dl>${details.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}</dl>
+      <small>${escapeHtml(reason.earlyReviewNote)}</small>
+    </details>`;
+}
+
+function renderScheduleHistory(chapter = {}) {
+  const attempts = chapter.delayedAttempts || [];
+  const latestAttempt = attempts.at(-1);
+  const nextDate = chapter.reviewDue ? formatReviewDate(chapter.reviewDue) : "No review scheduled";
+  const initialDate = formatReviewDate(chapter.createdAt);
+  const firstReview = attempts[0]?.createdAt ? formatReviewDate(attempts[0].createdAt) : chapter.reviewDue ? `Scheduled ${nextDate}` : "Waiting for first review";
+  const nextPreview = chapter.reviewDue
+    ? attempts.length
+      ? `Next review: ${nextDate} if recall is strong`
+      : "Complete the first review to set the next interval"
+    : "Next review: none scheduled";
+  return `
+    <article class="history-card schedule-history-card">
+      <header><h2>Schedule history</h2><span class="status-tag">${escapeHtml(chapter.reviewSchedule?.manualRescheduled ? "Adjusted" : "Adaptive")}</span></header>
+      <ol>
+        <li><span>Initial check</span><strong>${escapeHtml(initialDate)}</strong></li>
+        <li><span>First review</span><strong>${escapeHtml(firstReview)}</strong></li>
+        ${latestAttempt ? `<li><span>Latest review</span><strong>${escapeHtml(formatReviewDate(latestAttempt.createdAt))}</strong></li>` : ""}
+        <li><span>Next step</span><strong>${escapeHtml(nextPreview)}</strong></li>
+      </ol>
+      ${renderScheduleWhy(chapter)}
+    </article>`;
+}
+
 function initialScheduleReason(evaluation, confidence, repairResolved, defaultReason) {
   const score = evaluationScore(evaluation || {});
   const responseLength = Number(evaluation?.responseWordCount) || 0;
@@ -2369,6 +2499,12 @@ function saveCurrent(goHome = true) {
   const previousInitialCard = previous?.status === "Draft" ? null : previous?.fsrsCard || null;
   const schedule = initialReviewSchedule(state.evaluation, values.confidence, state.repairResolved, previousInitialCard);
   const reviewDue = new Date(schedule.due || addDays(now, schedule.days)).toISOString();
+  const scheduleInputs = initialScheduleInputs(state.evaluation, values.confidence, state.repairResolved);
+  const reasonSnapshot = scheduleReasonSnapshot(schedule, "initial", {
+    evaluation: state.evaluation,
+    confidence: values.confidence,
+    inputs: scheduleInputs
+  });
   const chapter = {
     ...previous,
     id,
@@ -2386,8 +2522,9 @@ function saveCurrent(goHome = true) {
       policyVersion: SCHEDULING_POLICY_VERSION,
       days: schedule.days,
       reason: schedule.reason,
+      reasonSnapshot,
       rating: schedule.ratingLabel,
-      inputs: initialScheduleInputs(state.evaluation, values.confidence, state.repairResolved),
+      inputs: scheduleInputs,
       intervalGuardApplied: Boolean(schedule.intervalGuardApplied),
       log: schedule.log || null,
       scheduledAt: now.toISOString()
@@ -2458,6 +2595,7 @@ function migrateReviewsToFsrs(chapters) {
       shouldRebalanceInitialReviewSchedule(chapter) ? null : chapter.fsrsCard || null,
       scheduleAnchor
     );
+    const scheduleInputs = initialScheduleInputs(scheduleEvaluation, chapter.confidence, chapter.repairResolved);
     changed = true;
     return {
       ...chapter,
@@ -2476,7 +2614,13 @@ function migrateReviewsToFsrs(chapters) {
         days: schedule.days,
         reason: schedule.reason,
         rating: schedule.ratingLabel,
-        inputs: initialScheduleInputs(scheduleEvaluation, chapter.confidence, chapter.repairResolved),
+        inputs: scheduleInputs,
+        reasonSnapshot: scheduleReasonSnapshot(schedule, "initial", {
+          evaluation: scheduleEvaluation,
+          confidence: chapter.confidence,
+          inputs: scheduleInputs,
+          scheduledAt: scheduleAnchor.toISOString()
+        }),
         intervalGuardApplied: Boolean(schedule.intervalGuardApplied),
         log: schedule.log || null,
         scheduledAt: new Date().toISOString(),
@@ -2498,7 +2642,7 @@ function reviewDate(chapter) {
 function reviewScheduleDetail(chapter) {
   const schedule = chapter.reviewSchedule || {};
   const rating = schedule.rating ? `FSRS ${schedule.rating}` : "FSRS pending";
-  const reason = schedule.reason || displayGapType(chapter.evaluation?.gapType || "Chapter review");
+  const reason = schedule.reasonSnapshot?.reason || schedule.reason || displayGapType(chapter.evaluation?.gapType || "Chapter review");
   return `${rating} · ${reason}`;
 }
 
@@ -2521,7 +2665,11 @@ function renderReviewItem(chapter, manage = false) {
   return `
     <article class="review-item">
       <div class="date-tile"><span>${escapeHtml(date?.month || "No")}</span><strong>${date?.day || "date"}</strong></div>
-      <div class="item-copy"><strong>${escapeHtml(chapter.chapterTitle)}</strong><small>${escapeHtml(chapter.bookTitle)} · ${escapeHtml(reviewScheduleDetail(chapter))}</small></div>
+      <div class="item-copy">
+        <strong>${escapeHtml(chapter.chapterTitle)}</strong>
+        <small>${escapeHtml(chapter.bookTitle)} · ${escapeHtml(reviewScheduleDetail(chapter))}</small>
+        ${renderScheduleWhy(chapter, { compact: true })}
+      </div>
       ${manage ? `
         <div class="review-actions">
           <button class="item-action" type="button" data-review-id="${chapter.id}">${reviewIsDue(chapter) ? "Review now →" : "Start early →"}</button>
@@ -3397,6 +3545,15 @@ function completeReview() {
   };
   chapter.delayedAttempts = [...(chapter.delayedAttempts || []), attempt];
   const schedule = nextReviewSchedule(attempt, previousAttempt, chapter.fsrsCard || null);
+  const reviewScheduleInputs = {
+    gapBand: attempt.gapBand,
+    centralBand: attempt.band,
+    confidence: attempt.confidence,
+    responseWordCount: wordCount(attempt.response || ""),
+    gapResponseWordCount: wordCount(attempt.gapResponse || ""),
+    score: evaluationScore(result),
+    gapType: chapter.evaluation?.gapType || ""
+  };
   chapter.status = "Review scheduled";
   chapter.reviewDue = new Date(schedule.due || addDays(new Date(), schedule.days)).toISOString();
   chapter.fsrsCard = schedule.card || chapter.fsrsCard || null;
@@ -3408,13 +3565,13 @@ function completeReview() {
     days: schedule.days,
     reason: schedule.reason,
     rating: schedule.ratingLabel,
-    inputs: {
-      gapBand: attempt.gapBand,
-      centralBand: attempt.band,
+    inputs: reviewScheduleInputs,
+    reasonSnapshot: scheduleReasonSnapshot(schedule, "review", {
+      evaluation: result,
       confidence: attempt.confidence,
-      responseWordCount: wordCount(attempt.response || ""),
-      gapResponseWordCount: wordCount(attempt.gapResponse || "")
-    },
+      inputs: reviewScheduleInputs,
+      gapType: chapter.evaluation?.gapType || ""
+    }),
     log: schedule.log || null,
     scheduledAt: new Date().toISOString()
   };
@@ -3524,8 +3681,9 @@ function renderSavedChapterEntry(chapter) {
         <header><h2>Delayed review</h2><time>${new Date(latest.createdAt).toLocaleDateString()}</time></header>
         ${latest.gapResponse ? `<div class="review-result-row"><div><span>Previous gap</span><strong>${escapeHtml(latest.gapResult || reviewResult(latest.gapBand))}</strong></div><p class="response-quote">${escapeHtml(latest.gapResponse)}</p></div>` : ""}
         <div class="review-result-row"><div><span>Central claim</span><strong>${escapeHtml(latest.centralClaimResult || displayBand(latest.band))}</strong></div><p class="response-quote">${escapeHtml(latest.response)}</p></div>
-        <p class="review-schedule-note">${chapter.reviewDue ? `Next review ${new Date(chapter.reviewDue).toLocaleDateString()} · scheduled from the weaker result.` : "Both signals are holding up. No further review is scheduled."}</p>
+        <p class="review-schedule-note">${chapter.reviewDue ? `Next review ${formatReviewDate(chapter.reviewDue)} · scheduled from the weaker result.` : "Both signals are holding up. No further review is scheduled."}</p>
       </article>` : ""}
+      ${renderScheduleHistory(chapter)}
     </div>`;
 }
 
@@ -3567,6 +3725,8 @@ function openChapter(id) {
     <div class="detail-actions">
       <button class="secondary" type="button" data-action="edit-chapter" data-edit-chapter-id="${chapter.id}">Edit response</button>
       <button class="secondary" type="button" data-action="view-chapter-source" data-chapter-id="${chapter.id}">View source</button>
+      ${chapter.reviewDue ? `<button class="secondary" type="button" data-action="adjust-review" data-manage-review-id="${chapter.id}" data-delay="${Math.max(1, daysUntilReview(chapter) - 1)}">Review sooner</button>
+      <button class="secondary" type="button" data-action="adjust-review" data-manage-review-id="${chapter.id}" data-delay="${Math.max(2, daysUntilReview(chapter) + 3)}">Review later</button>` : ""}
       ${chapter.reviewDue ? `<button class="primary" type="button" data-review-id="${chapter.id}">Start review <span>→</span></button>` : ""}
     </div>`;
   setView("chapter");
@@ -3690,12 +3850,23 @@ function rescheduleManagedReview(id, delay) {
   if (index < 0) return;
   const due = new Date();
   due.setDate(due.getDate() + Number(delay));
+  const existingSchedule = chapters[index].reviewSchedule || {};
+  const manualReason = Number(delay) <= 1
+    ? "you chose to bring this review back sooner"
+    : "you chose to give this review more space";
   chapters[index].reviewDue = due.toISOString();
   chapters[index].status = "Review scheduled";
   chapters[index].reviewCanceled = false;
   chapters[index].reviewSchedule = {
-    ...(chapters[index].reviewSchedule || {}),
+    ...existingSchedule,
     policyVersion: SCHEDULING_POLICY_VERSION,
+    days: Number(delay),
+    reason: manualReason,
+    reasonSnapshot: scheduleReasonSnapshot({ days: Number(delay), due, reason: manualReason, ratingLabel: existingSchedule.rating }, "manual", {
+      evaluation: chapters[index].evaluation,
+      confidence: chapters[index].confidence,
+      inputs: scheduleInputsForChapter(chapters[index])
+    }),
     manualRescheduled: true,
     manualDelay: Number(delay),
     scheduledAt: new Date().toISOString()
@@ -4166,6 +4337,11 @@ document.addEventListener("click", async event => {
   if (action === "reschedule-managed-review") {
     const button = event.target.closest("[data-manage-review-id]");
     rescheduleManagedReview(button.dataset.manageReviewId, button.dataset.delay);
+  }
+  if (action === "adjust-review") {
+    const button = event.target.closest("[data-manage-review-id]");
+    rescheduleManagedReview(button.dataset.manageReviewId, button.dataset.delay);
+    openChapter(button.dataset.manageReviewId);
   }
   if (action === "cancel-review") {
     const button = event.target.closest("[data-manage-review-id]");
