@@ -4,16 +4,20 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f4f1ea">
-    <title>Margin — Find out what stuck</title>
+    <title>Ember | Find out what stuck</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700;8..60,800&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f312d'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia,serif' font-size='34' font-style='italic' fill='%23fffdf7'%3EE%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <a class="skip-link" href="#app">Skip to main content</a>
     <aside class="sidebar" aria-label="Reading library">
       <div class="brand-row">
-          <a class="brand" href="#" data-nav="home" aria-label="Margin home">
-          <span class="brand-mark" aria-hidden="true">M</span>
-          <span>Margin</span>
+          <a class="brand" href="#" data-nav="home" aria-label="Ember home">
+          <span class="brand-mark" aria-hidden="true">E</span>
+          <span>Ember</span>
         </a>
         <button class="icon-button" id="toggle-sidebar" type="button" aria-label="Collapse library">←</button>
       </div>
@@ -36,13 +40,13 @@
             </svg>
           </span> Home
         </button>
-        <button class="nav-item" type="button" data-nav="reviews" title="Reviews due">
+        <button class="nav-item" type="button" data-nav="reviews" title="Reviews">
           <span class="notification-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
               <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M10 21h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
             </svg>
-          </span> Reviews due
+          </span> Reviews
           <em id="review-count">0</em>
         </button>
         <button class="nav-item" type="button" data-nav="practice" title="Practice">
@@ -130,21 +134,21 @@
               <span class="loop-label">After a chapter worth remembering</span>
               <ol>
                 <li><span>01</span><div><strong>Close the book and explain it</strong><p>Start with what you can recall in your own words.</p></div></li>
-                <li><span>02</span><div><strong>Find out what you actually understood</strong><p>Get feedback grounded in the source—not a generic summary.</p></div></li>
+                <li><span>02</span><div><strong>Find out what you actually understood</strong><p>Get feedback grounded in the source, not a generic summary.</p></div></li>
                 <li><span>03</span><div><strong>Work through one weak spot</strong><p>Take a focused challenge before the missing connection fades.</p></div></li>
                 <li><span>04</span><div><strong>Bring the idea back later</strong><p>Review what matters until you can explain and use it.</p></div></li>
               </ol>
             </div>
           </div>
 
-          <section class="logged-out-value" aria-label="What Margin helps you do">
+          <section class="logged-out-value" aria-label="What Ember helps you do">
             <header><span class="eyebrow">For readers with a system already</span><h2>Your highlights aren’t the problem. Retrieval is.</h2></header>
             <div>
               <article><span>01</span><h3>Stop losing the useful framework</h3><p>Recover the argument before it becomes another highlight you never revisit.</p></article>
               <article><span>02</span><h3>Know whether you understood it</h3><p>Compare your explanation with the source and see the exact connection that needs work.</p></article>
               <article><span>03</span><h3>Use more of what you read</h3><p>Bring important ideas back when you’re ready to explain, recommend, decide, or lead.</p></article>
             </div>
-            <p class="audience-line"><strong>Built for people who already highlight, annotate, or keep notes</strong>—but still struggle to explain the book a month later.</p>
+            <p class="audience-line"><strong>Built for people who already highlight, annotate, or keep notes</strong>, but still struggle to explain the book a month later.</p>
           </section>
 
           <section class="logged-out-section product-tour" aria-labelledby="product-tour-title">
@@ -152,7 +156,7 @@
               <div>
                 <span class="eyebrow">Beyond notes and highlights</span>
                 <h2 id="product-tour-title">Turn a finished chapter into knowledge you can explain.</h2>
-                <p>Margin adds the missing layer after reading: retrieval, evidence-grounded feedback, focused practice, and review.</p>
+                <p>Ember adds the missing layer after reading: retrieval, evidence-grounded feedback, focused practice, and review.</p>
               </div>
               <button class="carousel-control" type="button" data-action="toggle-product-carousel" aria-pressed="false">Pause motion</button>
             </header>
@@ -167,7 +171,7 @@
                   </article>
                   <article class="product-frame compare-frame">
                     <span class="frame-step">02 · Compare</span>
-                    <h3>See the strongest thread—and the useful gap.</h3>
+                    <h3>See the strongest thread and the useful gap.</h3>
                     <div class="mock-signal good"><b>✓</b><span>Central idea recovered</span></div>
                     <div class="mock-signal gap"><b>↗</b><span>Relationship needs another pass</span></div>
                   </article>
@@ -193,7 +197,7 @@
                 </div>
                 <div class="product-carousel-group" aria-hidden="true">
                   <article class="product-frame recall-frame"><span class="frame-step">01 · Recall</span><h3>Explain it before you look back.</h3><div class="mock-answer"><i></i><i></i><i></i><i></i></div><small>Your own words reveal what recognition can hide.</small></article>
-                  <article class="product-frame compare-frame"><span class="frame-step">02 · Compare</span><h3>See the strongest thread—and the useful gap.</h3><div class="mock-signal good"><b>✓</b><span>Central idea recovered</span></div><div class="mock-signal gap"><b>↗</b><span>Relationship needs another pass</span></div></article>
+                  <article class="product-frame compare-frame"><span class="frame-step">02 · Compare</span><h3>See the strongest thread and the useful gap.</h3><div class="mock-signal good"><b>✓</b><span>Central idea recovered</span></div><div class="mock-signal gap"><b>↗</b><span>Relationship needs another pass</span></div></article>
                   <article class="product-frame challenge-frame"><span class="frame-step">03 · Challenge</span><h3>Push the one idea that matters.</h3><blockquote>How do these two ideas depend on one another?</blockquote><div class="mock-button">Take the challenge →</div></article>
                   <article class="product-frame review-frame"><span class="frame-step">04 · Review</span><h3>Return before the idea fades.</h3><div class="mock-review-row"><span>Previous gap</span><strong>Recovered</strong></div><div class="mock-review-row"><span>Central claim</span><strong>Developing</strong></div><small>Next review adapts to the weaker result.</small></article>
                   <article class="product-frame practice-frame"><span class="frame-step">05 · Practice</span><h3>Build the skill behind the gap.</h3><div class="mock-success"><b>✓</b><span><strong>You got it</strong>Central claim found</span></div><small>Short exercises improve transferable reading skills.</small></article>
@@ -206,7 +210,7 @@
             <div class="compounding-copy">
               <span class="eyebrow">Make your reading system earn its keep</span>
               <h2 id="compounding-title">See what your notes app can’t tell you.</h2>
-              <p>Kindle, Readwise, Notion, and Obsidian help you save ideas. Margin helps you discover whether you can still explain them—and what to strengthen next.</p>
+              <p>Kindle, Readwise, Notion, and Obsidian help you save ideas. Ember helps you discover whether you can still explain them and what to strengthen next.</p>
               <ul>
                 <li><span>✓</span> Find the framework you would otherwise forget</li>
                 <li><span>✓</span> See recurring weak spots across chapters</li>
@@ -238,14 +242,14 @@
 
           <section class="logged-out-section skill-acquisition" aria-labelledby="skill-acquisition-title">
             <header>
-              <span class="eyebrow">Build the skill—not just the memory</span>
+              <span class="eyebrow">Build the skill, not just the memory</span>
               <h2 id="skill-acquisition-title">Become a more precise, durable reader.</h2>
-              <p>Margin notices the kinds of comprehension work that repeatedly give you trouble, then reinforces one skill at a time until it holds up in your real reading.</p>
+              <p>Ember notices the kinds of comprehension work that repeatedly give you trouble, then reinforces one skill at a time until it holds up in your real reading.</p>
             </header>
             <div class="skill-acquisition-grid">
               <article><span>01</span><h3>Find the central claim</h3><p>Separate what a chapter discusses from what the author actually wants you to believe.</p></article>
               <article><span>02</span><h3>Connect ideas</h3><p>Explain how two concepts support, cause, limit, or contradict one another.</p></article>
-              <article><span>03</span><h3>Evaluate evidence</h3><p>Recognize which examples and reasons truly support an argument—and which merely sound related.</p></article>
+              <article><span>03</span><h3>Evaluate evidence</h3><p>Recognize which examples and reasons truly support an argument and which merely sound related.</p></article>
               <article><span>04</span><h3>Build clear explanations</h3><p>Move from claim to reason to example in language you can use in a meeting, memo, or decision.</p></article>
               <article><span>05</span><h3>Calibrate your confidence</h3><p>Learn when your sense of understanding matches what you can actually retrieve and explain.</p></article>
               <article><span>06</span><h3>Apply ideas with judgment</h3><p>Test where an argument is useful, where it breaks, and how it should change what you do.</p></article>
@@ -263,14 +267,14 @@
             <div>
               <span class="eyebrow">Questions serious readers ask</span>
               <h2 id="landing-faq-title">Useful effort, without another complicated system.</h2>
-              <p>Margin is intentionally selective. It should earn the extra minutes it asks from you.</p>
+              <p>Ember is intentionally selective. It should earn the extra minutes it asks from you.</p>
             </div>
             <div class="faq-list">
-              <details open><summary>Do I need to check every chapter?</summary><p>No. Use Margin for high-value chapters containing ideas you want to remember, explain, or apply.</p></details>
-              <details><summary>Does this replace Kindle, Readwise, Notion, or Obsidian?</summary><p>No. Those tools help you capture and organize. Margin helps you test whether the captured ideas became usable knowledge.</p></details>
+              <details open><summary>Do I need to check every chapter?</summary><p>No. Use Ember for high-value chapters containing ideas you want to remember, explain, or apply.</p></details>
+              <details><summary>Does this replace Kindle, Readwise, Notion, or Obsidian?</summary><p>No. Those tools help you capture and organize. Ember helps you test whether the captured ideas became usable knowledge.</p></details>
               <details><summary>Is this an AI book-summary tool?</summary><p>No. You begin with your own recall. Feedback is compared with source material you provide and points back to its evidence.</p></details>
               <details><summary>How much time does a chapter check take?</summary><p>The target is about six minutes. Daily skill practice takes roughly three minutes, and you can skip or reschedule reviews.</p></details>
-              <details><summary>Can I trust the evaluation?</summary><p>Treat it as directional guidance, not an objective grade. Margin exposes evidence, labels partial sources, and lets you disagree or edit.</p></details>
+              <details><summary>Can I trust the evaluation?</summary><p>Treat it as directional guidance, not an objective grade. Ember exposes evidence, labels partial sources, and lets you disagree or edit.</p></details>
             </div>
           </section>
 
@@ -285,29 +289,50 @@
           </section>
 
           <div class="returning-home" id="returning-home" hidden>
-            <section class="learning-snapshot" aria-label="Learning snapshot">
-              <article><span>Chapters checked</span><strong id="stat-chapters">0</strong><small>Across your library</small></article>
-              <article><span>Reviews completed</span><strong id="stat-reviews">0</strong><small>Delayed retrievals</small></article>
-              <article><span>Challenges completed</span><strong id="stat-repairs">0</strong><small>Ideas strengthened</small></article>
-              <article>
-                <span class="stat-label">Common gap <button class="stat-info-button" type="button" data-action="open-gap-info" aria-label="About common gaps">i</button></span>
-                <strong class="text-stat" id="stat-gap">—</strong>
-                <small>Across recent checks</small>
-              </article>
+            <section class="next-action-card" id="next-action-card" aria-labelledby="next-action-title">
+              <div class="next-action-marker" id="next-action-marker" aria-hidden="true">→</div>
+              <div class="next-action-copy">
+                <span class="eyebrow" id="next-action-label">Recommended next</span>
+                <h2 id="next-action-title">Pick up where it matters most.</h2>
+                <p id="next-action-copy">Ember will suggest the highest-value next step from your current reading state.</p>
+              </div>
+              <button class="primary" id="next-action-button" type="button">Continue <span>→</span></button>
             </section>
 
             <section class="continue-card" id="continue-card">
-              <div class="continue-marker" aria-hidden="true">↗</div>
+              <div class="continue-marker" id="continue-marker" aria-hidden="true">↗</div>
               <div class="continue-copy">
-                <span class="eyebrow">Continue reading</span>
+                <div class="continue-kicker">
+                  <span class="eyebrow" id="continue-state">Continue reading</span>
+                  <button class="focus-edit-button" id="focus-edit-button" type="button" aria-expanded="false" aria-controls="focus-book-panel" title="Change book in focus">✎</button>
+                </div>
                 <h2 id="continue-book">Your latest book</h2>
                 <p id="continue-meta">Pick up where you left off.</p>
+                <div class="continue-progress" id="continue-progress" aria-label="Book progress" hidden>
+                  <span><i id="continue-progress-fill"></i></span>
+                  <small id="continue-progress-label">0%</small>
+                </div>
+                <label class="continue-focus-control" id="focus-book-panel" for="focus-book-select" hidden>
+                  <span>Book in focus</span>
+                  <select id="focus-book-select"></select>
+                </label>
               </div>
               <div class="continue-actions">
                 <button class="text-button" id="open-book-insights" type="button">What’s sticking?</button>
                 <button class="text-button" id="open-latest" type="button">Open last check</button>
                 <button class="secondary" id="check-next" type="button">Check next chapter</button>
               </div>
+            </section>
+
+            <section class="learning-snapshot" aria-label="Learning snapshot">
+              <article><span>Chapters checked</span><strong id="stat-chapters">0</strong><small>Across your library</small></article>
+              <article><span>Reviews completed</span><strong id="stat-reviews">0</strong><small>Delayed retrievals</small></article>
+              <article><span>Challenges completed</span><strong id="stat-repairs">0</strong><small>Ideas strengthened</small></article>
+              <article>
+                <span class="stat-label">Common gap <button class="stat-info-button" type="button" data-action="open-gap-info" aria-label="About common gaps">i</button></span>
+                <strong class="text-stat" id="stat-gap">None yet</strong>
+                <small>Across recent checks</small>
+              </article>
             </section>
           </div>
 
@@ -316,7 +341,7 @@
               <div class="section-head">
                 <div>
                   <span class="eyebrow">Up next</span>
-                  <h2>Reviews due</h2>
+                  <h2>Review queue</h2>
                 </div>
                 <button class="text-button" type="button" data-nav="reviews">View all →</button>
               </div>
@@ -333,11 +358,15 @@
             </section>
             <section class="dashboard-section practice-promo" id="practice-home-promo">
               <div>
-                <span class="eyebrow">Practice a reading skill</span>
-                <h2>Find the central claim</h2>
+                <span class="eyebrow" id="practice-home-state">Skill focus</span>
+                <h2 id="practice-home-title">Find the central claim</h2>
                 <p id="practice-home-reason">Learn to separate what a passage discusses from what its author actually argues.</p>
+                <div class="home-practice-progress">
+                  <span id="practice-home-progress-label">0 of 3 successful days</span>
+                  <div><i id="practice-home-progress-fill"></i></div>
+                </div>
               </div>
-              <button class="secondary" type="button" data-nav="practice">Try 3-minute practice <span>→</span></button>
+              <button class="secondary" id="practice-home-action" type="button" data-nav="practice">Try 3-minute practice <span>→</span></button>
             </section>
           </div>
         </section>
@@ -345,8 +374,8 @@
         <section class="view reviews-view" data-view="reviews">
           <div class="page-heading">
             <span class="eyebrow">Delayed proof</span>
-            <h1>Reviews due</h1>
-            <p>Come back without looking. The point is not perfection—it is seeing what lasted.</p>
+            <h1>Reviews</h1>
+            <p>Start with what is ready now. Everything else is grouped so it can wait.</p>
           </div>
           <div id="all-reviews" class="review-list wide"></div>
         </section>
@@ -400,7 +429,7 @@
             <blockquote id="daily-practice-passage">Many workplaces treat fast replies as evidence of commitment. Yet constant responsiveness fragments attention and pushes demanding work into evenings. Teams should establish shared response windows so employees can protect focused time without leaving colleagues uncertain.</blockquote>
             <label class="answer-box">
               <span class="sr-only" id="daily-answer-label">Practice answer</span>
-              <textarea id="practice-answer" rows="6" placeholder="State the author’s central claim in your own words…"></textarea>
+              <textarea id="practice-answer" rows="6" placeholder="State the author’s central claim in your own words."></textarea>
             </label>
             <div class="practice-actions">
               <button class="secondary" type="button" data-action="reset-practice">Start over</button>
@@ -414,11 +443,11 @@
           <div class="marketing-hero">
             <span class="eyebrow">How it works</span>
             <h1>A small learning loop for the chapters that matter.</h1>
-            <p>You do not need to process every page. Use Margin when a chapter contains an argument, framework, or idea you want to carry into your work.</p>
+            <p>You do not need to process every page. Use Ember when a chapter contains an argument, framework, or idea you want to carry into your work.</p>
           </div>
           <div class="deep-dive-steps">
-            <article><span>01</span><div><h2>Recall before looking</h2><p>Close the book and explain the chapter in your own words. This reveals what you can retrieve—not merely recognize.</p></div></article>
-            <article><span>02</span><div><h2>Compare with the source</h2><p>Margin identifies the strongest part of your explanation and one consequential gap, with evidence from the text you supplied.</p></div></article>
+            <article><span>01</span><div><h2>Recall before looking</h2><p>Close the book and explain the chapter in your own words. This reveals what you can retrieve, not merely recognize.</p></div></article>
+            <article><span>02</span><div><h2>Compare with the source</h2><p>Ember identifies the strongest part of your explanation and one consequential gap, with evidence from the text you supplied.</p></div></article>
             <article><span>03</span><div><h2>Take a study challenge</h2><p>Work through one question aimed at the missing claim, connection, or evidence while the chapter is still fresh.</p></div></article>
             <article><span>04</span><div><h2>Return without looking</h2><p>An adaptive review separately tests the previous gap and the chapter’s central claim.</p></div></article>
             <article><span>05</span><div><h2>Strengthen the underlying skill</h2><p>If the same gap appears across chapters, daily practice helps build the transferable reading skill behind it.</p></div></article>
@@ -430,7 +459,7 @@
           <div class="marketing-hero">
             <span class="eyebrow">Reading skills</span>
             <h1>Build abilities that transfer beyond one book.</h1>
-            <p>Margin turns recurring comprehension gaps into a sequenced practice path. One skill remains active until it succeeds across multiple days.</p>
+            <p>Ember turns recurring comprehension gaps into a sequenced practice path. One skill remains active until it succeeds across multiple days.</p>
           </div>
           <div class="marketing-card-grid skills-deep-dive">
             <article><span>01</span><h2>Find the central claim</h2><p>Distinguish the subject of a chapter from the argument the author wants you to accept.</p></article>
@@ -447,7 +476,7 @@
           <div class="marketing-hero">
             <span class="eyebrow">Why it works</span>
             <h1>Saving an idea is not the same as learning it.</h1>
-            <p>Margin combines established learning principles in one practical workflow, without pretending every result is an objective grade.</p>
+            <p>Ember combines established learning principles in one practical workflow, without pretending every result is an objective grade.</p>
           </div>
           <div class="principles-list">
             <article><h2>Retrieval practice</h2><p>Trying to reconstruct an idea strengthens access to it and reveals gaps that rereading can conceal.</p><span>Used in chapter recall and delayed review</span></article>
@@ -456,7 +485,7 @@
             <article><h2>Metacognitive calibration</h2><p>Comparing confidence with demonstrated recall helps readers judge their own understanding more accurately.</p><span>Used in confidence tracking</span></article>
             <article><h2>Transfer</h2><p>Practicing the same reading skill across new passages tests whether improvement extends beyond one chapter.</p><span>Used in daily skill practice</span></article>
           </div>
-          <div class="marketing-callout"><strong>What Margin does not claim</strong><p>A text comparison cannot perfectly measure understanding. Results are directional, source-dependent, and designed to support the reader’s judgment.</p></div>
+          <div class="marketing-callout"><strong>What Ember does not claim</strong><p>A text comparison cannot perfectly measure understanding. Results are directional, source-dependent, and designed to support the reader’s judgment.</p></div>
         </section>
 
         <section class="view marketing-view" data-view="examples">
@@ -478,11 +507,11 @@
           <div class="marketing-hero">
             <span class="eyebrow">Trust & privacy</span>
             <h1>AI feedback should show its work.</h1>
-            <p>Your reading is personal, and evaluative feedback can feel authoritative. Margin is designed to make its evidence, uncertainty, and limits visible.</p>
+            <p>Your reading is personal, and evaluative feedback can feel authoritative. Ember is designed to make its evidence, uncertainty, and limits visible.</p>
           </div>
           <div class="trust-grid">
             <article><span>Evidence</span><h2>Feedback points back to the source.</h2><p>Strengths and gaps include the passage used in the comparison, so you can inspect the reasoning yourself.</p></article>
-            <article><span>Uncertainty</span><h2>Partial sources are labeled.</h2><p>Highlights and notes cannot represent a whole chapter. Margin reduces confidence rather than hiding that limitation.</p></article>
+            <article><span>Uncertainty</span><h2>Partial sources are labeled.</h2><p>Highlights and notes cannot represent a whole chapter. Ember reduces confidence rather than hiding that limitation.</p></article>
             <article><span>Control</span><h2>Your interpretation remains yours.</h2><p>Edit responses, disagree with feedback, inspect the source, reschedule reviews, and remove material.</p></article>
             <article><span>Privacy</span><h2>Clear handling before clever features.</h2><p>A production version should plainly disclose storage, model providers, training policy, export, and deletion before asking for source material.</p></article>
           </div>
@@ -501,10 +530,10 @@
             <form class="account-setting" id="account-name-form">
               <div>
                 <h2>Display name</h2>
-                <p>This is how Margin addresses you throughout the product. You can change it at any time.</p>
+                <p>This is how Ember addresses you throughout the product. You can change it at any time.</p>
               </div>
               <div class="account-control">
-                <label class="field"><span>Name</span><input id="account-name" type="text" autocomplete="name" maxlength="80" placeholder="How should Margin address you?" required></label>
+                <label class="field"><span>Name</span><input id="account-name" type="text" autocomplete="name" maxlength="80" placeholder="How should Ember address you?"></label>
                 <p class="account-status" id="account-name-status" role="status"></p>
                 <button class="secondary" type="submit">Save display name</button>
               </div>
@@ -513,7 +542,7 @@
             <form class="account-setting" id="account-reading-context-form">
               <div>
                 <h2>Reading context</h2>
-                <p>Optional context Margin can use when your library is still too small to personalize reflection notes.</p>
+                <p>Optional context Ember can use when your library is still too small to personalize reflection notes.</p>
               </div>
               <div class="account-control">
                 <label class="field"><span>Location</span><input id="account-location" type="text" autocomplete="address-level2" maxlength="80" placeholder="City, region, or country"></label>
@@ -522,13 +551,106 @@
               </div>
             </form>
 
+            <section class="account-setting" aria-labelledby="account-color-title">
+              <div>
+                <h2 id="account-color-title">Color preferences</h2>
+                <p>Choose the earth-tone palette Ember uses across your dashboard, feedback, and reading reports.</p>
+              </div>
+              <div class="account-control">
+                <div class="color-mode-options" id="color-mode-options" role="radiogroup" aria-label="Color mode">
+                  <label class="color-mode-option">
+                    <input type="radio" name="colorMode" value="system">
+                    <span>System</span>
+                  </label>
+                  <label class="color-mode-option">
+                    <input type="radio" name="colorMode" value="light">
+                    <span>Light</span>
+                  </label>
+                  <label class="color-mode-option">
+                    <input type="radio" name="colorMode" value="dark">
+                    <span>Dark</span>
+                  </label>
+                </div>
+
+                <div class="color-theme-options" id="color-theme-options" role="radiogroup" aria-label="Color palette">
+                  <label class="color-theme-option">
+                    <input type="radio" name="colorTheme" value="moss-paper">
+                    <span class="palette-swatches" aria-hidden="true">
+                      <i style="background:#2f312d"></i>
+                      <i style="background:#496553"></i>
+                      <i style="background:#9a6b43"></i>
+                      <i style="background:#f3eee3"></i>
+                    </span>
+                    <span>
+                      <strong>Moss paper</strong>
+                      <small>Near-black surfaces with restrained moss accents.</small>
+                    </span>
+                  </label>
+                  <label class="color-theme-option">
+                    <input type="radio" name="colorTheme" value="clay-library">
+                    <span class="palette-swatches" aria-hidden="true">
+                      <i style="background:#332f2b"></i>
+                      <i style="background:#65735b"></i>
+                      <i style="background:#9b643f"></i>
+                      <i style="background:#f4eadc"></i>
+                    </span>
+                    <span>
+                      <strong>Clay library</strong>
+                      <small>Near-black surfaces with warm clay accents.</small>
+                    </span>
+                  </label>
+                  <label class="color-theme-option">
+                    <input type="radio" name="colorTheme" value="sage-slate">
+                    <span class="palette-swatches" aria-hidden="true">
+                      <i style="background:#303436"></i>
+                      <i style="background:#5d6f64"></i>
+                      <i style="background:#967344"></i>
+                      <i style="background:#f1eadf"></i>
+                    </span>
+                    <span>
+                      <strong>Sage slate</strong>
+                      <small>Near-black surfaces with cool sage accents.</small>
+                    </span>
+                  </label>
+                </div>
+
+                <div class="color-preview-card" aria-label="Color preview">
+                  <div class="preview-header">
+                    <span>Preview</span>
+                    <strong id="active-color-theme">Moss paper</strong>
+                  </div>
+                  <div class="preview-reading-card">
+                    <span class="preview-marker">↗</span>
+                    <div>
+                      <small>Book in focus</small>
+                      <strong>The Road to Character</strong>
+                      <p>8 of 12 chapters checked</p>
+                    </div>
+                    <button type="button">Continue</button>
+                  </div>
+                  <div class="preview-feedback-grid">
+                    <article>
+                      <span>What you captured</span>
+                      <p>You held onto the main idea and a useful supporting example.</p>
+                    </article>
+                    <article>
+                      <span>Next move</span>
+                      <p>Look for the contrast that makes the author’s claim easier to explain.</p>
+                    </article>
+                  </div>
+                  <div class="preview-progress"><i style="width:72%"></i></div>
+                </div>
+                <p class="account-status" id="account-color-status" role="status">Muted earth tones are applied across the prototype.</p>
+              </div>
+            </section>
+
             <form class="account-setting" id="account-email-form">
               <div>
                 <h2>Sign-in email</h2>
-                <p>This is your primary identity in Margin. Supabase may require confirmation from both your current and new addresses.</p>
+                <p>This is your primary identity in Ember. Supabase may require confirmation from both your current and new addresses.</p>
               </div>
               <div class="account-control">
-                <label class="field"><span>Email address</span><input id="account-email" type="email" autocomplete="email" required></label>
+                <label class="field"><span>Email address</span><input id="account-email" type="email" autocomplete="email"></label>
                 <p class="account-status" id="account-email-status" role="status"></p>
                 <button class="secondary" type="submit">Update sign-in email</button>
               </div>
@@ -540,8 +662,8 @@
                 <p>Add or replace a password for this account. Magic-link and Google sign-in will continue to work.</p>
               </div>
               <div class="account-control">
-                <label class="field"><span>New password</span><input id="account-password" type="password" autocomplete="new-password" minlength="8" required></label>
-                <label class="field"><span>Confirm new password</span><input id="account-password-confirm" type="password" autocomplete="new-password" minlength="8" required></label>
+                <label class="field"><span>New password</span><input id="account-password" type="password" autocomplete="new-password" minlength="8"></label>
+                <label class="field"><span>Confirm new password</span><input id="account-password-confirm" type="password" autocomplete="new-password" minlength="8"></label>
                 <p class="account-status" id="account-password-status" role="status"></p>
                 <button class="secondary" type="submit">Update password</button>
               </div>
@@ -562,7 +684,7 @@
             <section class="account-setting" aria-labelledby="account-sessions-title">
               <div>
                 <h2 id="account-sessions-title">Sessions</h2>
-                <p>Margin keeps trusted devices signed in. Sensitive account changes may still require you to authenticate again.</p>
+                <p>Ember keeps trusted devices signed in. Sensitive account changes may still require you to authenticate again.</p>
               </div>
               <div class="account-control">
                 <div class="session-policy">
@@ -571,6 +693,17 @@
                 </div>
                 <p class="account-status" id="account-session-status">This prototype enforces a local companion check. Configure the matching server policy in Supabase before launch.</p>
                 <button class="secondary danger-button" id="logout-all-devices" type="button">Log out of all devices</button>
+              </div>
+            </section>
+
+            <section class="account-setting" aria-labelledby="account-feedback-title">
+              <div>
+                <h2 id="account-feedback-title">Generated feedback</h2>
+                <p>Refresh saved chapter coaching after updates to the feedback system. Ember uses each chapter's Reading Map and Free Recall grade.</p>
+              </div>
+              <div class="account-control">
+                <p class="account-status" id="account-feedback-refresh-status">This updates saved feedback notes for recent chapters with Reading Maps and Free Recall grades.</p>
+                <button class="secondary" id="refresh-generated-feedback" type="button">Refresh generated feedback</button>
               </div>
             </section>
 
@@ -631,7 +764,7 @@
                   <label>
                     <span>Choose a book <b>Required</b></span>
                     <select id="existing-book" name="existingBook">
-                      <option value="">Select from your library…</option>
+                      <option value="">Select from your library</option>
                     </select>
                   </label>
                   <p id="existing-book-help">The author and book title will be carried forward automatically.</p>
@@ -666,7 +799,7 @@
                 </div>
                 <label class="source-input">
                   <span>Source material <b>Required</b></span>
-                  <textarea id="source-text" name="sourceText" rows="10" placeholder="Paste the chapter, excerpt, or detailed notes here…"></textarea>
+                  <textarea id="source-text" name="sourceText" rows="10" placeholder="Paste the chapter, excerpt, or detailed notes here."></textarea>
                   <small id="source-status">Your text stays private in this prototype.</small>
                 </label>
               </div>
@@ -697,7 +830,7 @@
               </details>
               <label class="answer-box">
                 <span class="sr-only">Your recall</span>
-                <textarea id="recall" name="recall" rows="10" placeholder="Start with what feels most important…"></textarea>
+                <textarea id="recall" name="recall" rows="10" placeholder="Start with what feels most important."></textarea>
                 <small><span id="recall-words">0 words</span><span>There is no target length.</span></small>
               </label>
               <div class="flow-actions">
@@ -730,7 +863,7 @@
                 <div class="analysis-transition-head">
                   <span class="eyebrow">Reading your answer</span>
                   <h2>Measuring the parts of comprehension.</h2>
-                  <p>Margin is checking meaning, not writing style. Each signal becomes part of the feedback you’ll see next.</p>
+                  <p>Ember is checking meaning, not writing style. Each signal helps shape the feedback you’ll see next.</p>
                 </div>
                 <div class="analysis-meter-list">
                   <article data-analysis-module="central-claim">
@@ -778,7 +911,7 @@
               <div class="evidence-mini" id="repair-evidence"></div>
               <label class="answer-box">
                 <span class="sr-only">Your challenge response</span>
-                <textarea id="repair" name="repair" rows="7" placeholder="Take on the challenge in your own words…"></textarea>
+                <textarea id="repair" name="repair" rows="7" placeholder="Take on the challenge in your own words."></textarea>
               </label>
               <div class="flow-actions">
                 <button class="secondary" type="button" data-action="skip-repair">Skip challenge</button>
@@ -797,17 +930,14 @@
 
               <div class="schedule-card">
                 <div>
-                  <span class="eyebrow">Delayed proof</span>
-                  <h2>When should we bring this back?</h2>
-                  <p>Try again later without the source. Three days is a useful default.</p>
+                  <span class="eyebrow">Adaptive review</span>
+                  <h2 id="adaptive-review-title">FSRS will bring this back at the right time.</h2>
+                  <p id="adaptive-review-copy">Ember uses the official FSRS scheduler with your recall quality and confidence.</p>
                 </div>
-                <fieldset class="schedule-options">
-                  <legend class="sr-only">Review date</legend>
-                  <label><input type="radio" name="reviewDelay" value="1"><span>Tomorrow</span></label>
-                  <label><input type="radio" name="reviewDelay" value="3" checked><span>In 3 days</span></label>
-                  <label><input type="radio" name="reviewDelay" value="7"><span>In 7 days</span></label>
-                  <label><input type="radio" name="reviewDelay" value="none"><span>No reminder</span></label>
-                </fieldset>
+                <div class="adaptive-schedule" aria-live="polite">
+                  <span id="adaptive-review-when">Scheduled after save</span>
+                  <strong id="adaptive-review-reason">Based on today’s response</strong>
+                </div>
               </div>
               <div class="flow-actions">
                 <button class="secondary" type="button" data-action="new-after-save">Check another chapter</button>
@@ -818,13 +948,21 @@
         </section>
 
         <section class="view review-session" data-view="review-session">
-          <button class="back-link" type="button" data-nav="reviews">← Reviews due</button>
+          <button class="back-link" type="button" data-nav="reviews">← Reviews</button>
           <div class="review-session-inner">
             <div class="closed-source"><span aria-hidden="true">◉</span><div><strong id="review-source-state">Source and prior answer hidden</strong><small id="review-source-note">This is a check of what lasted.</small></div></div>
             <div class="review-progress" aria-label="Review progress">
               <span id="review-part-label">1 of 2 · Previous gap</span>
               <div><i id="review-progress-fill"></i></div>
             </div>
+            <section class="review-context-card" aria-labelledby="review-context-title">
+              <div>
+                <span class="eyebrow">Before you answer</span>
+                <h2 id="review-context-title">Re-enter the chapter.</h2>
+                <p id="review-context-copy">Use the context below to get situated, then answer from memory.</p>
+              </div>
+              <div class="review-context-details" id="review-context-details"></div>
+            </section>
             <div class="step-heading">
               <span class="eyebrow" id="review-step-eyebrow">Revisit the gap</span>
               <h1 id="review-session-title">What do you remember now?</h1>
@@ -837,10 +975,11 @@
             </div>
             <label class="answer-box">
               <span class="sr-only">Delayed recall</span>
-              <textarea id="delayed-recall" rows="9" placeholder="Reconstruct the central claim and its most important support…"></textarea>
+              <textarea id="delayed-recall" rows="9" placeholder="Reconstruct the central claim and its most important support."></textarea>
             </label>
             <fieldset class="mini-confidence">
               <legend>How confident are you?</legend>
+              <div class="confidence-scale-track" aria-hidden="true"><i></i></div>
               <label><input type="radio" name="delayedConfidence" value="Partly"><span>Partly</span></label>
               <label><input type="radio" name="delayedConfidence" value="Mostly"><span>Mostly</span></label>
               <label><input type="radio" name="delayedConfidence" value="Very well"><span>Very well</span></label>
@@ -874,7 +1013,7 @@
         <button class="icon-button" type="button" data-action="close-gap-info" aria-label="Close">×</button>
       </div>
       <div class="gap-glossary">
-        <p>This reflects the pattern that appears most often across your completed chapter checks. It is a direction for practice—not a grade.</p>
+        <p>This reflects the pattern that appears most often across your completed chapter checks. It is a direction for practice, not a grade.</p>
         <dl>
           <div><dt>No pattern yet</dt><dd>There are not enough repeated signals to name a trustworthy pattern.</dd></div>
           <div><dt>Insufficient response</dt><dd>The response was too brief to compare meaningfully with the source.</dd></div>
@@ -906,7 +1045,7 @@
         <button class="icon-button" type="button" data-action="close-confidence-info" aria-label="Close">×</button>
       </div>
       <div class="gap-glossary">
-        <p>Confidence is the estimate you chose before seeing feedback. Margin does not calculate or change it.</p>
+        <p>Confidence is the estimate you chose before seeing feedback. Ember does not calculate or change it.</p>
         <dl>
           <div><dt>Partly</dt><dd>You remembered fragments or felt unsure about the chapter’s main argument.</dd></div>
           <div><dt>Mostly</dt><dd>You believed the important ideas were present, with some uncertainty or missing detail.</dd></div>
@@ -917,7 +1056,7 @@
     </dialog>
     <dialog id="auth-dialog" class="auth-dialog">
       <div class="dialog-head">
-        <div><span class="eyebrow">Your reading system</span><h2 id="auth-dialog-title">Log in to Margin</h2></div>
+        <div><span class="eyebrow">Your reading system</span><h2 id="auth-dialog-title">Log in to Ember</h2></div>
         <button class="icon-button" type="button" data-action="close-auth" aria-label="Close">×</button>
       </div>
       <div class="auth-dialog-body">
@@ -925,11 +1064,14 @@
         <button class="google-auth-button" id="google-auth-button" type="button">
           <span aria-hidden="true">G</span> Continue with Google
         </button>
+        <button class="prototype-auth-button" id="prototype-auth-button" type="button">
+          Continue in prototype mode
+        </button>
         <div class="auth-divider"><span>or continue with email</span></div>
         <form id="email-auth-form">
           <label class="field">
             <span>Email address</span>
-            <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+            <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com">
           </label>
           <button class="primary" id="email-auth-button" type="submit">Email me a sign-in link</button>
         </form>
@@ -940,11 +1082,11 @@
         <form id="password-auth-form" hidden>
           <label class="field">
             <span>Email address</span>
-            <input id="password-auth-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+            <input id="password-auth-email" type="email" autocomplete="email" placeholder="you@example.com">
           </label>
           <label class="field">
             <span>Password</span>
-            <input id="password-auth-password" type="password" autocomplete="current-password" required>
+            <input id="password-auth-password" type="password" autocomplete="current-password">
           </label>
           <button class="primary" id="password-auth-button" type="submit">Log in</button>
           <div class="password-auth-links">
@@ -960,6 +1102,7 @@
       </div>
     </dialog>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="vendor/ts-fsrs/dist/index.umd.js"></script>
     <script src="supabase-config.js"></script>
     <script src="app.js"></script>
   </body>

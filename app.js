@@ -5,6 +5,127 @@ const BOOKS_KEY = "margin-books-v1";
 const COLLAPSED_BOOKS_KEY = "margin-collapsed-books-v1";
 const BOOK_ORDER_KEY = "margin-book-order-v1";
 const PRACTICE_KEY = "margin-practice-v1";
+const PROFILE_KEY = "margin-profile-v1";
+const FOCUS_BOOK_KEY = "margin-focus-book-v1";
+const DEFAULT_COLOR_THEME = "moss-paper";
+const DEFAULT_COLOR_MODE = "light";
+
+const COLOR_PALETTES = {
+  "moss-paper": {
+    label: "Moss paper",
+    description: "Near-black surfaces with restrained moss accents.",
+    vars: {
+      "--ink": "#2f312d",
+      "--muted": "#737367",
+      "--faint": "#a09d91",
+      "--paper": "#f3eee3",
+      "--white": "#fffdf7",
+      "--line": "#ddd5c8",
+      "--line-dark": "#c7bcae",
+      "--green": "#496553",
+      "--green-soft": "#e3ebe4",
+      "--amber": "#9a6b43",
+      "--amber-soft": "#f3e5cf",
+      "--red": "#8a5146",
+      "--red-soft": "#f0ded7",
+      "--blue": "#536f76"
+    },
+    darkVars: {
+      "--ink": "#f4f2eb",
+      "--muted": "#c5c2b9",
+      "--faint": "#96968f",
+      "--paper": "#111312",
+      "--white": "#1d211e",
+      "--line": "#303631",
+      "--line-dark": "#495149",
+      "--green": "#bdd2bf",
+      "--green-soft": "#243028",
+      "--amber": "#f0c085",
+      "--amber-soft": "#30251b",
+      "--red": "#eeaa9c",
+      "--red-soft": "#30201e",
+      "--blue": "#b9d0d8"
+    },
+    swatches: ["#2f312d", "#496553", "#9a6b43", "#f3eee3"],
+    darkSwatches: ["#111312", "#bdd2bf", "#f0c085", "#1d211e"]
+  },
+  "clay-library": {
+    label: "Clay library",
+    description: "Near-black surfaces with warm clay accents.",
+    vars: {
+      "--ink": "#332f2b",
+      "--muted": "#766f65",
+      "--faint": "#a69b8d",
+      "--paper": "#f4eadc",
+      "--white": "#fffaf2",
+      "--line": "#e0d1bf",
+      "--line-dark": "#c9b59f",
+      "--green": "#65735b",
+      "--green-soft": "#e8eadb",
+      "--amber": "#9b643f",
+      "--amber-soft": "#f4dfca",
+      "--red": "#8b4e43",
+      "--red-soft": "#efd9d2",
+      "--blue": "#5d6872"
+    },
+    darkVars: {
+      "--ink": "#f6f1e9",
+      "--muted": "#c9c0b5",
+      "--faint": "#9c948b",
+      "--paper": "#131211",
+      "--white": "#211e1b",
+      "--line": "#38312b",
+      "--line-dark": "#554a40",
+      "--green": "#c9d2aa",
+      "--green-soft": "#2a2d21",
+      "--amber": "#f5bf86",
+      "--amber-soft": "#332319",
+      "--red": "#eea99a",
+      "--red-soft": "#321f1c",
+      "--blue": "#bfd0d9"
+    },
+    swatches: ["#332f2b", "#65735b", "#9b643f", "#f4eadc"],
+    darkSwatches: ["#131211", "#c9d2aa", "#f5bf86", "#211e1b"]
+  },
+  "sage-slate": {
+    label: "Sage slate",
+    description: "Near-black surfaces with cool sage accents.",
+    vars: {
+      "--ink": "#303436",
+      "--muted": "#6f746e",
+      "--faint": "#9ca198",
+      "--paper": "#f1eadf",
+      "--white": "#fffdf8",
+      "--line": "#d8d2c5",
+      "--line-dark": "#bfb9ab",
+      "--green": "#5d6f64",
+      "--green-soft": "#e2e9e2",
+      "--amber": "#967344",
+      "--amber-soft": "#f0e4cf",
+      "--red": "#82524b",
+      "--red-soft": "#eadbd6",
+      "--blue": "#4d6874"
+    },
+    darkVars: {
+      "--ink": "#f3f5ef",
+      "--muted": "#c1c8c0",
+      "--faint": "#949c95",
+      "--paper": "#101213",
+      "--white": "#1c2021",
+      "--line": "#303738",
+      "--line-dark": "#485253",
+      "--green": "#bfd7c5",
+      "--green-soft": "#223029",
+      "--amber": "#efca8f",
+      "--amber-soft": "#30271d",
+      "--red": "#eba79c",
+      "--red-soft": "#30201f",
+      "--blue": "#bad3de"
+    },
+    swatches: ["#303436", "#5d6f64", "#967344", "#f1eadf"],
+    darkSwatches: ["#101213", "#bfd7c5", "#efca8f", "#1c2021"]
+  }
+};
 
 const state = {
   view: "home",
@@ -15,10 +136,14 @@ const state = {
   reviewId: null,
   reviewStep: 0,
   reviewDraft: null,
+  reviewSession: null,
   currentBookKey: null,
   draggedBookKey: null,
   activePracticeSkill: "central-claim",
-  availableBooks: []
+  availableBooks: [],
+  supabaseClient: null,
+  supabaseSession: null,
+  authMode: "login"
 };
 
 const sample = {
@@ -38,12 +163,137 @@ const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
 function isLoggedIn() {
-  return localStorage.getItem(AUTH_KEY) !== "false";
+  return Boolean(state.supabaseSession) || localStorage.getItem(AUTH_KEY) === "true";
+}
+
+function loadLocalProfile() {
+  try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; } catch { return {}; }
+}
+
+function saveLocalProfile(profile = {}) {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify({ ...loadLocalProfile(), ...profile }));
+}
+
+function currentColorTheme() {
+  const local = loadLocalProfile();
+  const metadata = currentUserMetadata();
+  const theme = local.color_theme || metadata.color_theme || DEFAULT_COLOR_THEME;
+  return COLOR_PALETTES[theme] ? theme : DEFAULT_COLOR_THEME;
+}
+
+function currentColorMode() {
+  const local = loadLocalProfile();
+  const metadata = currentUserMetadata();
+  const mode = local.color_mode || metadata.color_mode || DEFAULT_COLOR_MODE;
+  return ["system", "dark", "light"].includes(mode) ? mode : DEFAULT_COLOR_MODE;
+}
+
+function resolvedColorMode(mode = currentColorMode()) {
+  if (mode === "system") {
+    return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
+  }
+  return mode === "dark" ? "dark" : "light";
+}
+
+function applyColorTheme(theme = currentColorTheme(), mode = currentColorMode()) {
+  const palette = COLOR_PALETTES[theme] || COLOR_PALETTES[DEFAULT_COLOR_THEME];
+  const resolvedMode = resolvedColorMode(mode);
+  const vars = resolvedMode === "dark" ? palette.darkVars : palette.vars;
+  document.documentElement.dataset.colorTheme = theme;
+  document.documentElement.dataset.colorMode = resolvedMode;
+  document.documentElement.dataset.colorPreference = mode;
+  Object.entries(vars).forEach(([name, value]) => {
+    document.documentElement.style.setProperty(name, value);
+  });
+}
+
+function hydrateColorSettings() {
+  const theme = currentColorTheme();
+  const mode = currentColorMode();
+  const resolvedMode = resolvedColorMode(mode);
+  $$('input[name="colorTheme"]').forEach(input => {
+    const inputPalette = COLOR_PALETTES[input.value] || COLOR_PALETTES[DEFAULT_COLOR_THEME];
+    const swatches = resolvedMode === "dark" ? inputPalette.darkSwatches : inputPalette.swatches;
+    input.checked = input.value === theme;
+    const option = input.closest(".color-theme-option");
+    option?.classList.toggle("is-selected", input.checked);
+    option?.querySelectorAll(".palette-swatches i").forEach((swatch, index) => {
+      swatch.style.background = swatches[index] || swatches[0];
+    });
+  });
+  $$('input[name="colorMode"]').forEach(input => {
+    input.checked = input.value === mode;
+    input.closest(".color-mode-option")?.classList.toggle("is-selected", input.checked);
+  });
+  const palette = COLOR_PALETTES[theme] || COLOR_PALETTES[DEFAULT_COLOR_THEME];
+  const label = $("#active-color-theme");
+  if (label) label.textContent = `${palette.label}, ${mode === "system" ? `system ${resolvedMode}` : mode}`;
+}
+
+function currentUserMetadata() {
+  return state.supabaseSession?.user?.user_metadata || {};
+}
+
+function currentDisplayName() {
+  const metadata = currentUserMetadata();
+  const local = loadLocalProfile();
+  return metadata.display_name || metadata.full_name || metadata.name || local.display_name || "";
+}
+
+function currentUserEmail() {
+  return state.supabaseSession?.user?.email || loadLocalProfile().email || "";
+}
+
+function profileInitial(name = currentDisplayName(), email = currentUserEmail()) {
+  const source = name || email || "Reader";
+  return source.trim().charAt(0).toUpperCase() || "R";
+}
+
+function updateProfileUI() {
+  const name = currentDisplayName();
+  const email = currentUserEmail();
+  const label = name || "Reader profile";
+  $("#profile-button .avatar").textContent = profileInitial(name, email);
+  $("#profile-button span:nth-child(2)").textContent = label;
+  const menuName = $(".profile-menu-head strong");
+  const menuEmail = $(".profile-menu-head small");
+  if (menuName) menuName.textContent = label;
+  if (menuEmail) menuEmail.textContent = email || "Prototype account";
+}
+
+function getSupabaseClient() {
+  if (state.supabaseClient) return state.supabaseClient;
+  const config = window.MARGIN_SUPABASE_CONFIG;
+  if (!window.supabase?.createClient || !config?.url || !config?.anonKey) return null;
+  state.supabaseClient = window.supabase.createClient(config.url, config.anonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  });
+  return state.supabaseClient;
+}
+
+async function refreshSupabaseSession(render = false) {
+  const client = getSupabaseClient();
+  if (!client) return null;
+  const { data, error } = await client.auth.getSession();
+  if (error) {
+    console.warn("Unable to read Supabase session.", error);
+    return null;
+  }
+  state.supabaseSession = data.session || null;
+  if (state.supabaseSession) localStorage.setItem(AUTH_KEY, "true");
+  if (render) renderAuthState();
+  return state.supabaseSession;
 }
 
 function renderAuthState() {
   const loggedIn = isLoggedIn();
+  applyColorTheme();
   document.body.classList.toggle("logged-out", !loggedIn);
+  updateProfileUI();
   if (loggedIn) {
     $("#onboarding-title").innerHTML = `<span data-local-greeting>${localGreeting()}</span><br><em>What stayed with you?</em>`;
     $("#onboarding-copy").textContent = "Turn the chapter you just finished into something you can explain, question, and use.";
@@ -51,7 +301,7 @@ function renderAuthState() {
     $("#hero-reassurance").textContent = "No perfect summary required. Start with what you remember.";
   } else {
     $("#onboarding-title").innerHTML = "Remember what you read.<br><em>Use it when it matters.</em>";
-    $("#onboarding-copy").textContent = "You already highlight, annotate, and save the good parts. Margin helps you find out what actually stuck, strengthen what didn’t, and turn nonfiction into knowledge you can explain and apply.";
+    $("#onboarding-copy").textContent = "You already highlight, annotate, and save the good parts. Ember helps you find out what actually stuck, strengthen what didn’t, and turn nonfiction into knowledge you can explain and apply.";
     $("#hero-start-label").textContent = "Try it on a chapter";
     $("#hero-reassurance").textContent = "Use it for the chapters worth remembering. A focused check takes about six minutes.";
   }
@@ -74,6 +324,264 @@ function setLoggedIn(loggedIn) {
   renderAuthState();
 }
 
+function setAccountStatus(id, message, type = "") {
+  const node = $(id);
+  if (!node) return;
+  node.textContent = message;
+  node.classList.toggle("is-success", type === "success");
+  node.classList.toggle("is-error", type === "error");
+}
+
+function hydrateAccountSettings() {
+  const metadata = currentUserMetadata();
+  const local = loadLocalProfile();
+  if ($("#account-name")) $("#account-name").value = currentDisplayName();
+  if ($("#account-location")) $("#account-location").value = metadata.location || local.location || "";
+  if ($("#account-email")) $("#account-email").value = currentUserEmail();
+  if ($("#account-recovery-email")) $("#account-recovery-email").value = metadata.recovery_email || local.recovery_email || "";
+  hydrateColorSettings();
+}
+
+function setAuthStatus(message = "") {
+  const note = $("#auth-setup-note");
+  if (!note) return;
+  if (!message) {
+    note.hidden = true;
+    return;
+  }
+  note.hidden = false;
+  note.innerHTML = `<strong>${escapeHtml(message)}</strong>`;
+}
+
+function openAuthDialog(mode = "login") {
+  const dialog = $("#auth-dialog");
+  if (!dialog) return;
+  const client = getSupabaseClient();
+  const isSignup = mode === "signup";
+  state.authMode = isSignup ? "signup" : "login";
+  $("#auth-dialog-title").textContent = isSignup ? "Create your Ember account" : "Log in to Ember";
+  $("#email-auth-button").textContent = isSignup ? "Create account with email link" : "Email me a sign-in link";
+  $("#password-auth-button").textContent = isSignup ? "Create account" : "Log in";
+  $("#prototype-auth-button").textContent = isSignup ? "Create local prototype account" : "Continue in prototype mode";
+  setAuthStatus(client ? "" : "Real auth is not connected yet. You can still continue locally in prototype mode.");
+  dialog.showModal();
+  setTimeout(() => $("#auth-email")?.focus(), 100);
+}
+
+function continueWithPrototypeAccount() {
+  const email = $("#auth-email")?.value.trim() || $("#password-auth-email")?.value.trim() || currentUserEmail() || "reader@example.com";
+  const existing = loadLocalProfile();
+  saveLocalProfile({
+    email,
+    display_name: existing.display_name || email.split("@")[0] || "Reader"
+  });
+  state.supabaseSession = null;
+  $("#auth-dialog")?.close();
+  setLoggedIn(true);
+}
+
+async function logOut() {
+  const client = getSupabaseClient();
+  if (client) await client.auth.signOut();
+  state.supabaseSession = null;
+  setLoggedIn(false);
+}
+
+async function handleMagicLinkSignIn(event) {
+  event.preventDefault();
+  const client = getSupabaseClient();
+  if (!client) {
+    setAuthStatus("Supabase is not connected yet. Check supabase-config.js.");
+    return;
+  }
+  const email = $("#auth-email").value.trim();
+  if (!email) {
+    setAuthStatus("Enter an email address to continue.");
+    $("#auth-email").focus();
+    return;
+  }
+  const { error } = await client.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: window.location.href.split("#")[0],
+      shouldCreateUser: state.authMode === "signup"
+    }
+  });
+  if (error) {
+    toast(error.message);
+    return;
+  }
+  toast("Check your email for the sign-in link.");
+}
+
+async function handlePasswordSignIn(event) {
+  event.preventDefault();
+  const client = getSupabaseClient();
+  if (!client) {
+    setAuthStatus("Supabase is not connected yet. Check supabase-config.js.");
+    return;
+  }
+  const email = $("#password-auth-email").value.trim();
+  const password = $("#password-auth-password").value;
+  if (!email || !password) {
+    setAuthStatus("Enter both your email address and password.");
+    (!email ? $("#password-auth-email") : $("#password-auth-password")).focus();
+    return;
+  }
+  const { data, error } = state.authMode === "signup"
+    ? await client.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: window.location.href.split("#")[0] }
+    })
+    : await client.auth.signInWithPassword({ email, password });
+  if (error) {
+    toast(error.message);
+    return;
+  }
+  state.supabaseSession = data.session || null;
+  localStorage.setItem(AUTH_KEY, "true");
+  $("#auth-dialog").close();
+  renderAuthState();
+  toast(state.authMode === "signup" && !data.session ? "Check your email to confirm your account." : "You’re signed in.");
+}
+
+async function updateSupabaseUser(payload) {
+  const client = getSupabaseClient();
+  const session = await refreshSupabaseSession(false);
+  if (!client || !session) return { error: null, skipped: true };
+  const { data, error } = await client.auth.updateUser(payload);
+  if (!error && data?.user) {
+    state.supabaseSession = {
+      ...session,
+      user: data.user
+    };
+  }
+  return { data, error, skipped: false };
+}
+
+async function handleAccountNameSubmit(event) {
+  event.preventDefault();
+  const displayName = $("#account-name").value.trim();
+  if (!displayName) {
+    setAccountStatus("#account-name-status", "Add the name you want Ember to use.", "error");
+    return;
+  }
+  saveLocalProfile({ display_name: displayName });
+  const { error, skipped } = await updateSupabaseUser({ data: { display_name: displayName } });
+  if (error) {
+    setAccountStatus("#account-name-status", error.message, "error");
+    return;
+  }
+  updateProfileUI();
+  setAccountStatus("#account-name-status", skipped ? "Saved locally for this prototype session." : "Display name saved.", "success");
+}
+
+async function handleReadingContextSubmit(event) {
+  event.preventDefault();
+  const location = $("#account-location").value.trim();
+  saveLocalProfile({ location });
+  const { error, skipped } = await updateSupabaseUser({ data: { location } });
+  if (error) {
+    setAccountStatus("#account-reading-context-status", error.message, "error");
+    return;
+  }
+  setAccountStatus("#account-reading-context-status", skipped ? "Saved locally for this prototype session." : "Reading context saved.", "success");
+}
+
+async function handleColorThemeChange(event) {
+  const input = event.target.closest('input[name="colorTheme"]');
+  if (!input || !COLOR_PALETTES[input.value]) return;
+  const colorTheme = input.value;
+  saveLocalProfile({ color_theme: colorTheme });
+  applyColorTheme(colorTheme, currentColorMode());
+  hydrateColorSettings();
+  const { error, skipped } = await updateSupabaseUser({ data: { color_theme: colorTheme } });
+  if (error) {
+    setAccountStatus("#account-color-status", error.message, "error");
+    return;
+  }
+  setAccountStatus("#account-color-status", skipped ? "Saved locally for this prototype session." : "Color preference saved.", "success");
+}
+
+async function handleColorModeChange(event) {
+  const input = event.target.closest('input[name="colorMode"]');
+  if (!input) return;
+  const colorMode = input.value === "system" ? "system" : input.value === "dark" ? "dark" : "light";
+  saveLocalProfile({ color_mode: colorMode });
+  applyColorTheme(currentColorTheme(), colorMode);
+  hydrateColorSettings();
+  const { error, skipped } = await updateSupabaseUser({ data: { color_mode: colorMode } });
+  if (error) {
+    setAccountStatus("#account-color-status", error.message, "error");
+    return;
+  }
+  setAccountStatus("#account-color-status", skipped ? "Saved locally for this prototype session." : "Color mode saved.", "success");
+}
+
+function handleSystemColorSchemeChange() {
+  if (currentColorMode() !== "system") return;
+  applyColorTheme(currentColorTheme(), "system");
+  hydrateColorSettings();
+}
+
+async function handleAccountEmailSubmit(event) {
+  event.preventDefault();
+  const email = $("#account-email").value.trim();
+  if (!email) {
+    setAccountStatus("#account-email-status", "Enter an email address.", "error");
+    return;
+  }
+  saveLocalProfile({ email });
+  const { error, skipped } = await updateSupabaseUser({ email });
+  if (error) {
+    setAccountStatus("#account-email-status", error.message, "error");
+    return;
+  }
+  updateProfileUI();
+  setAccountStatus("#account-email-status", skipped ? "Saved locally for this prototype session." : "Check your email to confirm this change if Supabase requires it.", "success");
+}
+
+async function handleAccountPasswordSubmit(event) {
+  event.preventDefault();
+  const password = $("#account-password").value;
+  const confirm = $("#account-password-confirm").value;
+  if (!password || !confirm) {
+    setAccountStatus("#account-password-status", "Enter and confirm the new password.", "error");
+    (!password ? $("#account-password") : $("#account-password-confirm")).focus();
+    return;
+  }
+  if (password.length < 8) {
+    setAccountStatus("#account-password-status", "Use at least 8 characters.", "error");
+    $("#account-password").focus();
+    return;
+  }
+  if (password !== confirm) {
+    setAccountStatus("#account-password-status", "The passwords do not match.", "error");
+    return;
+  }
+  const { error, skipped } = await updateSupabaseUser({ password });
+  if (error) {
+    setAccountStatus("#account-password-status", error.message, "error");
+    return;
+  }
+  $("#account-password").value = "";
+  $("#account-password-confirm").value = "";
+  setAccountStatus("#account-password-status", skipped ? "Password changes require a Supabase session." : "Password updated.", skipped ? "error" : "success");
+}
+
+async function handleRecoveryEmailSubmit(event) {
+  event.preventDefault();
+  const recoveryEmail = $("#account-recovery-email").value.trim();
+  saveLocalProfile({ recovery_email: recoveryEmail });
+  const { error, skipped } = await updateSupabaseUser({ data: { recovery_email: recoveryEmail } });
+  if (error) {
+    setAccountStatus("#account-recovery-status", error.message, "error");
+    return;
+  }
+  setAccountStatus("#account-recovery-status", skipped ? "Stored locally as an unverified secondary email." : "Stored as private account metadata · Unverified", "success");
+}
+
 function escapeHtml(value = "") {
   return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
 }
@@ -84,6 +592,23 @@ function displayBand(band = "") {
 
 function displayGapType(gap = "") {
   return gap === "Optional challenge" ? "Study challenge" : gap;
+}
+
+function isStudyChallengeGap(gap = "") {
+  return ["Optional challenge", "Study challenge", "Limits and exceptions", "qualification_loss"].includes(gap);
+}
+
+function normalizeReviewPrompt(prompt = "") {
+  const clean = String(prompt);
+  const boundaryPrompts = [
+    "Where might the chapter’s argument stop being useful or true?",
+    "Where might the chapter's argument stop being useful or true?",
+    "What assumption or boundary would make the chapter's argument less convincing?",
+    "What assumption or boundary would make the chapter’s argument less convincing?"
+  ];
+  return boundaryPrompts.includes(clean)
+    ? "Where might this chapter’s main idea break down?"
+    : clean;
 }
 
 function words(text = "") {
@@ -144,6 +669,128 @@ function saveBookMetadata(values) {
   };
   if (index >= 0) books[index] = book; else books.push(book);
   localStorage.setItem(BOOKS_KEY, JSON.stringify(books));
+}
+
+function bookRecordForChapter(chapter = {}, books = loadBookMetadata()) {
+  const key = bookKey(chapter.bookTitle || "", chapter.authorName || "");
+  const metadata = books.find(book => (book.key || bookKey(book.title, book.author)) === key) || {};
+  const total = Number.parseInt(metadata.totalChapters || chapter.bookTotalChapters || "", 10);
+  return {
+    key,
+    title: chapter.bookTitle || metadata.title || "Untitled book",
+    author: chapter.authorName || metadata.author || "",
+    total: Number.isFinite(total) && total > 0 ? total : null,
+    metadata
+  };
+}
+
+function bookStateFromEntry(entry, entries = [], books = loadBookMetadata()) {
+  if (!entry) return null;
+  const book = bookRecordForChapter(entry, books);
+  const chapters = entries.filter(chapter => chapter.status !== "Draft");
+  const bookEntries = entries.filter(chapter => bookKey(chapter.bookTitle, chapter.authorName || "") === book.key);
+  const completed = chapters.filter(chapter => bookKey(chapter.bookTitle, chapter.authorName || "") === book.key).length;
+  const latestChapter = bookEntries.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0] || entry;
+  return {
+    kind: latestChapter.status === "Draft"
+      ? "draft"
+      : book.total && completed >= book.total
+        ? "complete"
+        : "active",
+    chapter: latestChapter,
+    book,
+    completed
+  };
+}
+
+function focusBookOptions(entries = []) {
+  const books = loadBookMetadata();
+  const seen = new Set();
+  return entries
+    .map(entry => bookRecordForChapter(entry, books))
+    .filter(book => {
+      if (!book.key || seen.has(book.key)) return false;
+      seen.add(book.key);
+      return true;
+    })
+    .sort((a, b) => a.title.localeCompare(b.title));
+}
+
+function chooseCurrentReadingState(entries = []) {
+  const chapters = entries.filter(chapter => chapter.status !== "Draft");
+  const drafts = entries.filter(chapter => chapter.status === "Draft");
+  const books = loadBookMetadata();
+  const byUpdated = [...entries].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  const focusKey = localStorage.getItem(FOCUS_BOOK_KEY);
+  const focusedEntry = focusKey && byUpdated.find(chapter => bookKey(chapter.bookTitle, chapter.authorName || "") === focusKey);
+  if (focusedEntry) return bookStateFromEntry(focusedEntry, entries, books);
+
+  const draft = drafts.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
+  if (draft) {
+    const book = bookRecordForChapter(draft, books);
+    const completed = chapters.filter(chapter => bookKey(chapter.bookTitle, chapter.authorName || "") === book.key).length;
+    return {
+      kind: "draft",
+      chapter: draft,
+      book,
+      completed
+    };
+  }
+
+  const groups = new Map();
+  chapters.forEach(chapter => {
+    const book = bookRecordForChapter(chapter, books);
+    if (!groups.has(book.key)) {
+      groups.set(book.key, {
+        book,
+        chapters: [],
+        latestChapter: chapter,
+        latestUpdatedAt: chapter.updatedAt || chapter.createdAt
+      });
+    }
+    const group = groups.get(book.key);
+    group.chapters.push(chapter);
+    const updatedAt = chapter.updatedAt || chapter.createdAt;
+    if (new Date(updatedAt) > new Date(group.latestUpdatedAt || 0)) {
+      group.latestChapter = chapter;
+      group.latestUpdatedAt = updatedAt;
+    }
+  });
+
+  const activeBook = [...groups.values()]
+    .filter(group => group.book.total && group.chapters.length < group.book.total)
+    .sort((a, b) => new Date(b.latestUpdatedAt) - new Date(a.latestUpdatedAt))[0];
+  if (activeBook) {
+    return {
+      kind: "active",
+      chapter: activeBook.latestChapter,
+      book: activeBook.book,
+      completed: activeBook.chapters.length
+    };
+  }
+
+  const completedBook = [...groups.values()]
+    .filter(group => group.book.total && group.chapters.length >= group.book.total)
+    .sort((a, b) => new Date(b.latestUpdatedAt) - new Date(a.latestUpdatedAt))[0];
+  if (completedBook) {
+    return {
+      kind: "complete",
+      chapter: completedBook.latestChapter,
+      book: completedBook.book,
+      completed: completedBook.chapters.length
+    };
+  }
+
+  const latest = byUpdated[0];
+  if (!latest) return null;
+  const book = bookRecordForChapter(latest, books);
+  const completed = chapters.filter(chapter => bookKey(chapter.bookTitle, chapter.authorName || "") === book.key).length;
+  return {
+    kind: latest.status === "Draft" ? "draft" : "active",
+    chapter: latest,
+    book,
+    completed
+  };
 }
 
 function getValues() {
@@ -207,8 +854,8 @@ function renderBookOptions(preferredTitle = "", preferredAuthor = "") {
     ...book,
     completedChapters: chapters.filter(chapter => chapter.status !== "Draft" && bookKey(chapter.bookTitle, chapter.authorName || "") === bookKey(book.title, book.author)).length
   }));
-  $("#existing-book").innerHTML = '<option value="">Select from your library…</option>' +
-    state.availableBooks.map((book, index) => `<option value="${index}">${escapeHtml(book.title)}${book.author ? ` — ${escapeHtml(book.author)}` : ""} · ${book.completedChapters}${book.totalChapters ? ` of ${book.totalChapters}` : ""} completed</option>`).join("");
+  $("#existing-book").innerHTML = '<option value="">Select from your library</option>' +
+  state.availableBooks.map((book, index) => `<option value="${index}">${escapeHtml(book.title)}${book.author ? ` by ${escapeHtml(book.author)}` : ""} · ${book.completedChapters}${book.totalChapters ? ` of ${book.totalChapters}` : ""} completed</option>`).join("");
   const existingRadio = $('[name="bookPath"][value="existing"]');
   existingRadio.disabled = state.availableBooks.length === 0;
 
@@ -241,17 +888,17 @@ function syncBookPath() {
 }
 
 function saveDraft() {
-  if (state.step >= 5) return;
-  localStorage.setItem(DRAFT_KEY, JSON.stringify(getValues()));
+  const values = getValues();
+  localStorage.setItem(DRAFT_KEY, JSON.stringify({
+    ...values,
+    id: state.currentId,
+    draftStep: state.step
+  }));
+  autosaveVisibleDraft(values);
 }
 
-function saveEntryDraft() {
-  const values = getValues();
-  if (!values.bookTitle || !values.chapterTitle) {
-    toast("Choose a book and add a chapter title before saving this draft.");
-    (!values.bookTitle ? $("#book-title") : $("#chapter-title")).focus();
-    return;
-  }
+function autosaveVisibleDraft(values = getValues()) {
+  if (!values.bookTitle || !values.chapterTitle) return null;
   const chapters = loadChapters();
   const now = new Date().toISOString();
   const id = state.currentId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -261,10 +908,12 @@ function saveEntryDraft() {
     id,
     ...values,
     status: "Draft",
-    evaluation: null,
-    repairResolved: false,
+    evaluation: state.evaluation,
+    repairResolved: state.repairResolved,
     reviewDue: null,
-    delayedAttempts: [],
+    reviewSchedule: null,
+    fsrsCard: null,
+    delayedAttempts: existingIndex >= 0 ? chapters[existingIndex].delayedAttempts || [] : [],
     draftStep: state.step,
     updatedAt: now,
     createdAt: existingIndex >= 0 ? chapters[existingIndex].createdAt : now
@@ -273,41 +922,21 @@ function saveEntryDraft() {
   saveChapters(chapters);
   saveBookMetadata(values);
   state.currentId = id;
-  localStorage.removeItem(DRAFT_KEY);
   renderDashboard();
-  setView("home");
-  toast("Draft saved. Resume it whenever you’re ready.");
+  return draft;
 }
 
-function ensureMockDraft() {
-  const chapters = loadChapters();
-  const deepWork = chapters.find(chapter => chapter.bookTitle === "Deep Work");
-  const alreadyExists = chapters.some(chapter => chapter.bookTitle === "Deep Work" && chapter.chapterTitle === "Deep Work Is Rare");
-  if (!deepWork || alreadyExists) return;
-  const now = new Date(Date.now() + 1000).toISOString();
-  chapters.push({
-    id: `mock-draft-${Date.now()}`,
-    bookPath: "existing",
-    bookTitle: "Deep Work",
-    authorName: deepWork.authorName || "Cal Newport",
-    bookTotalChapters: deepWork.bookTotalChapters || "15",
-    chapterTitle: "Deep Work Is Rare",
-    sourceKind: "notes",
-    sourceText: "Deep work is becoming increasingly valuable, yet the ability to perform it is becoming increasingly rare. Modern workplaces reward visible busyness and constant responsiveness, even when those behaviors fragment attention.",
-    recall: "Deep work is valuable partly because fewer people are able to concentrate without interruption.",
-    confidence: "",
-    repair: "",
-    wantsApplication: false,
-    status: "Draft",
-    evaluation: null,
-    repairResolved: false,
-    reviewDue: null,
-    delayedAttempts: [],
-    draftStep: 1,
-    createdAt: now,
-    updatedAt: now
-  });
-  saveChapters(chapters);
+function saveEntryDraft() {
+  const values = getValues();
+  if (!values.bookTitle || !values.chapterTitle) {
+    toast("Choose a book and add a chapter title before saving this draft.");
+    (!values.bookTitle ? $("#book-title") : $("#chapter-title")).focus();
+    return;
+  }
+  autosaveVisibleDraft(values);
+  localStorage.removeItem(DRAFT_KEY);
+  setView("home");
+  toast("Draft saved. Resume it whenever you’re ready.");
 }
 
 function toast(message) {
@@ -323,9 +952,12 @@ function setView(name) {
   $$(".view").forEach(view => view.classList.toggle("is-active", view.dataset.view === name));
   $$(".nav-item").forEach(item => item.classList.toggle("is-active", item.dataset.nav === name));
   document.body.classList.remove("mobile-nav-open");
+  $("#profile-menu").hidden = true;
+  $("#profile-button").setAttribute("aria-expanded", "false");
   window.scrollTo({ top: 0, behavior: "smooth" });
   $("#app").focus({ preventScroll: true });
   if (name === "home" || name === "reviews") renderDashboard();
+  if (name === "account") hydrateAccountSettings();
 }
 
 function setStep(step) {
@@ -389,6 +1021,12 @@ function revealFeedbackResults() {
 
 function runAnalysisTransition(evaluation, onComplete) {
   resetAnalysisTransition();
+  let workSettled = false;
+  const workPromise = Promise.resolve()
+    .then(onComplete)
+    .finally(() => {
+      workSettled = true;
+    });
   const modules = $$("[data-analysis-module]");
   const stepDuration = 520;
   modules.forEach((module, index) => {
@@ -406,9 +1044,17 @@ function runAnalysisTransition(evaluation, onComplete) {
       if (stateLabel) stateLabel.textContent = "Measured";
     }, index * stepDuration + stepDuration - 110);
   });
-  setTimeout(() => {
-    completeAnalysisTransition(evaluation);
-    onComplete();
+  setTimeout(async () => {
+    if (!workSettled) {
+      const finalModule = modules.at(-1);
+      const stateLabel = finalModule?.querySelector("em");
+      if (stateLabel) stateLabel.textContent = "Finalizing";
+      finalModule?.classList.add("is-measuring");
+      finalModule?.classList.remove("is-complete");
+      finalModule?.style.setProperty("--analysis-progress", "86%");
+    }
+    await workPromise;
+    completeAnalysisTransition(state.evaluation || evaluation);
     setTimeout(revealFeedbackResults, 850);
   }, modules.length * stepDuration + 450);
 }
@@ -419,14 +1065,18 @@ function startNew(prefill = null) {
   state.repairResolved = false;
   $("#check-form").reset();
   renderBookOptions(prefill?.bookTitle, prefill?.authorName);
-  setValues({ ...(prefill || {}), bookPath: prefill?.bookPath || (state.availableBooks.length ? "existing" : "new") });
+  const bookPath = prefill?.bookPath || (prefill?.bookTitle && state.availableBooks.length ? "existing" : "new");
+  setValues({ ...(prefill || {}), bookPath });
   if (prefill?.bookTitle && state.availableBooks.some(book => book.title === prefill.bookTitle && book.author === (prefill.authorName || ""))) {
     renderBookOptions(prefill.bookTitle, prefill.authorName);
   }
   localStorage.removeItem(DRAFT_KEY);
   setStep(0);
   setView("flow");
-  setTimeout(() => $("#book-title").focus(), 100);
+  setTimeout(() => {
+    const activePath = $('[name="bookPath"]:checked')?.value;
+    (activePath === "existing" ? $("#chapter-title") : $("#book-title"))?.focus();
+  }, 100);
 }
 
 function updateCounts() {
@@ -441,8 +1091,8 @@ function syncSourceKind() {
   const isPdf = $('[name="sourceKind"]:checked')?.value === "pdf";
   $("#pdf-source").hidden = !isPdf;
   $("#source-text").placeholder = isPdf
-    ? "Extracted PDF text will appear here. Review it or paste the relevant chapter text…"
-    : "Paste the chapter, excerpt, or detailed notes here…";
+    ? "Extracted PDF text will appear here. Review it or paste the relevant chapter text."
+    : "Paste the chapter, excerpt, or detailed notes here.";
 }
 
 function setPdfStatus(name = "", size = 0, attached = false) {
@@ -547,6 +1197,110 @@ function findEvidence(source, terms, answerTerms, preferMissing = false) {
   return candidates[0] || { sentence: sentences(source)[0] || source.slice(0, 240), index: 0, score: 0 };
 }
 
+function sentenceSnippet(text = "") {
+  return String(text).replace(/\s+/g, " ").trim();
+}
+
+function keyNamesFromSource(source = "") {
+  const matches = String(source).match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\b/g) || [];
+  const stop = new Set(["The", "This", "That", "These", "Those", "Chapter", "When", "After", "Before", "But", "And"]);
+  return [...new Set(matches.filter(name => !stop.has(name.split(" ")[0])))]
+    .slice(0, 8)
+    .map(name => ({ name, role: "Named detail the author uses to make the idea easier to explain later." }));
+}
+
+function keyTimeMarkersFromSource(source = "") {
+  const matches = String(source).match(/\b(?:\d{3,4}s?|\d+\s+(?:years|decades|centuries|months|weeks|days)|Victorian|modern|ancient|early|late)\b/gi) || [];
+  return [...new Set(matches.map(match => match.trim()))].slice(0, 4);
+}
+
+function buildLocalReadingMap(source = "", evaluation = {}) {
+  const sourceSentences = sentences(source);
+  const strongest = evaluation.strengthEvidence?.sentence || sourceSentences[0] || source.slice(0, 260);
+  const terms = topTerms(source).slice(0, 6);
+  const relationshipSignals = /\b(because|therefore|depends|leads|requires|means|while|but|however|instead|rather|although)\b/i;
+  const relationSentences = sourceSentences.filter(sentence => relationshipSignals.test(sentence)).slice(0, 4);
+  const contrastSentences = sourceSentences.filter(sentence => /\b(but|while|however|rather|instead|contrast|unlike)\b/i.test(sentence)).slice(0, 3);
+  const qualificationSentences = sourceSentences.filter(sentence => /\b(if|unless|only|except|boundary|limit|condition|depends|not enough)\b/i.test(sentence)).slice(0, 3);
+  const timeMarkers = keyTimeMarkersFromSource(source);
+  const entityAnchors = keyNamesFromSource(source).slice(0, 4).map((entity, index) => ({
+    id: `entity-${index + 1}`,
+    type: "entity",
+    text: entity.name,
+    why_it_matters: entity.role
+  }));
+  const temporalAnchors = timeMarkers.map((text, index) => ({
+    id: `temporal-${index + 1}`,
+    type: "temporal",
+    text,
+    why_it_matters: "Timing can explain why an example matters, not just when it happened."
+  }));
+  const relationshipAnchors = relationSentences.slice(0, 3).map((sentence, index) => ({
+    id: `relationship-${index + 1}`,
+    type: "relationship",
+    text: sentenceSnippet(sentence),
+    why_it_matters: "This sentence helps show how two ideas depend on, contrast with, or change one another."
+  }));
+  const evidenceAnchors = [evaluation.gapEvidence?.sentence, evaluation.strengthEvidence?.sentence]
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((sentence, index) => ({
+      id: `evidence-${index + 1}`,
+      type: "evidence",
+      text: sentenceSnippet(sentence),
+      why_it_matters: "This concrete detail can help the reader explain the chapter with evidence."
+    }));
+
+  return {
+    central_claim: sentenceSnippet(strongest, 28),
+    supporting_ideas: terms.slice(0, 6).map((term, index) => ({
+      id: `idea-${index + 1}`,
+      idea: term,
+      role: "Recurring source idea to check against the reader's recall."
+    })),
+    key_examples: [evaluation.gapEvidence?.sentence, evaluation.strengthEvidence?.sentence]
+      .filter(Boolean)
+      .slice(0, 4)
+      .map((sentence, index) => ({
+        id: `example-${index + 1}`,
+        text: sentenceSnippet(sentence),
+        why_it_matters: "The example gives the recalled idea something specific to stand on."
+      })),
+    key_entities: keyNamesFromSource(source),
+    relationships: relationSentences.map((sentence, index) => ({
+      id: `relationship-${index + 1}`,
+      from: "One source idea",
+      to: "Another source idea",
+      relationship: sentenceSnippet(sentence)
+    })),
+    contrasts: contrastSentences.map((sentence, index) => ({
+      id: `contrast-${index + 1}`,
+      side_a: "First side of the contrast",
+      side_b: "Second side of the contrast",
+      meaning: sentenceSnippet(sentence)
+    })),
+    qualifications: qualificationSentences.map((sentence, index) => ({
+      id: `qualification-${index + 1}`,
+      text: sentenceSnippet(sentence),
+      why_it_matters: "This keeps the chapter's argument from becoming too broad or generic."
+    })),
+    recall_anchors: [
+      {
+        id: "claim-1",
+        type: "claim",
+        text: sentenceSnippet(strongest),
+        why_it_matters: "The claim is the handle for explaining the chapter later."
+      },
+      ...entityAnchors,
+      ...temporalAnchors,
+      ...relationshipAnchors,
+      ...evidenceAnchors
+    ].slice(0, 12),
+    common_misreadings: evaluation.gap ? [evaluation.gap] : [],
+    why_it_matters: "This map gives Ember a stable understanding of the chapter before it evaluates what came back from memory."
+  };
+}
+
 function evaluateResponse(source, response, sourceKind) {
   const sourceTerms = topTerms(source);
   const answerTerms = new Set(words(response));
@@ -587,7 +1341,7 @@ function evaluateResponse(source, response, sourceKind) {
   if (band === "Strong") {
     gapType = "Study challenge";
     gap = "No consequential misconception is visible in this response. If you want to go further, test the boundary of the author's argument.";
-    prompt = "What assumption or boundary would make the chapter's argument less convincing?";
+    prompt = "Where might this chapter’s main idea break down?";
     const sourceSentences = sentences(source);
     gapEvidence = {
       sentence: sourceSentences.at(-1) || strengthEvidence.sentence,
@@ -597,9 +1351,10 @@ function evaluateResponse(source, response, sourceKind) {
   }
 
   if (!["full", "pdf"].includes(sourceKind) && band === "Strong") band = "Developing";
-  return {
+  const evaluation = {
     band,
     coverage,
+    responseWordCount: responseLength,
     strength: matched.length
       ? `You recovered the chapter's emphasis on ${matched.slice(0, 3).join(", ")} and kept the account in your own words.`
       : "You made an original retrieval attempt instead of copying from the source.",
@@ -611,6 +1366,117 @@ function evaluateResponse(source, response, sourceKind) {
     sourceKind,
     uncertainty: ["full", "pdf"].includes(sourceKind) ? "" : `This is based on ${sourceKind}; it may not represent the full chapter.`
   };
+  evaluation.readingMap = buildLocalReadingMap(source, evaluation);
+  return evaluation;
+}
+
+function mergeStructuredEvaluation(localEvaluation, result = {}) {
+  if (!result?.grading_result) return localEvaluation;
+  const score = Number(result.grading_result.overall_score);
+  const band = Number.isFinite(score)
+    ? score >= 80 ? "Strong" : score >= 50 ? "Developing" : "Needs another pass"
+    : localEvaluation.band;
+  const missed = result.grading_result.feedback?.what_you_missed || [];
+  const distorted = result.grading_result.feedback?.what_may_be_distorted || [];
+  const reviewNext = result.grading_result.feedback?.what_to_review_next || [];
+  const primaryDiagnosis = result.grading_result.recall_pattern_diagnosis?.[0];
+  const nextPrompt = reviewNext[0] || localEvaluation.prompt;
+  const normalizedPrompt = normalizeReviewPrompt(nextPrompt);
+  return {
+    ...localEvaluation,
+    band,
+    responseWordCount: localEvaluation.responseWordCount,
+    gapType: primaryDiagnosis ? recallPatternLabel(primaryDiagnosis.pattern) : localEvaluation.gapType,
+    gap: missed[0] || distorted[0] || localEvaluation.gap,
+    prompt: normalizedPrompt,
+    answerKey: result.answer_key || localEvaluation.answerKey,
+    readingMap: result.reading_map || localEvaluation.readingMap,
+    gradingResult: result.grading_result,
+    gradeId: result.grade_id || null,
+    readingMapId: result.reading_map_id || null,
+    gradedAt: result.created_at || new Date().toISOString()
+  };
+}
+
+async function gradeRecallWithSupabase(values, localEvaluation) {
+  const client = getSupabaseClient();
+  if (!client) return { evaluation: localEvaluation, mode: "local", reason: "Supabase is not configured." };
+  const session = await refreshSupabaseSession(false);
+  if (!session?.access_token) {
+    return { evaluation: localEvaluation, mode: "local", reason: "No active Supabase session." };
+  }
+  const chapterId = state.currentId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  state.currentId = chapterId;
+  const { data, error } = await client.functions.invoke("grade-free-recall", {
+    body: {
+      chapter_id: chapterId,
+      passage: values.sourceText,
+      user_response: values.recall
+    },
+    headers: {
+      Authorization: `Bearer ${session.access_token}`
+    }
+  });
+  if (error) throw error;
+  return {
+    evaluation: mergeStructuredEvaluation(localEvaluation, data),
+    mode: "supabase",
+    data
+  };
+}
+
+function withTimeout(promise, timeoutMs, message) {
+  let timeoutId;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
+}
+
+async function regenerateNextTimeCoaching(limit = 50) {
+  const client = getSupabaseClient();
+  if (!client) throw new Error("Supabase is not configured.");
+  const session = await refreshSupabaseSession(false);
+  if (!session?.access_token) throw new Error("Sign in before refreshing generated feedback.");
+  const { data, error } = await client.functions.invoke("regenerate-next-time-coaching", {
+    body: {
+      limit,
+      only_missing: false
+    },
+    headers: {
+      Authorization: `Bearer ${session.access_token}`
+    }
+  });
+  if (error) throw error;
+  return data || { updated_count: 0, updated_grade_ids: [] };
+}
+
+window.regenerateNextTimeCoaching = regenerateNextTimeCoaching;
+
+function syncGeneratedCoachingToLocalChapters(data = {}) {
+  const updatedGrades = Array.isArray(data.updated_grades) ? data.updated_grades : [];
+  if (!updatedGrades.length) return 0;
+  const chapters = loadChapters();
+  let changed = 0;
+  updatedGrades.forEach(row => {
+    const index = chapters.findIndex(chapter => chapter.id === row.chapter_client_id);
+    if (index < 0 || !row.grading_result) return;
+    chapters[index] = {
+      ...chapters[index],
+      evaluation: {
+        ...(chapters[index].evaluation || {}),
+        gradingResult: row.grading_result
+      },
+      updatedAt: new Date().toISOString()
+    };
+    changed += 1;
+  });
+  if (changed) {
+    saveChapters(chapters);
+    renderDashboard();
+    if (state.view === "chapter" && state.currentId && chapters.some(chapter => chapter.id === state.currentId)) openChapter(state.currentId);
+  }
+  return changed;
 }
 
 function confidencePhrase(confidence = "") {
@@ -626,8 +1492,16 @@ function localStructuredFeedback(evaluation = {}) {
   const remembered = evaluation.strength ? [evaluation.strength] : ["You made a real attempt to recall the chapter without copying from the source."];
   const missed = evaluation.band === "Strong" ? [] : [evaluation.gap].filter(Boolean);
   const distorted = evaluation.gapType === "Unsupported claim" || evaluation.gapType === "Distorted idea" ? [evaluation.gap] : [];
+  const rubric = rubricScoresForEvaluation({ ...evaluation, gradingResult: null });
   return {
-    overall_score: Math.max(0, Math.min(100, Math.round((evaluation.coverage || 0) * 100))),
+    overall_score: rubric.overall,
+    rubric_scores: {
+      central_claim: rubric.central_claim,
+      supporting_ideas: rubric.supporting_ideas,
+      relationship_between_ideas: rubric.relationship_between_ideas,
+      source_fidelity: rubric.source_fidelity,
+      transfer_application: rubric.transfer_application
+    },
     feedback: {
       what_you_remembered: remembered,
       what_you_missed: missed,
@@ -669,26 +1543,91 @@ function cleanRememberedFeedback(items = []) {
     .filter(item => !/retrieval attempt|recovered useful meaning|behavior this check is designed/i.test(item));
 }
 
+function looksLikeKeywordPile(text = "") {
+  const clean = String(text)
+    .replace(/^You recovered the chapter's emphasis on\s+/i, "")
+    .replace(/^You (correctly )?(identified|captured|remembered|recovered)\s+/i, "")
+    .replace(/\sand kept the account in your own words\.?$/i, "")
+    .replace(/\.$/, "")
+    .trim();
+  if (!clean.includes(",")) return false;
+  const parts = clean.split(",").map(part => part.trim()).filter(Boolean);
+  return parts.length >= 2 && parts.every(part => part.split(/\s+/).length <= 3 && !/[.!?]/.test(part));
+}
+
+function conciseIdea(text = "") {
+  return String(text)
+    .replace(/^You recovered the chapter's emphasis on\s+/i, "")
+    .replace(/\sand kept the account in your own words\.?$/i, "")
+    .replace(/^You (correctly )?(identified|captured|remembered|recovered)\s+/i, "")
+    .replace(/\.$/, "")
+    .trim();
+}
+
+function cleanConceptItems(evaluation = {}, structured = {}) {
+  const remembered = cleanRememberedFeedback(structured.feedback?.what_you_remembered || [])
+    .filter(item => !looksLikeKeywordPile(item));
+  if (remembered.length) return remembered;
+  const ideas = evaluation.readingMap?.supporting_ideas || [];
+  if (ideas.length) {
+    return ideas
+      .map(idea => idea.idea)
+      .filter(Boolean)
+      .slice(0, 3);
+  }
+  return [evaluation.strength || "You started from memory instead of copying from the source."];
+}
+
 function whatHeldIntro(evaluation = {}, structured = {}) {
   const items = cleanRememberedFeedback(structured.feedback?.what_you_remembered || []);
+  const captured = conciseIdea(items[0] || evaluation.strength || "");
+  const centralClaim = conciseIdea(evaluation.readingMap?.central_claim || evaluation.answerKey?.central_claim || "");
+  const capturedIsKeywordPile = looksLikeKeywordPile(items[0] || evaluation.strength || "");
+  if (centralClaim && !capturedIsKeywordPile) {
+    return `${centralClaim}. That idea came through clearly in your response.`;
+  }
+  if (centralClaim) {
+    return `${centralClaim}. Your response pointed toward this idea, though some of its supporting detail is still missing.`;
+  }
+  if (captured && !capturedIsKeywordPile) {
+    return `You brought back a concrete part of the chapter. ${captured}. That gives you something real to build from in the challenge.`;
+  }
   if (evaluation.band === "Strong") {
-    return "Nice work. You brought back the main idea and kept the meaning close to the source.";
+    return "The central claim came through clearly in your response.";
   }
   if (items.length) {
     return "You have something real to build from. A few important pieces came back clearly.";
   }
-  return "You started from memory, which gives Margin something honest to work with.";
+  return "You started from memory, which gives Ember something honest to work with.";
+}
+
+function feedbackCopy(text = "") {
+  return String(text)
+    .replace(/\s*—\s*/g, ". ")
+    .replace(/\s+–\s+/g, ". ")
+    .replace(/([A-Za-z0-9”\)])\s*:\s+/g, "$1. ")
+    .replace(/\s*(?:…|\.{3,})\s*/g, ". ")
+    .replace(/\.{2,}/g, ".")
+    .replace(/\s{2,}/g, " ")
+    .replace(/(^|[.!?]\s+)([“"'‘(\[]*)([a-z])/g, (_, boundary, opener, letter) =>
+      `${boundary}${opener}${letter.toUpperCase()}`
+    )
+    .trim();
+}
+
+function escapeFeedback(value = "") {
+  return escapeHtml(feedbackCopy(value));
 }
 
 function sourceEvidenceBlock(label, evidence, tone = "neutral") {
   if (!evidence?.sentence) return "";
-  return `<div class="evidence-block compact ${tone === "revisit" ? "is-revisit" : ""}"><span>${escapeHtml(label)}</span><blockquote>“${escapeHtml(evidence.sentence)}”</blockquote></div>`;
+  return `<div class="evidence-block compact ${tone === "revisit" ? "is-revisit" : ""}"><span>${escapeFeedback(label)}</span><blockquote>“${escapeHtml(evidence.sentence)}”</blockquote></div>`;
 }
 
 function feedbackConceptList(title, items = []) {
   const clean = items.filter(Boolean);
   if (!clean.length) return "";
-  return `<div class="feedback-concepts"><span>${escapeHtml(title)}</span><ul>${clean.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>`;
+  return `<div class="feedback-concepts"><span>${escapeFeedback(title)}</span><ul>${clean.map(item => `<li>${escapeFeedback(item)}</li>`).join("")}</ul></div>`;
 }
 
 function recallPatternLabel(pattern = "") {
@@ -708,7 +1647,86 @@ function formalRecallPatternFeedback(diagnosis = []) {
   if (!usable.length) return null;
   return {
     title: usable.length === 1 ? "Pattern to watch" : "Patterns to watch",
-    items: usable.map(item => `${recallPatternLabel(item.pattern)}: ${item.coaching}`)
+    items: usable.map(item => `${recallPatternLabel(item.pattern)}. ${item.coaching}`)
+  };
+}
+
+function generatedCoachingFeedback(structured = {}) {
+  const coaching = structured.next_time_coaching;
+  if (!coaching?.message) return null;
+  const items = [
+    coaching.pattern_to_watch,
+    coaching.why_it_matters,
+    coaching.next_reading_move
+  ].filter(Boolean);
+  return {
+    title: coaching.title || "Where to go deeper next time",
+    intro: coaching.message,
+    items
+  };
+}
+
+function strongRecallReminder(evaluation = {}) {
+  const map = evaluation.readingMap || {};
+  const contrast = map.contrasts?.[0];
+  if (contrast?.meaning) {
+    return {
+      title: "Where to go deeper next time",
+      intro: "You remembered the main thread. A useful next step is to notice the contrast the author used to sharpen the idea.",
+      items: [`Look for what the author is setting against something else. In this chapter, the contrast to watch is ${contrast.meaning}.`]
+    };
+  }
+  const relationship = map.relationships?.[0];
+  if (relationship?.relationship) {
+    return {
+      title: "Where to go deeper next time",
+      intro: "Your response is strongest on the central claim. Next time, notice the connection that holds the chapter together.",
+      items: [`Ask how one idea changes, supports, or depends on another. The connection to watch here is ${relationship.relationship}.`]
+    };
+  }
+  const qualification = map.qualifications?.[0];
+  if (qualification?.text) {
+    return {
+      title: "Where to go deeper next time",
+      intro: "You have the main idea in hand. The next layer is to notice where the author narrows, limits, or qualifies the claim.",
+      items: [`Look for the condition that keeps the idea from becoming too broad. In this chapter, that condition appears in ${qualification.text}.`]
+    };
+  }
+  const example = map.key_examples?.[0];
+  if (example?.text) {
+    return {
+      title: "Where to go deeper next time",
+      intro: "You remembered the chapter’s direction. To make it stick, attach the idea to the example that carries it.",
+      items: [`After naming the claim, ask which example makes it easier to retell. The example to watch here is ${example.text}.`]
+    };
+  }
+  const entity = map.key_entities?.[0];
+  if (entity?.name) {
+    return {
+      title: "Where to go deeper next time",
+      intro: "You remembered the shape of the idea. A good next move is to hold onto the named detail that gives the idea a handle.",
+      items: [`Notice the person, place, or group the author uses to carry the point. Here, ${entity.name} is worth remembering.`]
+    };
+  }
+  const variants = [
+    {
+      intro: "You remembered the main thread. Next time, choose the one detail you would use if someone asked you to explain why the claim matters.",
+      item: "Before moving on, point to the sentence, example, or relationship that would make your explanation easier to repeat tomorrow."
+    },
+    {
+      intro: "You have enough of the chapter in mind to move beyond recall. The next useful move is to notice what makes the idea travel.",
+      item: "Ask what part of the chapter would help the idea survive a real conversation with someone who has not read it."
+    },
+    {
+      intro: "The central idea came back. Now look for the piece that gives it shape, such as a reason, example, contrast, or limit.",
+      item: "Try asking which detail would make the idea clearer if you had to explain it tomorrow."
+    }
+  ];
+  const index = Math.floor(((evaluation.coverage || 0) * 100)) % variants.length;
+  return {
+    title: "Where to go deeper next time",
+    intro: variants[index].intro,
+    items: [variants[index].item]
   };
 }
 
@@ -716,11 +1734,7 @@ function recallGapReminderFeedback(evaluation = {}, structured = {}) {
   const missed = structured.feedback?.what_you_missed || [];
   const distorted = structured.feedback?.what_may_be_distorted || [];
   if (evaluation.band === "Strong") {
-    return {
-      title: "Reminder for next time",
-      intro: "Pressure-testing an argument shows you understand more than what the author said. It shows you can see when the idea applies, where it may break down, and what would make it stronger or weaker.",
-      items: ["After you remember the central claim, ask: what example, contrast, or condition makes this claim work?"]
-    };
+    return strongRecallReminder(evaluation);
   }
   if (evaluation.gapType === "Weak relationship between ideas") {
     return {
@@ -733,7 +1747,7 @@ function recallGapReminderFeedback(evaluation = {}, structured = {}) {
     return {
       title: "Reminder for next time",
       intro: "Finding the central claim shows you can separate the subject of a chapter from the point the author wants you to carry away. That is what makes the rest of the details easier to organize.",
-      items: ["Before collecting details, try finishing this sentence: The author wants me to believe that..."]
+      items: ["Before collecting details, write one sentence stating what the author wants you to believe."]
     };
   }
   if (evaluation.gapType === "Insufficient response") {
@@ -753,8 +1767,8 @@ function recallGapReminderFeedback(evaluation = {}, structured = {}) {
 
 function readingStrategyFor(evaluation = {}) {
   if (evaluation.band === "Strong") return "You have the main idea in hand. The next useful move is to test where the argument might bend.";
-  if (evaluation.gapType === "Weak relationship between ideas") return "Look for the word that connects the ideas: because, but, therefore, depends on, or leads to.";
-  if (evaluation.gapType === "Missed central claim") return "Before adding details, write one sentence that starts with: The author wants me to believe that...";
+  if (evaluation.gapType === "Weak relationship between ideas") return "Look for the word that connects the ideas. Because, but, therefore, depends on, or leads to can all help.";
+  if (evaluation.gapType === "Missed central claim") return "Before adding details, write one sentence stating what the author wants you to believe.";
   if (evaluation.gapType === "Insufficient response") return "Start smaller. One plain sentence about the chapter is enough to begin rebuilding it.";
   return "Return to the evidence and attach one specific reason or example to the main idea.";
 }
@@ -798,23 +1812,23 @@ function renderEvaluation(showResults = true) {
   const values = getValues();
   const structured = evaluation.gradingResult || localStructuredFeedback(evaluation);
   const progression = progressionForEvaluation(evaluation);
-  const remembered = cleanRememberedFeedback(structured.feedback?.what_you_remembered || []);
-  const rememberedItems = remembered.length ? remembered : [evaluation.strength || "You started from memory instead of copying from the source."];
-  const patternFeedback = formalRecallPatternFeedback(structured.recall_pattern_diagnosis || [])
+  const rememberedItems = cleanConceptItems(evaluation, structured);
+  const patternFeedback = generatedCoachingFeedback(structured)
+    || formalRecallPatternFeedback(structured.recall_pattern_diagnosis || [])
     || recallGapReminderFeedback(evaluation, structured);
-  const heldBody = `<p>${escapeHtml(whatHeldIntro(evaluation, structured))}</p>
+  const heldBody = `<p>${escapeFeedback(whatHeldIntro(evaluation, structured))}</p>
     ${feedbackConceptList("Key concepts", rememberedItems)}
     ${sourceEvidenceBlock("Evidence for what came through", evaluation.strengthEvidence)}`;
   const strengthenBody = patternFeedback
-    ? `<p>${escapeHtml(patternFeedback.intro || (evaluation.band === "Strong" ? "You can now go deeper by noticing the kind of detail that would make this idea easier to carry into a future conversation." : "This is the pattern most worth watching next time you read."))}</p>
+    ? `<p>${escapeFeedback(patternFeedback.intro || (evaluation.band === "Strong" ? "You can go deeper by noticing the detail that would make this idea easier to use later." : "This is the pattern most worth watching next time you read."))}</p>
       ${feedbackConceptList(patternFeedback.title, patternFeedback.items)}
       ${sourceEvidenceBlock("Text evidence to revisit", evaluation.gapEvidence, "revisit")}`
     : "";
   const strengthenStep = patternFeedback
     ? `<article class="path-step path-step-warm">
-        <span class="path-marker">↗</span>
+        <span class="path-marker">4</span>
         <div class="path-card feedback-card gap">
-          <header><span>↗</span><h3>${patternFeedback.title === "Reminder for next time" ? "Reminder for next time" : evaluation.band === "Strong" ? "Where to go deeper next time" : "What to look for next time"}</h3></header>
+          <header><h3>${patternFeedback.title === "Reminder for next time" ? "Reminder for next time" : evaluation.band === "Strong" ? "Where to go deeper next time" : "What to look for next time"}</h3></header>
           ${strengthenBody}
         </div>
       </article>`
@@ -827,24 +1841,24 @@ function renderEvaluation(showResults = true) {
           <div class="path-card path-card-compact">
             <span class="eyebrow">Before feedback</span>
             <h3>${escapeHtml(confidencePhrase(values.confidence))}</h3>
-            <p>This is your read on your own understanding before Margin checks the response against the source.</p>
+            <p>This is your read on your own understanding before Ember checks the response against the source.</p>
           </div>
         </article>
         <article class="path-step path-step-signal">
-          <span class="path-marker">${progression.progress >= 80 ? "✓" : "↗"}</span>
+          <span class="path-marker">2</span>
           <div class="path-card checkpoint-hero">
             <div>
               <span class="eyebrow">Recall signal</span>
-              <h2>${escapeHtml(progression.title)}</h2>
+              <h2>${escapeFeedback(progression.title)}</h2>
               <div class="progression-meter-row"><div class="progression-meter" style="--progression:${progression.progress}%"><span></span></div><strong>${progression.progress}%</strong></div>
-              <p>${escapeHtml(progression.signal)}</p>
+              <p>${escapeFeedback(progression.signal)}</p>
             </div>
           </div>
         </article>
         <article class="path-step">
-          <span class="path-marker">✓</span>
+          <span class="path-marker">3</span>
           <div class="path-card feedback-card">
-            <header><span>✓</span><h3>What held</h3></header>
+            <header><h3>What you captured</h3></header>
             ${heldBody}
           </div>
         </article>
@@ -852,10 +1866,10 @@ function renderEvaluation(showResults = true) {
         <article class="path-step path-step-final">
           <span class="path-marker">→</span>
           <div class="path-card feedback-card next-move">
-            <header><span>?</span><h3>Next move</h3></header>
-            <p>${escapeHtml(readingStrategyFor(evaluation))}</p>
-            <div class="next-challenge-pill"><span>${escapeHtml(displayGapType(evaluation.gapType))}</span><strong>${escapeHtml(evaluation.prompt)}</strong></div>
-            <p class="path-card-note">${escapeHtml(challengeWhy(evaluation))}</p>
+            <header><h3>Next move</h3></header>
+            <p>${escapeFeedback(readingStrategyFor(evaluation))}</p>
+            <div class="next-challenge-pill"><span>${escapeFeedback(displayGapType(evaluation.gapType))}</span><strong>${escapeFeedback(normalizeReviewPrompt(evaluation.prompt))}</strong></div>
+            <p class="path-card-note">${escapeFeedback(challengeWhy(evaluation))}</p>
           </div>
         </article>
       </div>
@@ -865,7 +1879,7 @@ function renderEvaluation(showResults = true) {
   $("#repair-title").textContent = evaluation.band === "Strong" ? "Test the edge of the argument." : "Take on the idea that needs another pass.";
   $("#repair-prompt").textContent = evaluation.prompt;
   const guide = challengeGuideFor(evaluation);
-  $("#repair-guide").innerHTML = `<strong>${escapeHtml(guide.title)}</strong><p>${escapeHtml(guide.body)}</p><small>${escapeHtml(guide.helper)}</small>`;
+  $("#repair-guide").innerHTML = `<strong>${escapeFeedback(guide.title)}</strong><p>${escapeFeedback(guide.body)}</p><small>${escapeFeedback(guide.helper)}</small>`;
   $("#repair-evidence").innerHTML = `<span>${evaluation.band === "Strong" ? "Detail to test" : "Detail to rebuild"}</span><blockquote>“${escapeHtml(evaluation.gapEvidence.sentence)}”</blockquote>`;
   $('[data-action="to-repair"]').innerHTML = evaluation.band === "Strong"
     ? 'Take the challenge <span>→</span>'
@@ -886,25 +1900,347 @@ function buildCompletion(skipped = false) {
     <div class="summary-cell"><span class="summary-label">Initial check <button class="stat-info-button" type="button" data-action="open-initial-check-info" aria-label="About initial check results">i</button></span><strong>${escapeHtml(displayBand(state.evaluation.band))}</strong></div>
     <div class="summary-cell"><span class="summary-label">Confidence <button class="stat-info-button" type="button" data-action="open-confidence-info" aria-label="About confidence">i</button></span><strong>${escapeHtml(values.confidence || "Not recorded")}</strong></div>
     <div class="summary-cell"><span>Challenge</span><strong>${state.repairResolved ? "Completed" : skipped ? "Skipped" : "Attempted"}</strong></div>`;
+  const schedule = initialReviewSchedule(state.evaluation, values.confidence, state.repairResolved);
+  $("#adaptive-review-when").textContent = `Returns ${reviewTimingCopy(schedule.days)}`;
+  $("#adaptive-review-reason").textContent = `Because ${schedule.reason}.`;
+  $("#adaptive-review-copy").textContent = "Ember uses the official FSRS scheduler with your answer quality and confidence.";
   setStep(5);
+  saveDraft();
+}
+
+function confidenceRank(confidence = "") {
+  return {
+    "Not yet": 0,
+    "Partly": 1,
+    "Mostly": 2,
+    "Very well": 3
+  }[confidence] ?? 1;
+}
+
+function addDays(date, days) {
+  return new Date(date.getTime() + days * 86400000);
+}
+
+function reviewTimingCopy(days) {
+  if (days <= 1) return "tomorrow";
+  return `in ${days} days`;
+}
+
+const FSRS_PARAMETERS = {
+  request_retention: 0.9,
+  maximum_interval: 3650,
+  enable_fuzz: false,
+  enable_short_term: false
+};
+const SCHEDULING_POLICY_VERSION = "initial-rating-v5";
+
+function fsrsApi() {
+  return window.FSRS || null;
+}
+
+function fsrsScheduler() {
+  const api = fsrsApi();
+  return api?.fsrs ? api.fsrs(FSRS_PARAMETERS) : null;
+}
+
+function serializeFsrsCard(card) {
+  if (!card) return null;
+  return {
+    due: new Date(card.due).toISOString(),
+    stability: card.stability,
+    difficulty: card.difficulty,
+    elapsed_days: card.elapsed_days,
+    scheduled_days: card.scheduled_days,
+    learning_steps: card.learning_steps,
+    reps: card.reps,
+    lapses: card.lapses,
+    state: card.state,
+    last_review: card.last_review ? new Date(card.last_review).toISOString() : null
+  };
+}
+
+function hydrateFsrsCard(card) {
+  if (!card) return null;
+  return {
+    ...card,
+    due: new Date(card.due),
+    last_review: card.last_review ? new Date(card.last_review) : undefined
+  };
+}
+
+function clampFsrsDays(days) {
+  return Math.max(1, Math.round(Number(days) || 1));
+}
+
+function ratingLabel(rating) {
+  const api = fsrsApi();
+  return api?.Rating?.[rating] || String(rating);
+}
+
+function fallbackInitialReviewSchedule(evaluation, confidence, repairResolved) {
+  const rubric = rubricScoresForEvaluation(evaluation || {});
+  const bandRank = resultRank(evaluation?.band);
+  const confidenceScore = confidenceRank(confidence);
+  const score = rubric.overall;
+  const responseLength = Number(evaluation?.responseWordCount) || 0;
+  const substantialAnswer = responseLength >= 45;
+  const comprehensiveAnswer = responseLength >= 80;
+  const notEnoughEvidence = evaluation?.band === "Not enough evidence" || evaluation?.gapType === "Insufficient response";
+  if (!notEnoughEvidence && rubric.total >= 9) {
+    return { days: confidenceScore >= 3 || repairResolved ? 8 : 3, reason: "the rubric showed strong recall across the main reading traits" };
+  }
+  if (!notEnoughEvidence && rubric.total >= 7) {
+    return { days: 3, reason: "the rubric showed solid recall with a few details to reinforce" };
+  }
+  if (!notEnoughEvidence && rubric.total >= 5) {
+    return { days: 2, reason: "the rubric showed partial recall worth spacing beyond tomorrow" };
+  }
+  if (bandRank === 2 && confidenceScore >= 2) {
+    return {
+      days: repairResolved ? 7 : 5,
+      reason: repairResolved
+        ? "your recall and challenge response were both strong"
+        : "your recall was strong, but the edge case still deserves one delayed pass"
+    };
+  }
+  if (bandRank === 2) {
+    return { days: 3, reason: "your answer was strong, but your confidence was still forming" };
+  }
+  if (bandRank === 1 && confidenceScore >= 2) {
+    return {
+      days: repairResolved && score >= 70 ? 3 : 2,
+      reason: repairResolved && score >= 70
+        ? "your recall was developing and the challenge strengthened the weak spot"
+        : "the main shape was there, but one connection needs reinforcement"
+    };
+  }
+  if (!notEnoughEvidence && score >= 40 && confidenceScore >= 2) {
+    return { days: 2, reason: "your response had enough signal to wait a little longer than tomorrow" };
+  }
+  if (!notEnoughEvidence && comprehensiveAnswer) {
+    return { days: 3, reason: "your answer was substantial, even though the scorer wanted a cleaner match to the source" };
+  }
+  if (!notEnoughEvidence && substantialAnswer) {
+    return { days: 2, reason: "your answer had enough substance to avoid an immediate tomorrow retry" };
+  }
+  return { days: 1, reason: "the chapter still has a fragile spot" };
+}
+
+function initialFsrsRating(evaluation, confidence, repairResolved) {
+  const api = fsrsApi();
+  if (!api?.Rating) return null;
+  const rubric = rubricScoresForEvaluation(evaluation || {});
+  if (rubric.maxRating === "Again") return api.Rating.Again;
+  if (rubric.maxRating === "Hard" && rubric.total >= 5) return api.Rating.Hard;
+  const bandRank = resultRank(evaluation?.band);
+  const confidenceScore = confidenceRank(confidence);
+  const score = rubric.overall;
+  const responseLength = Number(evaluation?.responseWordCount) || 0;
+  const substantialAnswer = responseLength >= 45;
+  const comprehensiveAnswer = responseLength >= 80;
+  const notEnoughEvidence = evaluation?.band === "Not enough evidence" || evaluation?.gapType === "Insufficient response";
+  if (!notEnoughEvidence && rubric.total >= 9) return confidenceScore >= 3 || repairResolved ? api.Rating.Easy : api.Rating.Good;
+  if (!notEnoughEvidence && rubric.total >= 7) return api.Rating.Good;
+  if (!notEnoughEvidence && rubric.total >= 5) return api.Rating.Hard;
+  if (bandRank === 2 && confidenceScore === 3 && repairResolved && score >= 90) return api.Rating.Easy;
+  if (bandRank === 2 && confidenceScore >= 2) return api.Rating.Good;
+  if (bandRank === 2) return api.Rating.Hard;
+  if (bandRank === 1) {
+    if (repairResolved && confidenceScore >= 2 && score >= 70) return api.Rating.Good;
+    return confidenceScore >= 2 ? api.Rating.Hard : api.Rating.Again;
+  }
+  if (!notEnoughEvidence && score >= 40 && confidenceScore >= 2) return api.Rating.Hard;
+  if (!notEnoughEvidence && comprehensiveAnswer) return api.Rating.Good;
+  if (!notEnoughEvidence && substantialAnswer) return api.Rating.Hard;
+  return api.Rating.Again;
+}
+
+function initialScheduleInputs(evaluation, confidence, repairResolved) {
+  const rubric = rubricScoresForEvaluation(evaluation || {});
+  return {
+    band: evaluation?.band || "",
+    score: evaluationScore(evaluation || {}),
+    rubric,
+    confidence: confidence || "",
+    responseWordCount: Number(evaluation?.responseWordCount) || 0,
+    minimumDays: minimumInitialReviewDays(evaluation, confidence),
+    challengeCompleted: Boolean(repairResolved),
+    gapType: evaluation?.gapType || ""
+  };
+}
+
+function initialScheduleReason(evaluation, confidence, repairResolved, defaultReason) {
+  const score = evaluationScore(evaluation || {});
+  const responseLength = Number(evaluation?.responseWordCount) || 0;
+  const confidenceScore = confidenceRank(confidence);
+  const notEnoughEvidence = evaluation?.band === "Not enough evidence" || evaluation?.gapType === "Insufficient response";
+  if (!notEnoughEvidence && responseLength >= 80 && score < 50) {
+    return "your answer was substantial, but the scorer wanted a cleaner match to the source";
+  }
+  if (!notEnoughEvidence && responseLength >= 45 && score < 50) {
+    return "your answer had enough substance to avoid an immediate tomorrow retry";
+  }
+  if (repairResolved && score >= 70 && confidenceScore >= 2) {
+    return "your challenge response strengthened the weak spot";
+  }
+  return defaultReason;
+}
+
+function minimumInitialReviewDays(evaluation, confidence) {
+  const score = evaluationScore(evaluation || {});
+  const rubric = rubricScoresForEvaluation(evaluation || {});
+  const responseLength = Number(evaluation?.responseWordCount) || 0;
+  const confidenceScore = confidenceRank(confidence);
+  const notEnoughEvidence = evaluation?.band === "Not enough evidence" || evaluation?.gapType === "Insufficient response";
+  if (notEnoughEvidence || rubric.central_claim === 0 || responseLength < 25) return 1;
+  if (responseLength >= 80) return 3;
+  if (responseLength >= 45 || score >= 40 || confidenceScore >= 2) return 2;
+  return 1;
+}
+
+function enforceInitialScheduleMinimum(schedule, evaluation, confidence, repairResolved, now) {
+  if (!schedule) return schedule;
+  const minimumDays = minimumInitialReviewDays(evaluation, confidence);
+  if (schedule.days >= minimumDays) return schedule;
+  const due = addDays(now, minimumDays);
+  const card = schedule.card
+    ? {
+      ...schedule.card,
+      due: due.toISOString(),
+      scheduled_days: minimumDays
+    }
+    : schedule.card;
+  return {
+    ...schedule,
+    days: minimumDays,
+    due,
+    card,
+    intervalGuardApplied: true,
+    reason: initialScheduleReason(evaluation, confidence, repairResolved, schedule.reason)
+  };
+}
+
+function evaluationWithRecallLength(evaluation = {}, recall = "") {
+  if (!evaluation) return evaluation;
+  if (Number(evaluation.responseWordCount) > 0) return evaluation;
+  return {
+    ...evaluation,
+    responseWordCount: wordCount(recall || "")
+  };
+}
+
+function reviewFsrsRating(attempt) {
+  const api = fsrsApi();
+  if (!api?.Rating) return null;
+  const weakerRank = Math.min(resultRank(attempt.gapBand), resultRank(attempt.band));
+  const confidenceScore = confidenceRank(attempt.confidence);
+  if (weakerRank === 2 && confidenceScore === 3) return api.Rating.Easy;
+  if (weakerRank === 2) return api.Rating.Good;
+  if (weakerRank === 1) return api.Rating.Hard;
+  return api.Rating.Again;
+}
+
+function fsrsReasonForRating(rating, context = "initial") {
+  const label = ratingLabel(rating);
+  if (label === "Easy") return context === "initial"
+    ? "your recall, confidence, and challenge response were all strong"
+    : "both review prompts came back easily";
+  if (label === "Good") return context === "initial"
+    ? "your recall was strong enough for a normal FSRS interval"
+    : "both review prompts came back";
+  if (label === "Hard") return context === "initial"
+    ? "the idea was present, but still needed effort"
+    : "one answer came back only partially";
+  return context === "initial"
+    ? "the chapter still has a fragile spot"
+    : "one of the ideas did not come back reliably";
+}
+
+function scheduleWithFsrs(card, rating, now, context) {
+  const api = fsrsApi();
+  const scheduler = fsrsScheduler();
+  if (!api?.createEmptyCard || !scheduler || !rating) return null;
+  const startingCard = hydrateFsrsCard(card) || api.createEmptyCard(now);
+  const result = scheduler.next(startingCard, now, rating);
+  const days = clampFsrsDays(result.card.scheduled_days || dateDiffInDays(now, result.card.due));
+  return {
+    complete: false,
+    days,
+    due: new Date(result.card.due),
+    reason: fsrsReasonForRating(rating, context),
+    rating,
+    ratingLabel: ratingLabel(rating),
+    card: serializeFsrsCard(result.card),
+    log: result.log ? {
+      ...result.log,
+      due: new Date(result.log.due).toISOString(),
+      review: new Date(result.log.review).toISOString()
+    } : null
+  };
+}
+
+function dateDiffInDays(start, end) {
+  return Math.max(1, Math.round((new Date(end).getTime() - new Date(start).getTime()) / 86400000));
+}
+
+function initialReviewSchedule(evaluation, confidence, repairResolved, previousCard = null, now = new Date()) {
+  const schedule = scheduleWithFsrs(previousCard, initialFsrsRating(evaluation, confidence, repairResolved), now, "initial");
+  if (schedule) {
+    const explained = { ...schedule, reason: initialScheduleReason(evaluation, confidence, repairResolved, schedule.reason) };
+    return enforceInitialScheduleMinimum(explained, evaluation, confidence, repairResolved, now);
+  }
+  const fallback = fallbackInitialReviewSchedule(evaluation, confidence, repairResolved);
+  return { ...fallback, due: addDays(now, fallback.days), ratingLabel: "Fallback", card: previousCard || null };
+}
+
+function nextReviewSchedule(attempt, previousAttempt, previousCard = null, now = new Date()) {
+  const schedule = scheduleWithFsrs(previousCard, reviewFsrsRating(attempt), now, "review");
+  if (schedule) return schedule;
+  const weakerRank = Math.min(resultRank(attempt.gapBand), resultRank(attempt.band));
+  const confidenceScore = confidenceRank(attempt.confidence);
+  const days = weakerRank === 2 && confidenceScore >= 2 ? 14 : weakerRank === 2 ? 7 : weakerRank === 1 ? 3 : 1;
+  return {
+    complete: false,
+    days,
+    due: addDays(now, days),
+    reason: weakerRank === 2 ? "both answers were strong" : weakerRank === 1 ? "one answer was partial" : "one of the ideas did not come back reliably",
+    ratingLabel: "Fallback",
+    card: previousCard || null
+  };
 }
 
 function saveCurrent(goHome = true) {
   const values = getValues();
   const chapters = loadChapters();
   const now = new Date();
-  const selectedDelay = $('[name="reviewDelay"]:checked')?.value || "3";
-  const reviewDue = selectedDelay === "none" ? null : new Date(now.getTime() + Number(selectedDelay) * 86400000).toISOString();
   const id = state.currentId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const previous = chapters.find(chapter => chapter.id === id);
+  const previousInitialCard = previous?.status === "Draft" ? null : previous?.fsrsCard || null;
+  const schedule = initialReviewSchedule(state.evaluation, values.confidence, state.repairResolved, previousInitialCard);
+  const reviewDue = new Date(schedule.due || addDays(now, schedule.days)).toISOString();
   const chapter = {
     ...previous,
     id,
     ...values,
     evaluation: state.evaluation,
     repairResolved: state.repairResolved,
-    status: reviewDue ? "Review scheduled" : "Immediate complete",
+    status: "Review scheduled",
     reviewDue,
+    reviewCanceled: false,
+    fsrsCard: schedule.card || previous?.fsrsCard || null,
+    reviewSchedule: {
+      model: "ts-fsrs",
+      package: "ts-fsrs",
+      packageVersion: "5.4.1",
+      policyVersion: SCHEDULING_POLICY_VERSION,
+      days: schedule.days,
+      reason: schedule.reason,
+      rating: schedule.ratingLabel,
+      inputs: initialScheduleInputs(state.evaluation, values.confidence, state.repairResolved),
+      intervalGuardApplied: Boolean(schedule.intervalGuardApplied),
+      log: schedule.log || null,
+      scheduledAt: now.toISOString()
+    },
     updatedAt: now.toISOString(),
     createdAt: previous?.createdAt || now.toISOString(),
     delayedAttempts: previous?.delayedAttempts || []
@@ -916,12 +2252,90 @@ function saveCurrent(goHome = true) {
   state.currentId = id;
   localStorage.removeItem(DRAFT_KEY);
   renderDashboard();
-  toast(reviewDue ? "Saved. Your delayed review is scheduled." : "Saved to your library.");
+  toast(`Saved. FSRS scheduled this ${reviewTimingCopy(schedule.days)} because ${schedule.reason}.`);
   if (goHome) setView("home");
 }
 
 function reviewIsDue(chapter) {
   return chapter.reviewDue && new Date(chapter.reviewDue).getTime() <= Date.now() && chapter.status !== "Complete";
+}
+
+function reviewIsScheduled(chapter) {
+  return Boolean(chapter.reviewDue && chapter.status !== "Draft");
+}
+
+function hasReviewSourceData(chapter) {
+  return Boolean(chapter?.evaluation || chapter?.recall || chapter?.repair || (chapter?.delayedAttempts || []).length);
+}
+
+function reviewEligibilityReason(chapter) {
+  if (!chapter) return "missing chapter data";
+  if (chapter.status === "Draft") return "draft";
+  if (chapter.reviewCanceled) return "canceled";
+  if (!hasReviewSourceData(chapter)) return "no saved response data";
+  if (chapter.fsrsCard && chapter.reviewSchedule?.model === "ts-fsrs") return "already scored";
+  return "eligible";
+}
+
+function shouldMigrateReviewToFsrs(chapter) {
+  if (!chapter || chapter.status === "Draft" || chapter.reviewCanceled) return false;
+  if (chapter.fsrsCard && chapter.reviewSchedule?.model === "ts-fsrs") return false;
+  return hasReviewSourceData(chapter);
+}
+
+function shouldRebalanceInitialReviewSchedule(chapter) {
+  if (!chapter || chapter.status === "Draft" || chapter.reviewCanceled) return false;
+  if (!hasReviewSourceData(chapter)) return false;
+  if (chapter.reviewSchedule?.model !== "ts-fsrs") return false;
+  if (chapter.reviewSchedule?.manualRescheduled) return false;
+  if (chapter.reviewSchedule?.policyVersion === SCHEDULING_POLICY_VERSION) return false;
+  if ((chapter.delayedAttempts || []).length) return false;
+  return Boolean(chapter.reviewDue);
+}
+
+function migrateReviewsToFsrs(chapters) {
+  let changed = false;
+  const updated = chapters.map(chapter => {
+    if (!shouldMigrateReviewToFsrs(chapter) && !shouldRebalanceInitialReviewSchedule(chapter)) return chapter;
+    const anchor = new Date(chapter.reviewSchedule?.scheduledAt || chapter.updatedAt || chapter.createdAt || Date.now());
+    const scheduleAnchor = Number.isNaN(anchor.getTime()) ? new Date() : anchor;
+    const scheduleEvaluation = evaluationWithRecallLength(chapter.evaluation, chapter.recall);
+    const schedule = initialReviewSchedule(
+      scheduleEvaluation,
+      chapter.confidence,
+      chapter.repairResolved,
+      shouldRebalanceInitialReviewSchedule(chapter) ? null : chapter.fsrsCard || null,
+      scheduleAnchor
+    );
+    changed = true;
+    return {
+      ...chapter,
+      evaluation: scheduleEvaluation,
+      status: "Review scheduled",
+      reviewDue: new Date(schedule.due || addDays(scheduleAnchor, schedule.days)).toISOString(),
+      reviewCanceled: false,
+      fsrsCard: schedule.card || chapter.fsrsCard || null,
+      reviewBackfilled: !chapter.reviewDue,
+      reviewMigratedToFsrs: true,
+      reviewSchedule: {
+        model: "ts-fsrs",
+        package: "ts-fsrs",
+        packageVersion: "5.4.1",
+        policyVersion: SCHEDULING_POLICY_VERSION,
+        days: schedule.days,
+        reason: schedule.reason,
+        rating: schedule.ratingLabel,
+        inputs: initialScheduleInputs(scheduleEvaluation, chapter.confidence, chapter.repairResolved),
+        intervalGuardApplied: Boolean(schedule.intervalGuardApplied),
+        log: schedule.log || null,
+        scheduledAt: new Date().toISOString(),
+        backfilled: !chapter.reviewDue,
+        migrated: true
+      }
+    };
+  });
+  if (changed) saveChapters(updated);
+  return updated;
 }
 
 function reviewDate(chapter) {
@@ -930,28 +2344,111 @@ function reviewDate(chapter) {
   return { month: date.toLocaleDateString(undefined, { month: "short" }), day: date.getDate(), label: reviewIsDue(chapter) ? "Due now" : date.toLocaleDateString(undefined, { month: "short", day: "numeric" }) };
 }
 
+function reviewScheduleDetail(chapter) {
+  const schedule = chapter.reviewSchedule || {};
+  const rating = schedule.rating ? `FSRS ${schedule.rating}` : "FSRS pending";
+  const reason = schedule.reason || displayGapType(chapter.evaluation?.gapType || "Chapter review");
+  return `${rating} · ${reason}`;
+}
+
+function reviewIconTitle(chapter) {
+  const dueLabel = reviewIsDue(chapter)
+    ? "Due now"
+    : `Scheduled for ${new Date(chapter.reviewDue).toLocaleDateString()}`;
+  return `${dueLabel} · ${reviewScheduleDetail(chapter)}`;
+}
+
+function reviewQueueSummary(due, scheduled) {
+  if (!scheduled.length) return "No reviews scheduled";
+  return due.length
+    ? `${due.length} due now · ${scheduled.length} scheduled`
+    : `${scheduled.length} scheduled`;
+}
+
 function renderReviewItem(chapter, manage = false) {
   const date = reviewDate(chapter);
   return `
     <article class="review-item">
-      <div class="date-tile"><span>${escapeHtml(date?.month || "—")}</span><strong>${date?.day || "—"}</strong></div>
-      <div class="item-copy"><strong>${escapeHtml(chapter.chapterTitle)}</strong><small>${escapeHtml(chapter.bookTitle)} · ${escapeHtml(displayGapType(chapter.evaluation?.gapType || "Chapter review"))}</small></div>
+      <div class="date-tile"><span>${escapeHtml(date?.month || "No")}</span><strong>${date?.day || "date"}</strong></div>
+      <div class="item-copy"><strong>${escapeHtml(chapter.chapterTitle)}</strong><small>${escapeHtml(chapter.bookTitle)} · ${escapeHtml(reviewScheduleDetail(chapter))}</small></div>
       ${manage ? `
         <div class="review-actions">
           <button class="item-action" type="button" data-review-id="${chapter.id}">${reviewIsDue(chapter) ? "Review now →" : "Start early →"}</button>
-          <button class="text-button" type="button" data-action="toggle-reschedule" data-manage-review-id="${chapter.id}">Reschedule</button>
-          <button class="text-button cancel-review" type="button" data-action="cancel-review" data-manage-review-id="${chapter.id}">Cancel</button>
-        </div>
-        <div class="reschedule-panel" data-reschedule-panel="${chapter.id}" hidden>
-          <span>Bring this chapter back:</span>
-          <div class="reschedule-options">
-            <button type="button" data-action="reschedule-managed-review" data-manage-review-id="${chapter.id}" data-delay="1">Tomorrow</button>
-            <button type="button" data-action="reschedule-managed-review" data-manage-review-id="${chapter.id}" data-delay="3">In 3 days</button>
-            <button type="button" data-action="reschedule-managed-review" data-manage-review-id="${chapter.id}" data-delay="7">In 7 days</button>
-          </div>
+          <details class="review-manage">
+            <summary>More</summary>
+            <div class="reschedule-panel">
+              <span>Bring this chapter back:</span>
+              <div class="reschedule-options">
+                <button type="button" data-action="reschedule-managed-review" data-manage-review-id="${chapter.id}" data-delay="1">Tomorrow</button>
+                <button type="button" data-action="reschedule-managed-review" data-manage-review-id="${chapter.id}" data-delay="3">In 3 days</button>
+                <button type="button" data-action="reschedule-managed-review" data-manage-review-id="${chapter.id}" data-delay="7">In 7 days</button>
+                <button class="cancel-review" type="button" data-action="cancel-review" data-manage-review-id="${chapter.id}">Cancel</button>
+              </div>
+            </div>
+          </details>
         </div>` : `
         <button class="item-action" type="button" data-review-id="${chapter.id}">${reviewIsDue(chapter) ? "Review now →" : escapeHtml(date?.label || "Scheduled")}</button>`}
     </article>`;
+}
+
+function daysUntilReview(chapter) {
+  if (!chapter.reviewDue) return Infinity;
+  return Math.ceil((new Date(chapter.reviewDue).getTime() - Date.now()) / 86400000);
+}
+
+function reviewPriorityScore(chapter) {
+  const rating = chapter.reviewSchedule?.rating || "";
+  const ratingWeight = { Again: 0, Hard: 1, Good: 2, Easy: 3 }[rating] ?? 2;
+  const score = evaluationScore(chapter.evaluation || {});
+  return ratingWeight * 100 + score;
+}
+
+function sortReviewPriority(chapters = []) {
+  return [...chapters].sort((a, b) => {
+    const dueDelta = new Date(a.reviewDue).getTime() - new Date(b.reviewDue).getTime();
+    if (reviewIsDue(a) && reviewIsDue(b)) return reviewPriorityScore(a) - reviewPriorityScore(b) || dueDelta;
+    return dueDelta;
+  });
+}
+
+function reviewBuckets(scheduled = []) {
+  const due = sortReviewPriority(scheduled.filter(reviewIsDue));
+  return {
+    dueNow: due.slice(0, 3),
+    moreDue: due.slice(3),
+    soon: scheduled.filter(chapter => !reviewIsDue(chapter) && daysUntilReview(chapter) <= 7),
+    later: scheduled.filter(chapter => !reviewIsDue(chapter) && daysUntilReview(chapter) > 7)
+  };
+}
+
+function renderReviewSection(title, description, chapters = [], options = {}) {
+  if (!chapters.length) return "";
+  const limit = options.limit || chapters.length;
+  const visible = chapters.slice(0, limit);
+  const remaining = chapters.length - visible.length;
+  return `
+    <section class="review-chunk ${options.tone ? `is-${options.tone}` : ""}">
+      <header>
+        <div><span>${escapeHtml(title)}</span><p>${escapeHtml(description)}</p></div>
+        <strong>${chapters.length}</strong>
+      </header>
+      ${options.session ? `<button class="primary review-session-start" type="button" data-action="start-review-session" data-review-session-ids="${escapeHtml(chapters.map(chapter => chapter.id).join(","))}">Start review session <span>→</span></button>` : ""}
+      <div class="review-chunk-list">${visible.map(chapter => renderReviewItem(chapter, true)).join("")}</div>
+      ${remaining ? `<p class="review-chunk-more">${remaining} more scheduled later in this group.</p>` : ""}
+    </section>`;
+}
+
+function renderReviewQueue(scheduled = []) {
+  if (!scheduled.length) {
+    return '<div class="empty-state"><strong>Your review queue is clear</strong>New checks return here when FSRS schedules them.</div>';
+  }
+  const buckets = reviewBuckets(scheduled);
+  return [
+    renderReviewSection("Do now", "Work through a short set of up to 3. These are the highest-leverage reviews for this visit.", buckets.dueNow, { tone: "due", session: true }),
+    renderReviewSection("More due today", "Still worth doing today, but not part of the first set.", buckets.moreDue, { tone: "due" }),
+    renderReviewSection("Soon", "Keep these in view. They are coming back this week.", buckets.soon, { tone: "soon" }),
+    renderReviewSection("Later", "No action needed yet. FSRS is spacing these out.", buckets.later, { tone: "later", limit: 6 })
+  ].join("");
 }
 
 function renderRecentItem(chapter) {
@@ -1017,7 +2514,7 @@ function renderLibrary(chapters) {
         <svg class="book-drag-handle" viewBox="0 0 12 18" aria-hidden="true"><circle cx="3" cy="4" r="1"></circle><circle cx="9" cy="4" r="1"></circle><circle cx="3" cy="9" r="1"></circle><circle cx="9" cy="9" r="1"></circle><circle cx="3" cy="14" r="1"></circle><circle cx="9" cy="14" r="1"></circle></svg>
         <strong>${escapeHtml(group.title)}</strong>
         <span class="book-summary-meta">
-          ${group.title.toLowerCase().includes("road to character") ? "" : `<span class="book-summary-count">${completed}${total ? ` / ${total}` : ""}</span>`}
+          <span class="book-summary-count">${completed}${total ? ` / ${total}` : ""}</span>
           <svg class="book-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m7 5 5 5-5 5"></path></svg>
         </span>
       </summary>
@@ -1030,8 +2527,8 @@ function renderLibrary(chapters) {
       ${group.chapters.map(chapter => {
         const stateIndicator = chapter.status === "Draft"
           ? "<small>Unfinished</small>"
-          : chapter.reviewDue
-            ? `<span class="review-scheduled-icon" role="img" aria-label="Review scheduled" title="Review scheduled">
+          : reviewIsScheduled(chapter)
+            ? `<span class="review-scheduled-icon${reviewIsDue(chapter) ? " is-due" : ""}" role="img" aria-label="${reviewIsDue(chapter) ? "Review due" : "Review scheduled"}" title="${escapeHtml(reviewIconTitle(chapter))}">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5v5l3.5 2"></path></svg>
               </span>`
             : "";
@@ -1039,6 +2536,207 @@ function renderLibrary(chapters) {
       }).join("")}
     </details>`;
     })()}`).join("");
+}
+
+function uniqueStrings(items = [], limit = 5) {
+  const seen = new Set();
+  return items
+    .map(item => feedbackCopy(item || ""))
+    .filter(Boolean)
+    .filter(item => {
+      const key = item.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, limit);
+}
+
+function normalizeTraitScore(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return null;
+  return Math.max(0, Math.min(2, Math.round(numeric)));
+}
+
+function fourPointToTrait(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return null;
+  if (numeric >= 3) return 2;
+  if (numeric >= 1) return 1;
+  return 0;
+}
+
+function relationshipTraitFromEvaluation(evaluation = {}, rubricScores = {}) {
+  const direct = normalizeTraitScore(rubricScores.relationship_between_ideas);
+  if (direct !== null) return direct;
+  const diagnosis = evaluation.gradingResult?.recall_pattern_diagnosis || [];
+  const relationshipGap = diagnosis.find(item => item.pattern === "relationship_loss" || item.pattern === "qualification_loss");
+  if (relationshipGap) return relationshipGap.severity >= .75 ? 0 : 1;
+  if (evaluation.gapType === "Weak relationship between ideas") return evaluation.band === "Needs another pass" ? 0 : 1;
+  if (evaluation.band === "Strong") return 2;
+  return fourPointToTrait(evaluation.gradingResult?.supporting_ideas_score) ?? (Number(evaluation.coverage) >= .25 ? 1 : 0);
+}
+
+function transferTraitFromEvaluation(evaluation = {}, rubricScores = {}) {
+  const direct = normalizeTraitScore(rubricScores.transfer_application);
+  if (direct !== null) return direct;
+  const diagnosis = evaluation.gradingResult?.recall_pattern_diagnosis || [];
+  const qualificationGap = diagnosis.find(item => item.pattern === "qualification_loss");
+  if (qualificationGap) return qualificationGap.severity >= .75 ? 0 : 1;
+  if (evaluation.gapType === "Study challenge") return evaluation.band === "Strong" ? 2 : 1;
+  return evaluation.band === "Strong" ? 2 : evaluation.band === "Developing" ? 1 : 0;
+}
+
+function rubricScoresForEvaluation(evaluation = {}) {
+  const structured = evaluation.gradingResult || {};
+  const rubric = structured.rubric_scores || {};
+  const centralClaim = normalizeTraitScore(rubric.central_claim)
+    ?? fourPointToTrait(structured.central_claim_score)
+    ?? resultRank(evaluation.band);
+  const supportingIdeas = normalizeTraitScore(rubric.supporting_ideas)
+    ?? fourPointToTrait(structured.supporting_ideas_score)
+    ?? (Number(evaluation.coverage) >= .5 ? 2 : Number(evaluation.coverage) >= .25 ? 1 : 0);
+  const sourceFidelity = normalizeTraitScore(rubric.source_fidelity)
+    ?? normalizeTraitScore(structured.accuracy_score)
+    ?? (evaluation.gapType === "Unsupported claim" || evaluation.gapType === "Distorted idea" ? 0 : 2);
+  const relationship = relationshipTraitFromEvaluation(evaluation, rubric);
+  const transfer = transferTraitFromEvaluation(evaluation, rubric);
+  const traits = {
+    central_claim: centralClaim,
+    supporting_ideas: supportingIdeas,
+    relationship_between_ideas: relationship,
+    source_fidelity: sourceFidelity,
+    transfer_application: transfer
+  };
+  const total = Object.values(traits).reduce((sum, value) => sum + value, 0);
+  return {
+    ...traits,
+    total,
+    overall: total * 10,
+    maxRating: centralClaim === 0 ? "Again" : sourceFidelity === 0 ? "Hard" : null
+  };
+}
+
+function evaluationScore(evaluation = {}) {
+  const structured = evaluation.gradingResult || {};
+  const rubric = rubricScoresForEvaluation(evaluation);
+  const raw = Number.isFinite(rubric?.overall)
+    ? rubric.overall
+    : Number.isFinite(structured.overall_score)
+    ? structured.overall_score
+    : Number.isFinite(evaluation.coverage)
+      ? Math.round(evaluation.coverage * 100)
+      : 0;
+  return Math.max(0, Math.min(100, raw));
+}
+
+function recallScoreTone(score = 0) {
+  if (score >= 80) return "strong";
+  if (score >= 50) return "developing";
+  return "needs-pass";
+}
+
+function bookReportIntelligence(chapters = [], reviews = []) {
+  const maps = chapters.map(chapter => chapter.evaluation?.readingMap).filter(Boolean);
+  const gradingResults = chapters.map(chapter => chapter.evaluation?.gradingResult).filter(Boolean);
+  const captured = uniqueStrings(chapters.flatMap(chapter => {
+    const structured = chapter.evaluation?.gradingResult || localStructuredFeedback(chapter.evaluation || {});
+    return cleanConceptItems(chapter.evaluation || {}, structured);
+  }), 4);
+  const centralClaims = uniqueStrings(maps.map(map => map.central_claim), 4);
+  const supportingIdeas = uniqueStrings(maps.flatMap(map => (map.supporting_ideas || []).map(idea => idea.idea)), 5);
+  const relationships = uniqueStrings(maps.flatMap(map => (map.relationships || []).map(item => item.relationship)), 4);
+  const examples = uniqueStrings(maps.flatMap(map => (map.key_examples || []).map(item => item.text)), 3);
+  const diagnosisCounts = gradingResults
+    .flatMap(result => result.recall_pattern_diagnosis || [])
+    .reduce((counts, item) => {
+      if (!item?.pattern) return counts;
+      const existing = counts.get(item.pattern) || { pattern: item.pattern, count: 0, severity: 0, coaching: item.coaching || "" };
+      existing.count += 1;
+      existing.severity = Math.max(existing.severity, Number(item.severity) || 0);
+      if (!existing.coaching && item.coaching) existing.coaching = item.coaching;
+      counts.set(item.pattern, existing);
+      return counts;
+    }, new Map());
+  const diagnoses = [...diagnosisCounts.values()]
+    .sort((a, b) => (b.count - a.count) || (b.severity - a.severity))
+    .slice(0, 4);
+  const avgScore = chapters.length
+    ? Math.round(chapters.reduce((total, chapter) => total + evaluationScore(chapter.evaluation || {}), 0) / chapters.length)
+    : 0;
+  const strongCount = chapters.filter(chapter => evaluationScore(chapter.evaluation || {}) >= 80).length;
+  const reviewedCount = reviews.length;
+  const nextMove = diagnoses[0]
+    ? `Next time you read, watch for ${recallPatternLabel(diagnoses[0].pattern).toLowerCase()}. ${diagnoses[0].coaching || "Pause and name the specific detail before moving on."}`
+    : strongCount
+      ? "Your main ideas are starting to hold. The next useful move is to keep attaching each claim to the evidence or relationship that makes it easier to retell."
+      : "Keep using chapter checks to separate the main claim from interesting details. The pattern will get sharper as more chapters come in.";
+  return {
+    captured,
+    centralClaims,
+    supportingIdeas,
+    relationships,
+    examples,
+    diagnoses,
+    avgScore,
+    strongCount,
+    reviewedCount,
+    nextMove
+  };
+}
+
+function reportList(items = [], empty = "More checks will make this signal clearer.") {
+  const clean = uniqueStrings(items, 5);
+  if (!clean.length) return `<p class="report-empty">${escapeFeedback(empty)}</p>`;
+  return `<ul class="report-list">${clean.map(item => `<li>${escapeFeedback(item)}</li>`).join("")}</ul>`;
+}
+
+function renderPatternCards(diagnoses = [], fallbackGap = "") {
+  if (!diagnoses.length && !fallbackGap) {
+    return '<p class="report-empty">No repeated recall pattern is strong enough to name yet.</p>';
+  }
+  const items = diagnoses.length
+    ? diagnoses
+    : [{ label: displayGapType(fallbackGap), count: 1, severity: 0, coaching: "Keep checking whether this shows up again in future chapters." }];
+  return `<div class="report-pattern-list">${items.map(item => `
+    <article>
+      <span>${escapeFeedback(item.label || recallPatternLabel(item.pattern) || item.pattern)}</span>
+      <strong>${escapeHtml(item.count)} ${item.count === 1 ? "chapter" : "chapters"}</strong>
+      <p>${escapeFeedback(item.coaching || "This is worth watching in the next chapter check.")}</p>
+    </article>
+  `).join("")}</div>`;
+}
+
+function renderReportInsightCards(intelligence = {}, chapters = [], progressText = "", bookComplete = false) {
+  const primaryPattern = intelligence.diagnoses?.[0];
+  const patternLabel = primaryPattern ? recallPatternLabel(primaryPattern.pattern) : "";
+  const forming = intelligence.centralClaims?.[0]
+    || intelligence.captured?.[0]
+    || "The book’s main thread is beginning to take shape across your chapter checks.";
+  const pattern = primaryPattern
+    ? `${patternLabel} is the pattern most worth watching next. ${primaryPattern.coaching || "Pause and name the specific detail before moving on."}`
+    : "No repeated recall pattern is strong enough to name yet. A few more chapter checks will make the signal easier to trust.";
+  const next = bookComplete
+    ? "Carry this pattern into your next book. Start by watching whether the same recall habit shows up when the author, subject, and examples change."
+    : intelligence.nextMove || "Use the next chapter check to name the central claim, then attach it to one concrete reason or example.";
+  return `
+    <section class="report-insight-strip" aria-label="Reading insights">
+      <article class="report-insight-card tone-ink">
+        <span>What’s forming</span>
+        <h2>${escapeFeedback(forming)}</h2>
+        <p>${escapeFeedback(progressText)}</p>
+      </article>
+      <article class="report-insight-card tone-amber">
+        <span>Pattern to watch</span>
+        <h2>${escapeFeedback(patternLabel || "Still emerging")}</h2>
+        <p>${escapeFeedback(pattern)}</p>
+      </article>
+      <article class="report-insight-card tone-paper">
+        <span>Next useful move</span>
+        <h2>${bookComplete ? "Use the next book to test the pattern." : "Use the next chapter to sharpen the signal."}</h2>
+        <p>${escapeFeedback(next)}</p>
+      </article>
+    </section>`;
 }
 
 function renderBookInsights(key) {
@@ -1059,52 +2757,74 @@ function renderBookInsights(key) {
   }, new Map());
   const gaps = [...gapCounts.entries()].sort((a, b) => b[1] - a[1]);
   const topGap = gaps[0]?.[0];
+  const intelligence = bookReportIntelligence(chapters, reviews);
   const title = chapters[0].bookTitle;
   const author = chapters[0].authorName || book?.author || "";
+  const totalChapters = Number.parseInt(book?.totalChapters || chapters[0].bookTotalChapters || "", 10);
+  const hasTotal = Number.isFinite(totalChapters) && totalChapters > 0;
+  const progressPercent = hasTotal ? Math.min(100, Math.round(chapters.length / totalChapters * 100)) : null;
+  const bookComplete = hasTotal && chapters.length >= totalChapters;
   const progress = book?.totalChapters
     ? `${chapters.length} of ${book.totalChapters} chapters checked`
     : `${chapters.length} ${chapters.length === 1 ? "chapter" : "chapters"} checked`;
-  const synthesis = reviews.length
-    ? `You have completed ${reviews.length} delayed ${reviews.length === 1 ? "review" : "reviews"}. ${strongReviews ? `${strongReviews} came back strongly.` : "Your next reviews will show which ideas last."}${topGap ? ` The most consistent opportunity is ${topGap.toLowerCase()}.` : ""}`
-    : `Your immediate checks are beginning to reveal a pattern. ${strongChecks ? `${strongChecks} ${strongChecks === 1 ? "chapter has" : "chapters have"} a strong initial recall.` : "Delayed reviews will distinguish what felt clear from what truly lasted."}${topGap ? ` Watch for ${topGap.toLowerCase()} as you continue.` : ""}`;
+  const progressLead = hasTotal
+    ? `You’ve checked ${chapters.length} of ${totalChapters} chapters.`
+    : `You’ve checked ${chapters.length} ${chapters.length === 1 ? "chapter" : "chapters"}.`;
+  const patternLabel = intelligence.diagnoses[0] ? recallPatternLabel(intelligence.diagnoses[0].pattern).toLowerCase() : "";
+  const synthesis = patternLabel
+    ? `${progressLead} The next useful layer is ${patternLabel}, because that is where your recall can become easier to explain across chapters.`
+    : `${progressLead} The report will get more precise as more checks and reviews create a stronger pattern.`;
 
   $("#book-insights").innerHTML = `
-    <header class="insights-hero">
-      <span class="eyebrow">What’s sticking?</span>
-      <h1>${escapeHtml(title)}</h1>
-      <p class="insights-byline">${author ? `by ${escapeHtml(author)} · ` : ""}${escapeHtml(progress)}</p>
-      <p class="insights-synthesis">${escapeHtml(synthesis)}</p>
-    </header>
-    <section class="insights-stats" aria-label="Book learning summary">
-      <article><span>Chapters checked</span><strong>${chapters.length}${book?.totalChapters ? ` / ${book.totalChapters}` : ""}</strong></article>
-      <article><span>Delayed reviews</span><strong>${reviews.length}</strong></article>
-      <article><span>Strong recalls</span><strong>${strongChecks + strongReviews}</strong></article>
-      <article><span>Recurring gap</span><strong class="insights-text-stat">${escapeHtml(topGap || "Still emerging")}</strong></article>
-    </section>
-    <div class="insights-grid">
-      <section class="insights-panel">
-        <header><span class="eyebrow">Ideas retained</span><h2>The threads you’ve carried forward</h2></header>
-        <div class="retained-list">
-          ${chapters.slice(0, 4).map(chapter => {
-            const idea = chapter.evaluation?.strength || sentences(chapter.recall || "")[0] || "A chapter check was completed.";
-            return `<article><span aria-hidden="true">✓</span><div><strong>${escapeHtml(chapter.chapterTitle)}</strong><p>${escapeHtml(idea)}</p></div></article>`;
-          }).join("")}
-        </div>
+    <article class="learning-report">
+      <header class="insights-hero report-hero">
+        <span class="eyebrow">What’s sticking?</span>
+        <h1>${escapeHtml(title)}</h1>
+        <p class="insights-byline">${author ? `by ${escapeHtml(author)} · ` : ""}${escapeHtml(progress)}</p>
+        ${hasTotal ? `<div class="report-progress" aria-label="Book progress"><span><i style="width:${progressPercent}%"></i></span><strong>${progressPercent}%</strong></div>` : ""}
+        <p class="insights-synthesis">${escapeFeedback(synthesis)}</p>
+      </header>
+      ${renderReportInsightCards(intelligence, chapters, progressLead, bookComplete)}
+      <section class="insights-stats report-snapshot" aria-label="Book learning summary">
+        <article><span>Book progress</span><strong>${chapters.length}${hasTotal ? ` / ${totalChapters}` : ""}</strong></article>
+        <article><span>Recall signal</span><strong>${intelligence.avgScore}%</strong></article>
+        <article><span>Reviews completed</span><strong>${reviews.length}</strong></article>
+        <article><span>Pattern to watch</span><strong class="insights-text-stat">${escapeFeedback(intelligence.diagnoses[0] ? recallPatternLabel(intelligence.diagnoses[0].pattern) : topGap || "Still emerging")}</strong></article>
       </section>
-      <section class="insights-panel">
-        <header><span class="eyebrow">Patterns to strengthen</span><h2>Where understanding slips</h2></header>
-        ${gaps.length
-          ? `<div class="gap-list">${gaps.slice(0, 4).map(([gap, count]) => `<div><span>${escapeHtml(gap)}</span><strong>${count} ${count === 1 ? "check" : "checks"}</strong></div>`).join("")}</div>`
-          : '<div class="insights-empty"><strong>No recurring gap yet</strong><p>More chapter checks will make patterns easier to trust.</p></div>'}
-      </section>
-    </div>
-    <section class="chapter-signals">
+      <div class="report-grid">
+        <section class="insights-panel report-panel">
+          <header><span class="eyebrow">What you captured</span><h2>The ideas coming back from memory</h2></header>
+          ${reportList(intelligence.captured, "Your completed checks will reveal what is coming back from memory.")}
+        </section>
+        <section class="insights-panel report-panel">
+          <header><span class="eyebrow">Reading map</span><h2>What the source seems to be building</h2></header>
+          <div class="report-map-grid">
+            <div><span>Central claims</span>${reportList(intelligence.centralClaims, "Add source material to build a stronger map.")}</div>
+            <div><span>Supporting ideas</span>${reportList(intelligence.supportingIdeas, "Supporting ideas will appear as more chapters are checked.")}</div>
+            <div><span>Connections</span>${reportList(intelligence.relationships, "Connections will sharpen when the Reading Map has relationships to compare.")}</div>
+          </div>
+        </section>
+        <section class="insights-panel report-panel">
+          <header><span class="eyebrow">Recall pattern diagnosis</span><h2>Where the work can get sharper</h2></header>
+          ${renderPatternCards(intelligence.diagnoses, topGap)}
+        </section>
+        <section class="insights-panel report-panel report-next">
+          <header><span class="eyebrow">Next move</span><h2>${bookComplete ? "What to carry into the next book" : "What to do in the next chapter"}</h2></header>
+          <p>${escapeFeedback(bookComplete ? "Use the next book to test whether this same recall pattern follows you into new material. If it does, it is probably a durable reading habit worth practicing." : intelligence.nextMove)}</p>
+          ${intelligence.examples.length ? `<div class="report-evidence"><span>Useful evidence style</span>${reportList(intelligence.examples, "Evidence will appear after more source-backed checks.")}</div>` : ""}
+        </section>
+      </div>
+    </article>
+    <section class="chapter-signals report-chapter-signals">
       <header><span class="eyebrow">Chapter signals</span><h2>How your understanding is changing</h2></header>
       <div>${chapters.map(chapter => {
         const latestReview = chapter.delayedAttempts?.at(-1);
+        const score = evaluationScore(chapter.evaluation || {});
+        const scoreTone = recallScoreTone(score);
+        const pattern = chapter.evaluation?.gradingResult?.recall_pattern_diagnosis?.[0]?.pattern;
         return `<button type="button" data-chapter-id="${chapter.id}">
           <span><strong>${escapeHtml(chapter.chapterTitle)}</strong><small>${latestReview ? `Reviewed ${new Date(latestReview.createdAt).toLocaleDateString()}` : "Awaiting delayed review"}</small></span>
-          <span class="signal-bands"><em>${escapeHtml(displayBand(chapter.evaluation?.band || "Checked"))}</em><em>${escapeHtml(displayBand(latestReview?.band || "Not reviewed"))}</em></span>
+          <span class="signal-bands"><em class="recall-score-tag is-${scoreTone}">${score}% recall</em><em>${escapeFeedback(pattern ? recallPatternLabel(pattern) : displayBand(latestReview?.band || "Not reviewed"))}</em></span>
           <span aria-hidden="true">→</span>
         </button>`;
       }).join("")}</div>
@@ -1117,15 +2837,24 @@ function renderDashboard() {
   $$("[data-local-greeting]").forEach(element => {
     element.textContent = localGreeting();
   });
-  const entries = loadChapters().sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  const entries = migrateReviewsToFsrs(loadChapters()).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   const chapters = entries.filter(chapter => chapter.status !== "Draft");
   const drafts = entries.filter(chapter => chapter.status === "Draft");
-  const scheduled = chapters.filter(chapter => chapter.reviewDue && chapter.status !== "Complete").sort((a, b) => new Date(a.reviewDue) - new Date(b.reviewDue));
+  const scheduled = chapters.filter(reviewIsScheduled).sort((a, b) => new Date(a.reviewDue) - new Date(b.reviewDue));
   const due = scheduled.filter(reviewIsDue);
+  const reviewSummary = reviewQueueSummary(due, scheduled);
   const hasChapters = isLoggedIn() && entries.length > 0;
   $("#onboarding-home").hidden = hasChapters;
   $("#returning-home").hidden = !hasChapters;
   $("#review-count").textContent = scheduled.length;
+  $("#review-count").classList.toggle("is-due", due.length > 0);
+  $("#review-count").classList.toggle("has-scheduled", scheduled.length > 0 && !due.length);
+  $("#review-count").title = reviewSummary;
+  const reviewsNav = $('[data-nav="reviews"]');
+  if (reviewsNav) {
+    reviewsNav.title = `Reviews · ${reviewSummary}`;
+    reviewsNav.setAttribute("aria-label", `Reviews. ${reviewSummary}`);
+  }
   renderLibrary(entries);
 
   if (hasChapters) {
@@ -1145,12 +2874,30 @@ function renderDashboard() {
           ? "Start with a foundational skill: separating what a passage discusses from what it actually argues."
           : `Finding the central claim gives you a stronger foundation for working on ${commonGap.toLowerCase()}.`;
     $("#practice-reason").textContent = practiceReason;
-    $("#practice-home-reason").textContent = practiceReason;
-    $("#practice-home-promo").hidden = hasPracticeCompletionToday();
-    const latest = entries[0];
-    const latestBookKey = bookKey(latest.bookTitle, latest.authorName || "");
-    const latestBook = loadBookMetadata().find(book => (book.key || bookKey(book.title, book.author)) === latestBookKey);
-    const latestCompleted = chapters.filter(chapter => bookKey(chapter.bookTitle, chapter.authorName || "") === latestBookKey).length;
+    const practiceState = currentPracticeSkillState();
+    $("#practice-home-promo").hidden = false;
+    $("#practice-home-promo").classList.toggle("is-ready", !practiceState.completedToday);
+    $("#practice-home-promo").classList.toggle("is-complete", practiceState.completedToday);
+    $("#practice-home-state").textContent = practiceState.completedToday ? "Practice complete today" : "Skill focus";
+    $("#practice-home-title").textContent = practiceState.skill.title;
+    $("#practice-home-reason").textContent = practiceState.completedToday
+      ? "Nice. Today’s practice is logged. You can revisit the lesson, or come back tomorrow for a new question."
+      : practiceReason;
+    $("#practice-home-progress-label").textContent = `${practiceState.successfulDays} of 3 successful days`;
+    $("#practice-home-progress-fill").style.width = `${practiceState.progressPercent}%`;
+    $("#practice-home-action").innerHTML = practiceState.completedToday
+      ? "View practice <span>→</span>"
+      : "Try 3-minute practice <span>→</span>";
+    const currentReading = chooseCurrentReadingState(entries);
+    const latest = currentReading?.chapter || entries[0];
+    const latestBookKey = currentReading?.book?.key || bookKey(latest.bookTitle, latest.authorName || "");
+    const latestCompleted = currentReading?.completed || 0;
+    const latestTotal = currentReading?.book?.total || null;
+    const bookIsComplete = currentReading?.kind === "complete";
+    const bookIsDraft = currentReading?.kind === "draft";
+    const progressPercent = latestTotal ? Math.min(100, Math.round(latestCompleted / latestTotal * 100)) : 0;
+    const focusOptions = focusBookOptions(entries);
+    const manualFocusKey = localStorage.getItem(FOCUS_BOOK_KEY) || "";
 
     if ($("#dashboard-message")) {
       $("#dashboard-message").textContent = due.length
@@ -1162,24 +2909,100 @@ function renderDashboard() {
     $("#stat-repairs").textContent = repairs;
     $("#stat-gap").textContent = commonGap;
     $("#stat-gap").title = commonGap;
-    $("#continue-book").textContent = latest.bookTitle;
-    $("#continue-meta").textContent = latest.status === "Draft"
-      ? `Draft: ${latest.chapterTitle} · ${latestCompleted}${latestBook?.totalChapters ? ` of ${latestBook.totalChapters}` : ""} completed`
-      : latestBook?.totalChapters
-        ? `${latestCompleted} of ${latestBook.totalChapters} chapters · Last: ${latest.chapterTitle}`
+    $("#continue-state").textContent = bookIsDraft
+      ? "Draft in progress"
+      : bookIsComplete
+        ? "Book complete"
+        : "Continue reading";
+    $("#continue-marker").textContent = bookIsDraft
+      ? "✎"
+      : bookIsComplete
+        ? "✓"
+        : "↗";
+    $("#continue-book").textContent = currentReading?.book?.title || latest.bookTitle;
+    $("#continue-meta").textContent = bookIsDraft
+      ? `Draft saved for ${latest.chapterTitle} · ${latestCompleted}${latestTotal ? ` of ${latestTotal}` : ""} completed`
+      : bookIsComplete
+        ? `${latestCompleted} of ${latestTotal} chapters checked · Final review still ahead`
+        : latestTotal
+        ? `${latestCompleted} of ${latestTotal} chapters checked · Last: ${latest.chapterTitle}`
         : `${latestCompleted} ${latestCompleted === 1 ? "chapter" : "chapters"} completed · Last: ${latest.chapterTitle}`;
+    $("#continue-progress").hidden = !latestTotal || bookIsDraft;
+    $("#continue-progress-fill").style.width = `${progressPercent}%`;
+    $("#continue-progress-label").textContent = `${progressPercent}%`;
+    $("#focus-book-select").innerHTML = '<option value="">Automatic focus</option>' +
+      focusOptions.map(book => `<option value="${escapeHtml(book.key)}">${escapeHtml(book.title)}${book.author ? ` by ${escapeHtml(book.author)}` : ""}</option>`).join("");
+    $("#focus-book-select").value = manualFocusKey && focusOptions.some(book => book.key === manualFocusKey) ? manualFocusKey : "";
+    $("#open-book-insights").textContent = bookIsComplete ? "Review what stuck" : "What’s sticking?";
+    $("#open-latest").textContent = bookIsDraft ? "Resume draft" : "Open last check";
+    $("#check-next").textContent = bookIsComplete ? "Start another book" : "Check next chapter";
     $("#open-book-insights").dataset.bookKey = latestBookKey;
     $("#open-latest").dataset.chapterId = latest.id;
-    $("#check-next").dataset.bookTitle = latest.bookTitle;
-    $("#check-next").dataset.authorName = latest.authorName || "";
+    $("#check-next").dataset.mode = bookIsComplete ? "new-book" : "next-chapter";
+    $("#check-next").dataset.bookTitle = currentReading?.book?.title || latest.bookTitle;
+    $("#check-next").dataset.authorName = currentReading?.book?.author || latest.authorName || "";
+
+    let nextAction = {
+      label: "Recommended next",
+      marker: "↗",
+      title: bookIsComplete ? "Start another book." : "Check the next chapter.",
+      copy: bookIsComplete
+        ? "This book is checked. Keep the habit moving with a fresh book."
+        : `Continue ${currentReading?.book?.title || latest.bookTitle} while the thread is still warm.`,
+      text: bookIsComplete ? "Start another book" : "Check next chapter",
+      action: () => startNew({
+        ...(bookIsComplete
+          ? { bookPath: "new" }
+          : {
+            bookPath: "existing",
+            bookTitle: currentReading?.book?.title || latest.bookTitle,
+            authorName: currentReading?.book?.author || latest.authorName || ""
+          })
+      })
+    };
+    if (!practiceState.completedToday) {
+      nextAction = {
+        label: "Recommended next",
+        marker: "3m",
+        title: "Do today’s 3-minute question.",
+        copy: "It is the smallest useful move available right now. The skill focus and your progress are below.",
+        text: "Start daily question",
+        action: () => setView("practice")
+      };
+    } else if (due.length) {
+      const review = due[0];
+      nextAction = {
+        label: due.length === 1 ? "Review due" : `${due.length} reviews due`,
+        marker: "◉",
+        title: `Review ${review.chapterTitle}.`,
+        copy: `${review.bookTitle} is ready for delayed recall. Re-enter with the context card, then answer from memory.`,
+        text: "Start review",
+        action: () => openReview(review.id)
+      };
+    } else if (bookIsDraft) {
+      nextAction = {
+        label: "Draft waiting",
+        marker: "✎",
+        title: `Resume ${latest.chapterTitle}.`,
+        copy: "You already started this chapter check. Finish it before starting a new thread.",
+        text: "Resume draft",
+        action: () => openChapter(latest.id)
+      };
+    }
+    $("#next-action-label").textContent = nextAction.label;
+    $("#next-action-marker").textContent = nextAction.marker;
+    $("#next-action-title").textContent = nextAction.title;
+    $("#next-action-copy").textContent = nextAction.copy;
+    $("#next-action-button").innerHTML = `${escapeHtml(nextAction.text)} <span>→</span>`;
+    $("#next-action-button").onclick = nextAction.action;
   }
 
   $("#home-reviews").innerHTML = scheduled.length
     ? scheduled.slice(0, 3).map(chapter => renderReviewItem(chapter)).join("")
-    : '<div class="empty-state"><strong>Nothing due yet</strong>Complete a chapter check and its review will return here.</div>';
+    : '<div class="empty-state"><strong>No reviews scheduled</strong>Complete a chapter check and FSRS will bring it back.</div>';
   $("#all-reviews").innerHTML = scheduled.length
-    ? scheduled.map(chapter => renderReviewItem(chapter, true)).join("")
-    : '<div class="empty-state"><strong>Your review queue is clear</strong>New checks return here after the delay you choose.</div>';
+    ? renderReviewQueue(scheduled)
+    : '<div class="empty-state"><strong>Your review queue is clear</strong>New checks return here when FSRS schedules them.</div>';
   $("#recent-checks").innerHTML = entries.length
     ? entries.slice(0, 4).map(renderRecentItem).join("")
     : '<div class="empty-state"><strong>No checks yet</strong>Your first chapter takes about six minutes.</div>';
@@ -1194,8 +3017,8 @@ const reviewPrompts = {
   ],
   "Missed central claim": [
     "State the chapter’s central claim and the strongest reason the author gives for it.",
-    "What is the author arguing—not merely describing?",
-    "Complete this thought in your own words: “The author wants the reader to see that…”"
+    "What is the author arguing, not merely describing?",
+    "State what the author wants the reader to understand."
   ],
   "Weak relationship between ideas": [
     "How do the chapter’s two main ideas depend on or reinforce one another?",
@@ -1208,7 +3031,7 @@ const reviewPrompts = {
     "What evidence would you use to explain this idea to someone skeptical?"
   ],
   "Study challenge": [
-    "Where might the chapter’s argument stop being useful or true?",
+    "Where might this chapter’s main idea break down?",
     "What real situation would test this idea?",
     "What assumption does the argument depend on?"
   ]
@@ -1216,7 +3039,7 @@ const reviewPrompts = {
 
 const centralClaimPrompts = [
   chapter => `What is the central claim of “${chapter.chapterTitle}”?`,
-  () => "Complete this thought in your own words: “The author wants the reader to see that…”",
+  () => "State what the author wants the reader to understand.",
   () => "If you could preserve only one argument from this chapter, what would it be?"
 ];
 
@@ -1235,7 +3058,8 @@ function resultRank(band) {
 function chooseReviewPrompt(chapter) {
   const attempts = chapter.delayedAttempts || [];
   const latest = attempts.at(-1);
-  const gapType = displayGapType(chapter.evaluation?.gapType);
+  const rawGapType = chapter.evaluation?.gapType || "";
+  const gapType = isStudyChallengeGap(rawGapType) ? "Study challenge" : displayGapType(rawGapType);
   const prompts = reviewPrompts[gapType] || reviewPrompts["Missed supporting evidence"];
   const preferred = latest ? resultRank(latest.gapBand) : 0;
   const previous = Number.isInteger(latest?.promptVariant) ? latest.promptVariant : -1;
@@ -1245,7 +3069,7 @@ function chooseReviewPrompt(chapter) {
   return {
     gapType: gapType || "Missed supporting evidence",
     promptVariant,
-    prompt: prompts[promptVariant],
+    prompt: normalizeReviewPrompt(prompts[promptVariant]),
     centralPromptVariant
   };
 }
@@ -1255,9 +3079,19 @@ function needsReviewScaffolding(chapter) {
   return attempts.length >= 2 && attempts.slice(-2).every(attempt => resultRank(attempt.gapBand) === 0);
 }
 
-function openReview(id) {
+function openReview(id, options = {}) {
   const chapter = loadChapters().find(item => item.id === id);
   if (!chapter) return;
+  if (options.sessionIds?.length) {
+    state.reviewSession = {
+      ids: options.sessionIds,
+      index: Math.max(0, options.sessionIds.indexOf(id))
+    };
+  } else if (options.keepSession && state.reviewSession?.ids?.includes(id)) {
+    state.reviewSession.index = state.reviewSession.ids.indexOf(id);
+  } else {
+    state.reviewSession = null;
+  }
   state.reviewId = id;
   state.reviewStep = 0;
   state.reviewDraft = chooseReviewPrompt(chapter);
@@ -1265,23 +3099,103 @@ function openReview(id) {
   setView("review-session");
 }
 
+function startReviewSession(ids = []) {
+  const sessionIds = ids.filter(Boolean).slice(0, 3);
+  if (!sessionIds.length) return;
+  openReview(sessionIds[0], { sessionIds });
+}
+
+function sourceKindLabel(kind = "full") {
+  return {
+    full: "Chapter text",
+    notes: "Notes",
+    highlights: "Highlights",
+    pdf: "PDF text"
+  }[kind] || "Source material";
+}
+
+function synopsisFromText(text = "", maxSentences = 2, maxLength = 260) {
+  const clean = sentenceSnippet(text);
+  if (!clean) return "";
+  const selected = sentences(clean).slice(0, maxSentences).join(" ") || clean;
+  return selected.length > maxLength ? `${selected.slice(0, maxLength).replace(/\s+\S*$/, "")}...` : selected;
+}
+
+function reviewSourceSynopsis(chapter) {
+  const mapClaim = chapter.evaluation?.readingMap?.central_claim;
+  const sourceSynopsis = synopsisFromText(chapter.sourceText, 2, 280);
+  if (mapClaim && sourceSynopsis && !sourceSynopsis.toLowerCase().includes(mapClaim.toLowerCase().slice(0, 40))) {
+    return `${mapClaim} ${sourceSynopsis}`;
+  }
+  return mapClaim || sourceSynopsis || "No source synopsis is available for this chapter.";
+}
+
+function reviewAnswerSynopsis(chapter) {
+  const recall = synopsisFromText(chapter.recall, 2, 260);
+  if (!recall) return "No prior response was saved.";
+  return recall;
+}
+
+function renderReviewContext(chapter, isGapStep) {
+  const checkedDate = chapter.createdAt
+    ? new Date(chapter.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })
+    : "Earlier check";
+  const gapLabel = displayGapType(chapter.evaluation?.gapType || "Idea to revisit");
+  $("#review-context-title").textContent = isGapStep ? "Re-enter the weak spot." : "Zoom back out.";
+  $("#review-context-copy").textContent = isGapStep
+    ? "Use the synopsis to find your footing, then rebuild the missing idea without opening the full source or prior answer."
+    : "Use the synopsis to orient yourself, then recover the chapter’s main argument in your own words.";
+  $("#review-context-details").innerHTML = `
+    <dl class="review-context-facts">
+      <div><dt>Book</dt><dd>${escapeHtml(chapter.bookTitle || "Untitled book")}</dd></div>
+      <div><dt>Chapter</dt><dd>${escapeHtml(chapter.chapterTitle || "Untitled chapter")}</dd></div>
+      <div><dt>First checked</dt><dd>${escapeHtml(`${checkedDate}${chapter.confidence ? ` · ${chapter.confidence}` : ""}`)}</dd></div>
+      <div><dt>This step</dt><dd>${escapeHtml(isGapStep ? gapLabel : "Central claim")}</dd></div>
+    </dl>
+    <div class="review-synopsis-grid">
+      <article>
+        <span>Source synopsis</span>
+        <p>${escapeHtml(reviewSourceSynopsis(chapter))}</p>
+      </article>
+      <article>
+        <span>Your prior answer</span>
+        <p>${escapeHtml(reviewAnswerSynopsis(chapter))}</p>
+      </article>
+    </div>
+    <p class="review-context-note">${escapeHtml(sourceKindLabel(chapter.sourceKind))} and your full prior response stay closed. This is just enough context to wayfind.</p>
+  `;
+}
+
 function renderReviewStep(chapter) {
   $("#delayed-recall").value = "";
   $$('[name="delayedConfidence"]').forEach(input => { input.checked = false; });
   const isGapStep = state.reviewStep === 0;
   const useScaffolding = isGapStep && needsReviewScaffolding(chapter);
-  $("#review-part-label").textContent = isGapStep ? "1 of 2 · Previous gap" : "2 of 2 · Central claim";
-  $("#review-progress-fill").style.width = isGapStep ? "50%" : "100%";
+  const isStudyChallenge = isStudyChallengeGap(chapter.evaluation?.gapType || "");
+  renderReviewContext(chapter, isGapStep);
+  if (state.reviewSession?.ids?.length) {
+    const totalSteps = state.reviewSession.ids.length * 2;
+    const currentStep = state.reviewSession.index * 2 + (isGapStep ? 1 : 2);
+    $("#review-part-label").textContent = `${state.reviewSession.index + 1} of ${state.reviewSession.ids.length} chapters · ${isGapStep ? "Previous gap" : "Central claim"}`;
+    $("#review-progress-fill").style.width = `${Math.round(currentStep / totalSteps * 100)}%`;
+  } else {
+    $("#review-part-label").textContent = isGapStep ? "1 of 2 · Previous gap" : "2 of 2 · Central claim";
+    $("#review-progress-fill").style.width = isGapStep ? "50%" : "100%";
+  }
   $("#review-step-eyebrow").textContent = isGapStep ? "Revisit the gap" : "Test the main idea";
   $("#review-session-title").textContent = isGapStep
-    ? state.reviewDraft?.prompt || chapter.evaluation?.prompt
+    ? normalizeReviewPrompt(state.reviewDraft?.prompt || chapter.evaluation?.prompt)
     : centralClaimPrompts[state.reviewDraft?.centralPromptVariant || 0](chapter);
   $("#review-session-meta").textContent = isGapStep
-    ? `Earlier signal: ${displayGapType(chapter.evaluation?.gapType || "an idea needed another pass")}. Answer without looking back.`
+    ? isStudyChallenge
+      ? "Name one situation where the idea would need a caveat, exception, or adjustment."
+      : `Earlier signal was ${displayGapType(chapter.evaluation?.gapType || "an idea needed another pass")}. Answer without looking back.`
     : "In one or two sentences, reconstruct the chapter’s main argument in your own words.";
   $("#delayed-recall").placeholder = isGapStep
-    ? "Explain the missing idea or connection…"
-    : "State the central claim and its most important support…";
+    ? isStudyChallenge
+      ? "Describe the situation where the idea would not fully apply."
+      : "Explain the missing idea or connection."
+    : "State the central claim and its most important support.";
   $("#review-continue").innerHTML = isGapStep ? "Next question <span>→</span>" : "See what lasted <span>→</span>";
   $("#review-scaffold").hidden = !useScaffolding;
   $("#review-scaffold-source").textContent = useScaffolding ? chapter.evaluation?.gapEvidence?.sentence || "" : "";
@@ -1326,63 +3240,123 @@ function completeReview() {
     createdAt: new Date().toISOString()
   };
   chapter.delayedAttempts = [...(chapter.delayedAttempts || []), attempt];
-  const weakerRank = Math.min(resultRank(attempt.gapBand), resultRank(attempt.band));
-  const repeatedStrong = weakerRank === 2
-    && resultRank(previousAttempt?.gapBand) === 2
-    && resultRank(previousAttempt?.band) === 2;
-  const delay = weakerRank === 0 ? 3 : weakerRank === 1 ? 7 : 14;
-  if (repeatedStrong) {
-    chapter.status = "Complete";
-    chapter.reviewDue = null;
-  } else {
-    const nextReview = new Date();
-    nextReview.setDate(nextReview.getDate() + delay);
-    chapter.status = "Review scheduled";
-    chapter.reviewDue = nextReview.toISOString();
-  }
+  const schedule = nextReviewSchedule(attempt, previousAttempt, chapter.fsrsCard || null);
+  chapter.status = "Review scheduled";
+  chapter.reviewDue = new Date(schedule.due || addDays(new Date(), schedule.days)).toISOString();
+  chapter.fsrsCard = schedule.card || chapter.fsrsCard || null;
+  chapter.reviewSchedule = {
+    model: "ts-fsrs",
+    package: "ts-fsrs",
+    packageVersion: "5.4.1",
+    policyVersion: SCHEDULING_POLICY_VERSION,
+    days: schedule.days,
+    reason: schedule.reason,
+    rating: schedule.ratingLabel,
+    inputs: {
+      gapBand: attempt.gapBand,
+      centralBand: attempt.band,
+      confidence: attempt.confidence,
+      responseWordCount: wordCount(attempt.response || ""),
+      gapResponseWordCount: wordCount(attempt.gapResponse || "")
+    },
+    log: schedule.log || null,
+    scheduledAt: new Date().toISOString()
+  };
   chapter.updatedAt = new Date().toISOString();
   chapters[index] = chapter;
   saveChapters(chapters);
   renderDashboard();
-  toast(repeatedStrong
-    ? "Both ideas are holding up. This review is complete for now."
-    : `Review complete. The weaker result will return in ${delay} days.`);
+  const nextSessionId = state.reviewSession?.ids?.[state.reviewSession.index + 1];
   state.reviewDraft = null;
+  if (nextSessionId) {
+    toast(`Review saved. Next chapter in this set is ready.`);
+    openReview(nextSessionId, { keepSession: true });
+    return;
+  }
+  if (state.reviewSession?.ids?.length) {
+    const completedCount = state.reviewSession.ids.length;
+    state.reviewSession = null;
+    toast(`${completedCount} review${completedCount === 1 ? "" : "s"} complete. Take a break or keep going from the queue.`);
+    setView("reviews");
+    return;
+  }
+  toast(`Review complete. FSRS scheduled the next review ${reviewTimingCopy(schedule.days)} because ${schedule.reason}.`);
   openChapter(chapter.id);
 }
 
-function openChapter(id) {
-  const chapter = loadChapters().find(item => item.id === id);
-  if (!chapter) return;
-  if (chapter.status === "Draft") {
-    state.currentId = chapter.id;
-    state.evaluation = null;
-    state.repairResolved = false;
-    renderBookOptions(chapter.bookTitle, chapter.authorName);
-    setValues({ ...chapter, bookPath: "existing" });
-    setStep(chapter.sourceText ? Math.min(chapter.draftStep || 0, 1) : 0);
-    setView("flow");
-    toast("Draft reopened. Pick up where you left off.");
-    return;
-  }
+function renderSavedChapterFeedback(chapter) {
+  const evaluation = chapter.evaluation || evaluateResponse(chapter.sourceText || "", chapter.recall || "", chapter.sourceKind || "full");
+  const structured = evaluation.gradingResult || localStructuredFeedback(evaluation);
+  const progression = progressionForEvaluation(evaluation);
+  const rememberedItems = cleanConceptItems(evaluation, structured);
+  const patternFeedback = generatedCoachingFeedback(structured)
+    || formalRecallPatternFeedback(structured.recall_pattern_diagnosis || [])
+    || recallGapReminderFeedback(evaluation, structured);
+  const strengthenBody = patternFeedback
+    ? `<p>${escapeFeedback(patternFeedback.intro || (evaluation.band === "Strong" ? "You can go deeper by noticing the detail that would make this idea easier to use later." : "This is the pattern most worth watching next time you read."))}</p>
+      ${feedbackConceptList(patternFeedback.title, patternFeedback.items)}
+      ${sourceEvidenceBlock("Text evidence to revisit", evaluation.gapEvidence, "revisit")}`
+    : "";
+  const reviewState = chapter.reviewDue
+    ? `Review scheduled for ${new Date(chapter.reviewDue).toLocaleDateString()}.`
+    : "No review is scheduled right now.";
+  return `
+    <div class="chapter-feedback-shell learning-report chapter-learning-report">
+      <div class="learning-path">
+        <article class="path-step path-step-signal">
+          <span class="path-marker">1</span>
+          <div class="path-card checkpoint-hero">
+            <div>
+              <span class="eyebrow">Feedback snapshot</span>
+              <h2>${escapeFeedback(progression.title)}</h2>
+              <div class="progression-meter-row"><div class="progression-meter" style="--progression:${progression.progress}%"><span></span></div><strong>${progression.progress}%</strong></div>
+              <p>${escapeFeedback(progression.signal)}</p>
+            </div>
+          </div>
+        </article>
+        <article class="path-step">
+          <span class="path-marker">2</span>
+          <div class="path-card feedback-card">
+            <header><h3>What you captured</h3></header>
+            <p>${escapeFeedback(whatHeldIntro(evaluation, structured))}</p>
+            ${feedbackConceptList("Key concepts", rememberedItems)}
+            ${sourceEvidenceBlock("Evidence for what came through", evaluation.strengthEvidence)}
+          </div>
+        </article>
+        ${patternFeedback ? `<article class="path-step path-step-warm">
+          <span class="path-marker">3</span>
+          <div class="path-card feedback-card gap">
+            <header><h3>${patternFeedback.title === "Reminder for next time" ? "Reminder for next time" : evaluation.band === "Strong" ? "Where to go deeper next time" : "What to look for next time"}</h3></header>
+            ${strengthenBody}
+          </div>
+        </article>` : ""}
+        <article class="path-step path-step-final">
+          <span class="path-marker">→</span>
+          <div class="path-card feedback-card next-move">
+            <header><h3>Next move</h3></header>
+            <p>${escapeFeedback(readingStrategyFor(evaluation))}</p>
+            <div class="next-challenge-pill"><span>${escapeFeedback(displayGapType(evaluation.gapType || "Study challenge"))}</span><strong>${escapeFeedback(normalizeReviewPrompt(evaluation.prompt || "Return to the chapter’s central claim and name the support that makes it work."))}</strong></div>
+            <p class="path-card-note">${escapeFeedback(reviewState)}</p>
+          </div>
+        </article>
+      </div>
+    </div>`;
+}
+
+function renderSavedChapterEntry(chapter) {
   const latest = chapter.delayedAttempts?.at(-1);
-  $("#chapter-detail").innerHTML = `
-    <header class="chapter-hero">
-      <span class="eyebrow">${escapeHtml(chapter.bookTitle)}</span>
-      <h1>${escapeHtml(chapter.chapterTitle)}</h1>
-      <p>${escapeHtml(chapter.authorName || "Author not added")} · ${escapeHtml(chapter.status)}</p>
-    </header>
-    <div class="history">
+  return `
+    <div class="history chapter-entry-history">
       <article class="history-card">
-        <header><h2>Immediate recall</h2><time>${new Date(chapter.createdAt).toLocaleDateString()}</time></header>
-        <p class="response-quote">${escapeHtml(chapter.recall)}</p>
+        <header><h2>Your recall</h2><time>${new Date(chapter.createdAt).toLocaleDateString()}</time></header>
+        <p class="response-quote">${escapeHtml(chapter.recall || "No recall response saved.")}</p>
       </article>
       <article class="history-card">
-        <header><h2>${escapeHtml(displayBand(chapter.evaluation?.band || "Evaluation"))}</h2><span class="status-tag">${escapeHtml(displayGapType(chapter.evaluation?.gapType || "Saved"))}</span></header>
-        <p class="response-quote">${escapeHtml(chapter.evaluation?.gap || "No diagnostic available.")}</p>
+        <header><h2>Confidence</h2><span class="status-tag">${escapeHtml(chapter.confidence || "Not recorded")}</span></header>
+        <p class="response-quote">${escapeHtml(confidencePhrase(chapter.confidence))}</p>
       </article>
       <article class="history-card">
-        <header><h2>Challenge</h2><span class="status-tag ${chapter.repairResolved ? "" : "repair"}">${chapter.repairResolved ? "Completed" : "Attempted"}</span></header>
+        <header><h2>Challenge response</h2><span class="status-tag ${chapter.repairResolved ? "" : "repair"}">${chapter.repairResolved ? "Completed" : "Attempted"}</span></header>
         <p class="response-quote">${escapeHtml(chapter.repair || "Challenge skipped.")}</p>
       </article>
       ${latest ? `<article class="history-card delayed-review-card">
@@ -1391,7 +3365,44 @@ function openChapter(id) {
         <div class="review-result-row"><div><span>Central claim</span><strong>${escapeHtml(latest.centralClaimResult || displayBand(latest.band))}</strong></div><p class="response-quote">${escapeHtml(latest.response)}</p></div>
         <p class="review-schedule-note">${chapter.reviewDue ? `Next review ${new Date(chapter.reviewDue).toLocaleDateString()} · scheduled from the weaker result.` : "Both signals are holding up. No further review is scheduled."}</p>
       </article>` : ""}
+    </div>`;
+}
+
+function openChapter(id) {
+  const chapter = loadChapters().find(item => item.id === id);
+  if (!chapter) return;
+  if (chapter.status === "Draft") {
+    state.currentId = chapter.id;
+    state.evaluation = chapter.evaluation || null;
+    state.repairResolved = Boolean(chapter.repairResolved);
+    renderBookOptions(chapter.bookTitle, chapter.authorName);
+    setValues({ ...chapter, bookPath: "existing" });
+    const resumeStep = Math.max(0, Math.min(4, chapter.draftStep || 0));
+    setStep(chapter.sourceText ? resumeStep : 0);
+    setView("flow");
+    if (state.evaluation && resumeStep >= 3) renderEvaluation(true);
+    toast("Draft reopened. Pick up where you left off.");
+    return;
+  }
+  $("#chapter-detail").innerHTML = `
+    <header class="chapter-hero">
+      <div class="chapter-kicker">
+        <span class="eyebrow">${escapeHtml(chapter.bookTitle)}</span>
+        <time>${new Date(chapter.createdAt).toLocaleDateString()}</time>
+      </div>
+      <h1>${escapeHtml(chapter.chapterTitle)}</h1>
+      <p>${escapeHtml(chapter.authorName || "Author not added")} · ${escapeHtml(chapter.status)}</p>
+    </header>
+    <div class="chapter-tabs" role="tablist" aria-label="Chapter detail">
+      <button class="is-active" type="button" role="tab" aria-selected="true" data-chapter-tab="feedback">Feedback</button>
+      <button type="button" role="tab" aria-selected="false" data-chapter-tab="entry">My entry</button>
     </div>
+    <section class="chapter-tab-panel is-active" data-chapter-tab-panel="feedback" role="tabpanel">
+      ${renderSavedChapterFeedback(chapter)}
+    </section>
+    <section class="chapter-tab-panel" data-chapter-tab-panel="entry" role="tabpanel" hidden>
+      ${renderSavedChapterEntry(chapter)}
+    </section>
     <div class="detail-actions">
       <button class="secondary" type="button" data-action="edit-chapter" data-edit-chapter-id="${chapter.id}">Edit response</button>
       <button class="secondary" type="button" data-action="view-chapter-source" data-chapter-id="${chapter.id}">View source</button>
@@ -1498,6 +3509,14 @@ function rescheduleManagedReview(id, delay) {
   due.setDate(due.getDate() + Number(delay));
   chapters[index].reviewDue = due.toISOString();
   chapters[index].status = "Review scheduled";
+  chapters[index].reviewCanceled = false;
+  chapters[index].reviewSchedule = {
+    ...(chapters[index].reviewSchedule || {}),
+    policyVersion: SCHEDULING_POLICY_VERSION,
+    manualRescheduled: true,
+    manualDelay: Number(delay),
+    scheduledAt: new Date().toISOString()
+  };
   chapters[index].updatedAt = new Date().toISOString();
   saveChapters(chapters);
   renderDashboard();
@@ -1510,6 +3529,7 @@ function cancelManagedReview(id) {
   if (index < 0) return;
   chapters[index].reviewDue = null;
   chapters[index].status = "Immediate complete";
+  chapters[index].reviewCanceled = true;
   chapters[index].updatedAt = new Date().toISOString();
   saveChapters(chapters);
   renderDashboard();
@@ -1536,9 +3556,9 @@ const practiceQuestionBanks = {
       exampleTwo: "<strong>Claim:</strong> Cities should prioritize reliable bus service before investing in more expensive transit projects.",
       question: "What is this passage arguing?",
       passage: "Many workplaces treat fast replies as evidence of commitment. Yet constant responsiveness fragments attention and pushes demanding work into evenings. Teams should establish shared response windows so employees can protect focused time without leaving colleagues uncertain.",
-      placeholder: "State the author’s central claim in your own words…",
+      placeholder: "State the author’s central claim in your own words.",
       signals: [["teams", "workplaces", "companies"], ["windows", "boundaries", "times", "expectations"], ["focus", "focused", "attention", "concentration"]],
-      success: "You identified both the recommendation—shared response boundaries—and its purpose: protecting focused work."
+      success: "You identified the recommendation to set shared response boundaries and connected it to the purpose of protecting focused work."
     },
     {
       lessonTitle: "Look for the author’s recommendation",
@@ -1547,7 +3567,7 @@ const practiceQuestionBanks = {
       exampleTwo: "<strong>Claim:</strong> Secondary schools should begin later because adolescent sleep patterns make early mornings harmful to learning.",
       question: "What change does this author argue for?",
       passage: "Neighborhood parks are often designed around large lawns that are expensive to maintain and offer little shelter in hot weather. Trees and native plants cool surrounding streets while supporting local wildlife. Cities should replace portions of ornamental lawn with shaded native gardens.",
-      placeholder: "Name the recommendation and the reason behind it…",
+      placeholder: "Name the recommendation and the reason behind it.",
       signals: [["cities", "parks"], ["replace", "native", "gardens", "trees"], ["cool", "shade", "wildlife", "maintain"]], 
       success: "You found the recommendation to replace ornamental lawn and connected it to the practical benefits of native planting."
     }
@@ -1559,7 +3579,7 @@ const practiceQuestionBanks = {
     exampleTwo: "<strong>Connection:</strong> Sleep supports memory because it helps stabilize newly learned information.",
     question: "How do the two main ideas connect?",
     passage: "Frequent task switching creates a residue of attention on the previous task. Because part of the mind remains occupied, the next task receives less complete concentration. Reducing unnecessary switching therefore improves the quality of demanding work.",
-    placeholder: "Explain how task switching affects demanding work…",
+    placeholder: "Explain how task switching affects demanding work.",
     signals: [["switching", "tasks"], ["residue", "attention", "mind"], ["focus", "concentration", "quality", "work"]],
     success: "You explained the causal chain from task switching to attention residue to lower-quality focused work."
   }],
@@ -1570,7 +3590,7 @@ const practiceQuestionBanks = {
     exampleTwo: "<strong>Evidence:</strong> Shaded blocks measured substantially cooler than nearby unshaded blocks.",
     question: "Which evidence best supports the author’s claim, and why?",
     passage: "The author argues that brief outdoor breaks improve sustained attention. In one workplace trial, employees who took a ten-minute walk outside made fewer errors during the final hour of a long task than employees who remained at their desks.",
-    placeholder: "Identify the evidence and explain how it supports the claim…",
+    placeholder: "Identify the evidence and explain how it supports the claim.",
     signals: [["walk", "outside", "outdoor"], ["errors", "fewer"], ["attention", "task", "focus"]],
     success: "You selected the workplace trial and explained how fewer errors support the claim about sustained attention."
   }],
@@ -1581,7 +3601,7 @@ const practiceQuestionBanks = {
     exampleTwo: "<strong>Reason + example:</strong> They reduce interruption; for example, teams can reserve mornings for focused production.",
     question: "Build a complete explanation from this passage.",
     passage: "People are more likely to maintain a new habit when the desired action is easy to begin. Preparing materials in advance removes a moment of friction. Someone who places a book on their pillow, for example, is more likely to read before bed.",
-    placeholder: "State the claim, explain the reason, and include the example…",
+    placeholder: "State the claim, explain the reason, and include the example.",
     signals: [["habit", "action"], ["easy", "friction", "prepare"], ["book", "pillow", "read"]],
     success: "You included the claim, the friction-reducing mechanism, and the concrete reading example."
   }]
@@ -1605,6 +3625,20 @@ function hasPracticeCompletionToday() {
   );
 }
 
+function currentPracticeSkillState() {
+  const daysBySkill = new Map(practiceSequence.map(skill => [skill.id, successfulPracticeDays(skill)]));
+  const nextIndex = practiceSequence.findIndex(skill => (daysBySkill.get(skill.id) || 0) < 3);
+  const activeIndex = nextIndex < 0 ? practiceSequence.length - 1 : nextIndex;
+  const skill = practiceSequence[activeIndex] || practiceSequence[0];
+  const successfulDays = Math.min(3, daysBySkill.get(skill.id) || 0);
+  return {
+    skill,
+    successfulDays,
+    completedToday: hasPracticeCompletionToday(),
+    progressPercent: Math.min(100, Math.round(successfulDays / 3 * 100))
+  };
+}
+
 function showDailyQuestionState() {
   $("#daily-practice-complete").hidden = true;
   $("#practice-lesson").hidden = false;
@@ -1625,6 +3659,51 @@ function currentPracticeQuestion(skillId) {
   const today = new Date();
   const dayNumber = Math.floor(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) / 86400000);
   return bank[dayNumber % bank.length];
+}
+
+const practiceCoaching = {
+  "central-claim": {
+    parts: ["the topic", "the author’s recommendation", "the reason it matters"],
+    move: "Next time, write one sentence with this shape: “The author argues that [who] should [do what] because [why].”",
+    diagnostic: "A central claim needs more than the topic. It should include the author’s position and the reason behind it.",
+    template: "The author argues that ___ should ___ because ___."
+  },
+  "connect-ideas": {
+    parts: ["the first idea", "the linking mechanism", "the result for the second idea"],
+    move: "Next time, name the relationship with a connector like because, therefore, leads to, limits, or depends on.",
+    diagnostic: "A connection answer should show how one idea changes, causes, supports, or limits the other.",
+    template: "___ leads to ___ because ___."
+  },
+  "match-evidence": {
+    parts: ["the claim", "the specific evidence", "how the evidence proves the claim"],
+    move: "Next time, do not stop at naming evidence. Add one phrase that explains the job it does for the claim.",
+    diagnostic: "Evidence is useful only when you explain why it supports the claim rather than merely sharing the same topic.",
+    template: "The best evidence is ___ because it shows ___."
+  },
+  "build-explanation": {
+    parts: ["the claim", "the reason or mechanism", "a concrete example"],
+    move: "Next time, use a three-part answer: claim first, reason second, example last.",
+    diagnostic: "A complete explanation should move from the idea to why it works, then ground it in a concrete case.",
+    template: "The claim is ___. This works because ___. For example, ___."
+  }
+};
+
+function practiceFeedbackFor(skill, matchedGroups, matchedSignals) {
+  const coaching = practiceCoaching[skill.id] || practiceCoaching["central-claim"];
+  const missing = coaching.parts
+    .map((part, index) => ({ part, index }))
+    .filter(item => !matchedGroups.has(item.index))
+    .map(item => item.part);
+  const missingText = missing.length
+    ? `Add ${missing.length === 1 ? missing[0] : `${missing.slice(0, -1).join(", ")} and ${missing.at(-1)}`}.`
+    : "Make the relationship between the parts more explicit.";
+  return {
+    title: matchedSignals >= 2 ? "One specific piece is missing." : "Rebuild the answer around the skill.",
+    body: matchedSignals >= 2
+      ? `${missingText} ${coaching.move}`
+      : `${coaching.diagnostic} ${coaching.move}`,
+    template: coaching.template
+  };
 }
 
 function renderDailyPractice(skillId, reviewing = false) {
@@ -1699,16 +3778,26 @@ function checkPracticeAnswer() {
   const skill = practiceSequence.find(item => item.id === state.activePracticeSkill) || practiceSequence[0];
   const question = currentPracticeQuestion(skill.id);
   const answerWords = new Set(words(answer));
-  const matchedSignals = question.signals.filter(group => group.some(term => answerWords.has(term))).length;
+  const matchedGroups = new Set();
+  question.signals.forEach((group, index) => {
+    if (group.some(term => answerWords.has(term))) matchedGroups.add(index);
+  });
+  const matchedSignals = matchedGroups.size;
   const feedback = $("#practice-feedback");
   const checkButton = $("#practice-check");
   feedback.hidden = false;
   feedback.className = "practice-feedback";
+  const coaching = practiceCoaching[skill.id] || practiceCoaching["central-claim"];
   if (matchedSignals === 3) {
     feedback.classList.add("is-correct");
     feedback.innerHTML = `
       <span class="practice-feedback-icon" aria-hidden="true">✓</span>
-      <div><strong>You got it</strong><h3>Today’s skill held up.</h3><p>${escapeHtml(question.success)} This successful day now counts toward proficiency.</p></div>`;
+      <div>
+        <strong>You got it</strong>
+        <h3>Today’s skill held up.</h3>
+        <p>${escapeHtml(question.success)} This successful day now counts toward proficiency.</p>
+        <div class="practice-next-move"><span>Use this next time</span><code>${escapeHtml(coaching.template)}</code></div>
+      </div>`;
     checkButton.disabled = true;
     checkButton.innerHTML = "Practice complete <span>✓</span>";
     const records = loadPracticeRecords();
@@ -1723,11 +3812,27 @@ function checkPracticeAnswer() {
     showDailyCompleteState();
     toast("Daily practice complete. One successful day added.");
   } else if (matchedSignals >= 2) {
+    const coaching = practiceFeedbackFor(skill, matchedGroups, matchedSignals);
     feedback.classList.add("is-close");
-    feedback.innerHTML = `<span class="practice-feedback-icon" aria-hidden="true">↗</span><div><strong>Almost there</strong><h3>Two parts are in place.</h3><p>Your response shows the right direction. Add the missing relationship, reason, or example to make the explanation complete.</p></div>`;
+    feedback.innerHTML = `
+      <span class="practice-feedback-icon" aria-hidden="true">↗</span>
+      <div>
+        <strong>Almost there</strong>
+        <h3>${escapeHtml(coaching.title)}</h3>
+        <p>${escapeHtml(coaching.body)}</p>
+        <div class="practice-next-move"><span>Try this frame</span><code>${escapeHtml(coaching.template)}</code></div>
+      </div>`;
   } else {
+    const coaching = practiceFeedbackFor(skill, matchedGroups, matchedSignals);
     feedback.classList.add("needs-retry");
-    feedback.innerHTML = `<span class="practice-feedback-icon" aria-hidden="true">→</span><div><strong>Try once more</strong><h3>You found a relevant idea.</h3><p>Return to the question and make the key claim, relationship, or evidence more explicit.</p></div>`;
+    feedback.innerHTML = `
+      <span class="practice-feedback-icon" aria-hidden="true">→</span>
+      <div>
+        <strong>Try once more</strong>
+        <h3>${escapeHtml(coaching.title)}</h3>
+        <p>${escapeHtml(coaching.body)}</p>
+        <div class="practice-next-move"><span>Use this sentence frame</span><code>${escapeHtml(coaching.template)}</code></div>
+      </div>`;
   }
 }
 
@@ -1752,7 +3857,7 @@ function revisitPractice(skillId) {
   toast("Skill reopened. Your proficiency remains saved.");
 }
 
-document.addEventListener("click", event => {
+document.addEventListener("click", async event => {
   const nav = event.target.closest("[data-nav]");
   if (nav) setView(nav.dataset.nav);
 
@@ -1764,6 +3869,21 @@ document.addEventListener("click", event => {
 
   const chapter = event.target.closest("[data-chapter-id]");
   if (chapter && !chapter.dataset.reviewId) openChapter(chapter.dataset.chapterId);
+
+  const chapterTab = event.target.closest("[data-chapter-tab]");
+  if (chapterTab) {
+    const tab = chapterTab.dataset.chapterTab;
+    $$("[data-chapter-tab]").forEach(button => {
+      const active = button.dataset.chapterTab === tab;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    $$("[data-chapter-tab-panel]").forEach(panel => {
+      const active = panel.dataset.chapterTabPanel === tab;
+      panel.classList.toggle("is-active", active);
+      panel.hidden = !active;
+    });
+  }
 
   const action = event.target.closest("[data-action]")?.dataset.action;
   if (!action) return;
@@ -1779,7 +3899,7 @@ document.addEventListener("click", event => {
     toast("Source revealed. Your attempt is still saved.");
   }
   if (action === "to-confidence") {
-    if (!$("#recall").value.trim()) toast("Write what you remember—even “I don’t remember” is useful.");
+    if (!$("#recall").value.trim()) toast("Write what you remember. Even “I don’t remember” is useful.");
     else setStep(2);
   }
   if (action === "back-recall") setStep(1);
@@ -1788,8 +3908,33 @@ document.addEventListener("click", event => {
     const values = getValues();
     if (!values.confidence) { toast("Choose the confidence level that feels closest."); return; }
     setStep(3);
-    state.evaluation = evaluateResponse(values.sourceText, values.recall, values.sourceKind);
-    renderEvaluation(true);
+    const localEvaluation = evaluateResponse(values.sourceText, values.recall, values.sourceKind);
+    state.evaluation = localEvaluation;
+    saveDraft();
+    runAnalysisTransition(localEvaluation, async () => {
+      try {
+        const result = await withTimeout(
+          gradeRecallWithSupabase(values, localEvaluation),
+          12000,
+          "Feedback took longer than expected."
+        );
+        state.evaluation = result.evaluation;
+        saveDraft();
+        if (result.mode !== "supabase") {
+          console.info("[Ember admin] Local feedback was used.", {
+            reason: result.reason || "Supabase grading was unavailable.",
+            chapterId: state.currentId
+          });
+        }
+      } catch (error) {
+        console.warn("[Ember admin] Supabase grading failed. Local feedback was shown.", {
+          error,
+          chapterId: state.currentId
+        });
+        state.evaluation = localEvaluation;
+      }
+      renderEvaluation(false);
+    });
   }
   if (action === "inspect-source") showSource(getValues().sourceText, getValues().chapterTitle);
   if (action === "to-repair") setStep(4);
@@ -1803,6 +3948,7 @@ document.addEventListener("click", event => {
   if (action === "disagree") toast("Disagreement recorded. Your interpretation remains part of the chapter history.");
   if (action === "unsupported") toast("Evidence report recorded. This feedback is flagged for review.");
   if (action === "close-dialog") $("#source-dialog").close();
+  if (action === "close-auth") $("#auth-dialog").close();
   if (action === "open-gap-info") $("#gap-info-dialog").showModal();
   if (action === "close-gap-info") $("#gap-info-dialog").close();
   if (action === "open-initial-check-info") $("#initial-check-info-dialog").showModal();
@@ -1813,6 +3959,10 @@ document.addEventListener("click", event => {
   if (action === "reset-practice") resetPractice();
   if (action === "revisit-practice") revisitPractice(event.target.closest("[data-practice-skill]")?.dataset.practiceSkill);
   if (action === "complete-review") completeReview();
+  if (action === "start-review-session") {
+    const ids = (event.target.closest("[data-review-session-ids]")?.dataset.reviewSessionIds || "").split(",").filter(Boolean);
+    startReviewSession(ids);
+  }
   if (action === "reschedule-review") { toast("No problem. This review remains in your queue."); setView("reviews"); }
   if (action === "view-chapter-source") {
     const saved = loadChapters().find(item => item.id === event.target.closest("[data-chapter-id]").dataset.chapterId);
@@ -1821,11 +3971,6 @@ document.addEventListener("click", event => {
   if (action === "edit-chapter") editChapter(event.target.closest("[data-edit-chapter-id]").dataset.editChapterId);
   if (action === "cancel-chapter-edit") openChapter(event.target.closest("[data-edit-chapter-id]").dataset.editChapterId);
   if (action === "save-chapter-edit") saveChapterEdit(event.target.closest("[data-edit-chapter-id]").dataset.editChapterId);
-  if (action === "toggle-reschedule") {
-    const id = event.target.closest("[data-manage-review-id]").dataset.manageReviewId;
-    const panel = $(`[data-reschedule-panel="${id}"]`);
-    if (panel) panel.hidden = !panel.hidden;
-  }
   if (action === "reschedule-managed-review") {
     const button = event.target.closest("[data-manage-review-id]");
     rescheduleManagedReview(button.dataset.manageReviewId, button.dataset.delay);
@@ -1890,10 +4035,30 @@ $("#dashboard-start")?.addEventListener("click", () => startNew());
 $("#open-book-insights").addEventListener("click", event => renderBookInsights(event.currentTarget.dataset.bookKey));
 $("#open-latest").addEventListener("click", event => openChapter(event.currentTarget.dataset.chapterId));
 $("#check-next").addEventListener("click", event => startNew({
-  bookPath: "existing",
-  bookTitle: event.currentTarget.dataset.bookTitle,
-  authorName: event.currentTarget.dataset.authorName
+  ...(event.currentTarget.dataset.mode === "new-book"
+    ? {}
+    : {
+      bookPath: "existing",
+      bookTitle: event.currentTarget.dataset.bookTitle,
+      authorName: event.currentTarget.dataset.authorName
+    })
 }));
+$("#focus-edit-button")?.addEventListener("click", () => {
+  const panel = $("#focus-book-panel");
+  const button = $("#focus-edit-button");
+  const nextHidden = !panel.hidden;
+  panel.hidden = nextHidden;
+  button.setAttribute("aria-expanded", String(!nextHidden));
+  if (!nextHidden) $("#focus-book-select")?.focus();
+});
+$("#focus-book-select")?.addEventListener("change", event => {
+  const key = event.currentTarget.value;
+  if (key) localStorage.setItem(FOCUS_BOOK_KEY, key);
+  else localStorage.removeItem(FOCUS_BOOK_KEY);
+  $("#focus-book-panel").hidden = true;
+  $("#focus-edit-button").setAttribute("aria-expanded", "false");
+  renderDashboard();
+});
 $("#new-check").addEventListener("click", () => startNew());
 $("#profile-button").addEventListener("click", event => {
   event.stopPropagation();
@@ -1901,10 +4066,80 @@ $("#profile-button").addEventListener("click", event => {
   menu.hidden = !menu.hidden;
   $("#profile-button").setAttribute("aria-expanded", String(!menu.hidden));
 });
-$("#profile-menu").addEventListener("click", event => event.stopPropagation());
-$("#logout-button").addEventListener("click", () => setLoggedIn(false));
-$("#login-button").addEventListener("click", () => setLoggedIn(true));
-$("#signup-button").addEventListener("click", () => setLoggedIn(true));
+$("#profile-menu").addEventListener("click", event => {
+  event.stopPropagation();
+  const nav = event.target.closest("[data-nav]");
+  if (nav) setView(nav.dataset.nav);
+});
+$("#logout-button").addEventListener("click", () => logOut());
+$("#login-button").addEventListener("click", () => openAuthDialog("login"));
+$("#signup-button").addEventListener("click", () => openAuthDialog("signup"));
+$("#prototype-auth-button")?.addEventListener("click", continueWithPrototypeAccount);
+$("#email-auth-form")?.addEventListener("submit", handleMagicLinkSignIn);
+$("#password-auth-form")?.addEventListener("submit", handlePasswordSignIn);
+$("#show-password-auth")?.addEventListener("click", () => {
+  $("#magic-auth-options").hidden = true;
+  $("#email-auth-form").hidden = true;
+  $("#password-auth-form").hidden = false;
+  $("#password-auth-email").focus();
+});
+$("#show-magic-auth")?.addEventListener("click", () => {
+  $("#magic-auth-options").hidden = false;
+  $("#email-auth-form").hidden = false;
+  $("#password-auth-form").hidden = true;
+  $("#auth-email").focus();
+});
+$("#forgot-password")?.addEventListener("click", async () => {
+  const client = getSupabaseClient();
+  const email = $("#password-auth-email").value.trim() || $("#auth-email").value.trim();
+  if (!client) { setAuthStatus("Supabase is not connected yet. Check supabase-config.js."); return; }
+  if (!email) { toast("Enter your email first."); return; }
+  const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split("#")[0] });
+  toast(error ? error.message : "Password reset email sent.");
+});
+$("#google-auth-button")?.addEventListener("click", async () => {
+  const client = getSupabaseClient();
+  if (!client) { setAuthStatus("Supabase is not connected yet. Check supabase-config.js."); return; }
+  const { error } = await client.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.href.split("#")[0] }
+  });
+  if (error) toast(error.message);
+});
+$("#account-name-form")?.addEventListener("submit", handleAccountNameSubmit);
+$("#account-reading-context-form")?.addEventListener("submit", handleReadingContextSubmit);
+$("#color-theme-options")?.addEventListener("change", handleColorThemeChange);
+$("#color-mode-options")?.addEventListener("change", handleColorModeChange);
+$("#account-email-form")?.addEventListener("submit", handleAccountEmailSubmit);
+$("#account-password-form")?.addEventListener("submit", handleAccountPasswordSubmit);
+$("#account-recovery-form")?.addEventListener("submit", handleRecoveryEmailSubmit);
+$("#logout-all-devices")?.addEventListener("click", async () => {
+  const client = getSupabaseClient();
+  if (client) await client.auth.signOut({ scope: "global" });
+  state.supabaseSession = null;
+  setLoggedIn(false);
+});
+$("#refresh-generated-feedback")?.addEventListener("click", async () => {
+  const button = $("#refresh-generated-feedback");
+  if (button) button.disabled = true;
+  setAccountStatus("#account-feedback-refresh-status", "Refreshing saved feedback notes.", "");
+  try {
+    const data = await regenerateNextTimeCoaching(50);
+    const count = Number(data?.updated_count || 0);
+    const localCount = syncGeneratedCoachingToLocalChapters(data);
+    setAccountStatus(
+      "#account-feedback-refresh-status",
+      count
+        ? `${count} saved feedback ${count === 1 ? "note was" : "notes were"} refreshed. ${localCount} local ${localCount === 1 ? "chapter was" : "chapters were"} updated.`
+        : "No saved feedback needed a refresh.",
+      "success"
+    );
+  } catch (error) {
+    setAccountStatus("#account-feedback-refresh-status", error.message || "Unable to refresh generated feedback.", "error");
+  } finally {
+    if (button) button.disabled = false;
+  }
+});
 $("#save-entry-draft")?.addEventListener("click", saveEntryDraft);
 document.addEventListener("click", () => {
   $("#profile-menu").hidden = true;
@@ -1964,11 +4199,21 @@ $("#confidence-info-dialog").addEventListener("click", event => {
   if (event.target === $("#confidence-info-dialog")) $("#confidence-info-dialog").close();
 });
 
-ensureMockDraft();
 renderAuthState();
+const bootSupabaseClient = getSupabaseClient();
+if (bootSupabaseClient) {
+  bootSupabaseClient.auth.onAuthStateChange((_event, session) => {
+    state.supabaseSession = session || null;
+    if (session) localStorage.setItem(AUTH_KEY, "true");
+    renderAuthState();
+  });
+  refreshSupabaseSession(true);
+}
+window.matchMedia?.("(prefers-color-scheme: dark)")?.addEventListener?.("change", handleSystemColorSchemeChange);
 try {
   const draft = JSON.parse(localStorage.getItem(DRAFT_KEY));
   if (draft && Object.values(draft).some(Boolean)) {
+    state.currentId = draft.id || null;
     renderBookOptions(draft.bookTitle, draft.authorName);
     setValues(draft);
     toast("Your earlier draft is ready when you are.");
