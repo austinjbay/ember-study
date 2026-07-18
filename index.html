@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700;8..60,800&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f312d'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia,serif' font-size='34' font-style='italic' fill='%23fffdf7'%3EE%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="styles.css?v=20260718-coal-halo">
+    <link rel="stylesheet" href="styles.css?v=20260718-chatbox-companion">
   </head>
   <body>
     <a class="skip-link" href="#app">Skip to main content</a>
@@ -1240,12 +1240,12 @@
       </main>
 
       <div class="ember-companion" id="ember-companion" hidden>
-        <section class="ember-companion-panel" id="ember-companion-panel" role="dialog" aria-labelledby="sidebar-guide-title" hidden>
+        <section class="ember-companion-panel" id="ember-companion-panel" aria-labelledby="sidebar-guide-title">
           <div class="ember-guide-head">
             <span class="ember-guide-mark" aria-hidden="true"></span>
             <div>
-              <h2 id="sidebar-guide-title">Ask Ember</h2>
-              <p id="sidebar-guide-state">Ready when you are.</p>
+              <h2 id="sidebar-guide-title">Ember</h2>
+              <p id="sidebar-guide-state">Reading companion · local model</p>
             </div>
           </div>
           <div class="ember-guide-log" id="sidebar-guide-log" role="log" aria-live="polite">
@@ -1258,13 +1258,10 @@
           </div>
           <form class="ember-guide-form" id="sidebar-guide-form">
             <label class="sr-only" for="sidebar-guide-input">Ask Ember a question</label>
-            <input id="sidebar-guide-input" type="text" autocomplete="off" placeholder="Ask what to read next">
-            <button type="submit" aria-label="Ask Ember">↵</button>
+            <input id="sidebar-guide-input" type="text" autocomplete="off" placeholder="Ask about your books">
+            <button type="submit">Send</button>
           </form>
         </section>
-        <button class="ember-companion-button" id="ember-companion-button" type="button" aria-label="Ask Ember" aria-haspopup="dialog" aria-controls="ember-companion-panel" aria-expanded="false">
-          <span class="ember-companion-icon" aria-hidden="true"></span>
-        </button>
       </div>
 
       <nav class="marketing-bottom-nav" aria-label="Product information">

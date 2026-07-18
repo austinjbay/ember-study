@@ -1520,16 +1520,15 @@ function setSidebarGuideReply(reply) {
 function renderSidebarGuide() {
   const companion = $("#ember-companion");
   const panel = $("#ember-companion-panel");
-  const button = $("#ember-companion-button");
-  if (!companion || !panel || !button) return;
+  if (!companion || !panel) return;
   companion.hidden = !isLoggedIn();
   if (!isLoggedIn()) {
     panel.hidden = true;
-    button.setAttribute("aria-expanded", "false");
     return;
   }
+  panel.hidden = false;
   const summary = sidebarGuideReplyFor("next");
-  $("#sidebar-guide-state").textContent = summary.title;
+  $("#sidebar-guide-state").textContent = "Reading companion · local model";
   $("#sidebar-guide-log").innerHTML = `<strong>${escapeHtml(summary.title)}</strong><p>${escapeHtml(summary.body)}</p>`;
 }
 
