@@ -521,22 +521,15 @@ body.logged-out .landing-footer { display: flex; }
 .library-carousel-empty span { color: var(--muted); font-size: .76rem; }
 .reading-world-layout { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 28px 34px; align-items: start; }
 .reading-world-zone { min-width: 0; }
-.skill-progression-zone { grid-column: 1 / -1; }
-.mission-zone { display: grid; grid-column: span 4; grid-row: span 2; gap: 24px; align-content: start; }
-.library-zone { grid-column: span 8; }
-.memory-zone { grid-column: span 4; }
-.practice-zone { grid-column: span 4; }
+.memory-zone,
+.practice-zone,
+.library-zone { grid-column: span 4; }
+.diagnostic-zone { grid-column: 1 / -1; }
 .journey-zone,
 .support-zone { grid-column: 1 / -1; }
-.skill-progression-zone .adaptive-module { border-top: 1px solid var(--line-dark); background: color-mix(in srgb, var(--white), var(--paper) 40%); padding: clamp(22px, 3vw, 34px); box-shadow: 12px 12px 0 rgba(47,49,45,.06); }
-.skill-progression-zone .skill-signal-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; }
-.mission-zone .next-action-card { grid-template-columns: 1fr; gap: 18px; min-height: 0; margin: 0; padding: 26px; box-shadow: 9px 9px 0 #d8d2c7; }
-.mission-zone .next-action-card::after { display: none; }
-.mission-zone .next-action-marker { right: 22px; bottom: 18px; font-size: clamp(3.8rem, 8vw, 5.8rem); }
-.mission-zone .next-action-copy h2 { font-size: clamp(1.75rem, 3vw, 2.55rem); }
-.mission-zone .next-action-card .primary { width: 100%; }
-.mission-zone .diagnostic-module { padding: 22px; box-shadow: none; border-top: 1px solid var(--line-dark); background: transparent; }
-.mission-zone .diagnostic-module h2 { font-size: clamp(1.35rem, 2.2vw, 1.85rem); }
+.home-top-module[data-module-id="primary-next-action"] .next-action-card { margin: 0; }
+.home-top-module[data-module-id="skill-development"] .adaptive-module { background: color-mix(in srgb, var(--white), var(--paper) 40%); box-shadow: 12px 12px 0 rgba(47,49,45,.06); }
+.home-top-module[data-module-id="skill-development"] .skill-signal-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; }
 .library-zone .library-activity-module { min-height: 100%; }
 .memory-zone .memory-module,
 .practice-zone .today-practice-module { min-height: 100%; }
@@ -580,7 +573,7 @@ body.logged-out .landing-footer { display: flex; }
   text-align: center;
 }
 .adaptive-home .next-action-card .primary,
-.mission-zone .next-action-card .primary {
+.home-top-module[data-module-id="primary-next-action"] .primary {
   width: auto;
 }
 .diagnostic-module { display: grid; grid-template-columns: minmax(0, .9fr); border-top: 0; background: color-mix(in srgb, var(--white), var(--paper) 34%); padding: clamp(24px, 4vw, 38px); box-shadow: 12px 12px 0 rgba(47,49,45,.07); }
@@ -2356,14 +2349,13 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .reading-world-layout { grid-template-columns: 1fr; gap: 26px; }
   .library-carousel-heading { align-items: start; }
   .library-carousel-card { flex-basis: min(280px, 82vw); }
-  .skill-progression-zone,
-  .mission-zone,
   .library-zone,
   .memory-zone,
   .practice-zone,
+  .diagnostic-zone,
   .journey-zone,
   .support-zone { grid-column: 1; grid-row: auto; }
-  .skill-progression-zone .skill-signal-list { grid-template-columns: 1fr; }
+  .home-top-module[data-module-id="skill-development"] .skill-signal-list { grid-template-columns: 1fr; }
   .skill-path-grid { grid-template-columns: 1fr 1fr; }
   .prototype-head,
   .prototype-next-object,
@@ -2391,7 +2383,11 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .home-module-shell[data-module-id="reader-diagnostic"],
   .home-module-shell[data-module-id="progress-over-time"],
   .home-module-shell[data-module-id="memory-resurfacing"],
-  .home-module-shell[data-module-id="skill-development"] { grid-column: 1; }
+  .home-module-shell[data-module-id="skill-development"],
+  .memory-zone,
+  .practice-zone,
+  .library-zone,
+  .diagnostic-zone { grid-column: 1; }
   .progress li { font-size: 0; }
   .progress li span { margin-right: 0; font-size: .62rem; }
 }

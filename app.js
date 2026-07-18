@@ -4332,32 +4332,30 @@ function renderAdaptiveLoggedInHome(vm) {
   const zone = id => moduleById.get(id) ? `<div class="home-module-shell" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const topZone = id => moduleById.get(id) ? `<div class="home-top-module" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const supportModules = modules
-    .filter(module => !["library-carousel", "skill-development", "primary-next-action", "reader-diagnostic", "library-activity", "memory-resurfacing", "today-practice", "progress-over-time"].includes(module.id))
+    .filter(module => !["primary-next-action", "skill-development", "progress-over-time", "library-carousel", "memory-resurfacing", "today-practice", "library-activity", "reader-diagnostic"].includes(module.id))
     .map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`)
     .join("");
   $("#returning-home").innerHTML = `
     ${renderHomeFixtureSwitcher(state.homeFixture)}
     <div class="adaptive-home" data-evidence-state="${escapeHtml(vm.evidenceState)}">
       ${renderAdaptiveHomeStateHeader(vm)}
-      ${topZone("library-carousel")}
+      ${topZone("primary-next-action")}
+      ${topZone("skill-development")}
       ${topZone("progress-over-time")}
+      ${topZone("library-carousel")}
       ${renderHomeInteractionPrototype(vm)}
       <div class="reading-world-layout" aria-label="Logged-in reading home">
-        <section class="reading-world-zone skill-progression-zone" aria-label="Skill progression">
-          ${zone("skill-development")}
-        </section>
-        <section class="reading-world-zone mission-zone" aria-label="Mission and guide">
-          ${zone("primary-next-action")}
-          ${zone("reader-diagnostic")}
-        </section>
-        <section class="reading-world-zone library-zone" aria-label="Library">
-          ${zone("library-activity")}
-        </section>
         <section class="reading-world-zone memory-zone" aria-label="Memory recovery">
           ${zone("memory-resurfacing")}
         </section>
         <section class="reading-world-zone practice-zone" aria-label="Today’s practice">
           ${zone("today-practice")}
+        </section>
+        <section class="reading-world-zone library-zone" aria-label="Library activity">
+          ${zone("library-activity")}
+        </section>
+        <section class="reading-world-zone diagnostic-zone" aria-label="Reading profile">
+          ${zone("reader-diagnostic")}
         </section>
         ${supportModules ? `<section class="reading-world-zone support-zone" aria-label="Additional setup">${supportModules}</section>` : ""}
       </div>
