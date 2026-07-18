@@ -63,13 +63,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .nav-item.is-active { background: rgba(255,255,255,.58); color: var(--ink); }
 .nav-item.is-active { font-weight: 700; }
 .notification-icon, .home-icon, .practice-icon { display: grid; place-items: center; }
-.notification-icon svg, .home-icon svg, .practice-icon svg { display: block; width: 17px; height: 17px; transform-origin: center; transition: color .22s cubic-bezier(.2, .8, .2, 1), filter .22s cubic-bezier(.2, .8, .2, 1), transform .22s cubic-bezier(.2, .8, .2, 1); will-change: transform, filter; }
-.nav-item:hover .notification-icon svg,
-.nav-item:hover .home-icon svg,
-.nav-item:hover .practice-icon svg {
-  filter: drop-shadow(0 6px 5px rgba(47,49,45,.22));
-  transform: translateY(-3px) scale(1.05);
-}
+.notification-icon svg, .home-icon svg, .practice-icon svg { display: block; width: 17px; height: 17px; transition: color .18s ease; }
 .nav-item em { min-width: 21px; border-radius: 10px; background: rgba(73,101,83,.12); color: var(--green); padding: 2px 6px; font-size: .68rem; font-style: normal; text-align: center; }
 .nav-item em.is-due { background: var(--amber-soft); color: var(--amber); }
 .nav-item em.has-scheduled { background: var(--green-soft); color: var(--green); }
@@ -1622,9 +1616,7 @@ body.sidebar-collapsed .nav-item .home-icon svg,
 body.sidebar-collapsed .nav-item .practice-icon svg,
 body.sidebar-collapsed .sidebar-foot .avatar,
 body.sidebar-collapsed .signed-out-mark {
-  transform-origin: center;
-  transition: color .22s cubic-bezier(.2, .8, .2, 1), filter .22s cubic-bezier(.2, .8, .2, 1), transform .22s cubic-bezier(.2, .8, .2, 1);
-  will-change: transform, filter;
+  transition: color .18s ease;
 }
 body.sidebar-collapsed .nav-item .notification-icon,
 body.sidebar-collapsed .nav-item .home-icon,
@@ -1642,8 +1634,6 @@ body.sidebar-collapsed .nav-item:hover .practice-icon svg,
 body.sidebar-collapsed .sidebar-foot button:hover .avatar,
 body.sidebar-collapsed .signed-out-note:hover .signed-out-mark {
   color: var(--ink);
-  filter: drop-shadow(0 6px 5px rgba(47,49,45,.22));
-  transform: translateY(-3px) scale(1.05);
 }
 body.sidebar-collapsed .new-check:hover .new-check-icon,
 body.sidebar-collapsed .brand:hover .brand-mark {
@@ -1673,19 +1663,7 @@ body.sidebar-collapsed .brand:hover .brand-mark {
   body.sidebar-collapsed .nav-item .practice-icon svg,
   body.sidebar-collapsed .sidebar-foot .avatar,
   body.sidebar-collapsed .signed-out-mark {
-    transition: color .01ms linear, filter .01ms linear;
-  }
-  .nav-item:hover .notification-icon svg,
-  .nav-item:hover .home-icon svg,
-  .nav-item:hover .practice-icon svg,
-  body.sidebar-collapsed .brand:hover .brand-mark,
-  body.sidebar-collapsed .new-check:hover .new-check-icon,
-  body.sidebar-collapsed .nav-item:hover .notification-icon svg,
-  body.sidebar-collapsed .nav-item:hover .home-icon svg,
-  body.sidebar-collapsed .nav-item:hover .practice-icon svg,
-  body.sidebar-collapsed .sidebar-foot button:hover .avatar,
-  body.sidebar-collapsed .signed-out-note:hover .signed-out-mark {
-    transform: none;
+    transition: color .01ms linear;
   }
 }
 body.logged-out .new-check,
