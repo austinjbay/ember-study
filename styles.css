@@ -222,10 +222,10 @@ main:focus { outline: 0; }
 .ember-guide-log { display: grid; gap: 16px; min-height: 180px; max-height: 340px; overflow: auto; border-left: 0; padding: 2px 4px 4px; }
 .ember-guide-log strong { display: block; margin-bottom: 4px; color: var(--ink); font-family: var(--serif); font-size: .96rem; font-weight: 650; }
 .ember-chat-message { display: grid; max-width: 92%; gap: 4px; border-radius: 7px; padding: 2px 0; }
-.ember-chat-message p { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
+.ember-chat-message p { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
 .ember-chat-message.is-user { justify-self: end; background: transparent; border: 0; }
 .ember-chat-message.is-user p { color: var(--ink); }
-.ember-chat-message.is-assistant { justify-self: start; background: transparent; border: 0; }
+.ember-chat-message.is-assistant { justify-self: start; margin-top: 8px; background: transparent; border: 0; }
 .ember-guide-actions { display: flex; flex-wrap: wrap; gap: 7px; }
 .ember-guide-actions button { min-height: 30px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); padding: 0 10px; font-size: .68rem; font-weight: 800; }
 .ember-guide-actions button:hover { border-color: var(--green); color: var(--green); }
