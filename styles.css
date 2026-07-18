@@ -816,7 +816,6 @@ body.logged-out .landing-footer { display: flex; }
 }
 
 :root[data-color-mode="dark"] .secondary,
-:root[data-color-mode="dark"] .file-button,
 :root[data-color-mode="dark"] .google-auth-button {
   border-color: color-mix(in srgb, var(--line-dark), var(--ink) 12%);
   background: color-mix(in srgb, var(--white), var(--paper) 8%);
@@ -824,7 +823,6 @@ body.logged-out .landing-footer { display: flex; }
 }
 
 :root[data-color-mode="dark"] .secondary:hover,
-:root[data-color-mode="dark"] .file-button:hover,
 :root[data-color-mode="dark"] .google-auth-button:hover {
   border-color: color-mix(in srgb, var(--green), var(--line-dark) 16%);
   background: color-mix(in srgb, var(--white), var(--ink) 8%);
@@ -846,15 +844,6 @@ body.logged-out .landing-footer { display: flex; }
 :root[data-color-mode="dark"] .danger-button {
   border-color: color-mix(in srgb, var(--red), var(--line-dark) 20%);
   color: var(--red);
-}
-.local-data-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.local-data-actions .secondary { width: auto; }
-.file-button { display: inline-grid; place-items: center; cursor: pointer; }
-#import-local-data { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; opacity: 0; }
-.file-button:focus-within,
-.file-button:has(+ #import-local-data:focus-visible) {
-  outline: 3px solid rgba(54,91,74,.32);
-  outline-offset: 3px;
 }
 .session-policy { display: flex; flex-wrap: wrap; gap: 8px; }
 .session-policy span { border-radius: 999px; background: var(--green-soft); color: var(--green); padding: 7px 10px; font-size: .64rem; }
