@@ -1531,7 +1531,7 @@ function setSidebarGuideStatus(title, body = "") {
 function setSidebarChatMessages(userMessage = "", assistantMessage = "", { loading = false } = {}) {
   if (loading) {
     state.emberChatMessages.push({ role: "user", text: userMessage });
-    state.emberChatMessages.push({ role: "assistant", text: assistantMessage || "Thinking...", loading: true });
+    state.emberChatMessages.push({ role: "assistant", text: assistantMessage || "...", loading: true });
     state.pendingEmberAssistantIndex = state.emberChatMessages.length - 1;
   } else if (state.pendingEmberAssistantIndex !== null && state.emberChatMessages[state.pendingEmberAssistantIndex]) {
     state.emberChatMessages[state.pendingEmberAssistantIndex] = { role: "assistant", text: assistantMessage || "Unable to ask Ember." };
@@ -6058,7 +6058,7 @@ $("#sidebar-guide-form")?.addEventListener("submit", async event => {
   }
   input.disabled = true;
   if (button) button.disabled = true;
-  setSidebarChatMessages(text, "Looking across your reading state.", { loading: true });
+  setSidebarChatMessages(text, "...", { loading: true });
   try {
     const answer = await withTimeout(askEmber(text), 30000, "Ember took too long to respond. Try again in a moment.");
     setSidebarChatMessages(text, answer);

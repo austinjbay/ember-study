@@ -235,6 +235,11 @@ main:focus { outline: 0; }
 .ember-chat-message.is-user { justify-self: end; background: transparent; border-color: var(--line-dark); }
 .ember-chat-message.is-user p { color: var(--ink); }
 .ember-chat-message.is-assistant { justify-self: start; margin-top: 8px; background: transparent; border-color: var(--line); }
+.ember-chat-message.is-loading p { min-width: 1.5em; color: var(--green); font-weight: 750; letter-spacing: .08em; animation: emberThinking 1.1s ease-in-out infinite; }
+@keyframes emberThinking {
+  0%, 100% { opacity: .38; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-1px); }
+}
 .ember-guide-actions { display: flex; flex-wrap: wrap; gap: 7px; }
 .ember-guide-actions button { min-height: 30px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); padding: 0 10px; font-size: .68rem; font-weight: 800; }
 .ember-guide-actions button:hover { border-color: var(--green); color: var(--green); }
