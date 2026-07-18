@@ -3724,7 +3724,7 @@ function practiceReasonForGap(gap = "") {
 function firstBookNextAction(evidenceState = "establishing", why = "") {
   return {
     kind: "first-book",
-    label: "First step",
+    label: "Start here",
     marker: "01",
     title: "Create your first book.",
     copy: "Start by adding the book you’re reading. Then Ember can help you review chapters from that source.",
