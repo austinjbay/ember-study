@@ -1532,12 +1532,13 @@ function buildEmberChatContext() {
   const scheduled = chapters.filter(reviewIsScheduled).sort((a, b) => new Date(a.reviewDue) - new Date(b.reviewDue));
   const due = scheduled.filter(reviewIsDue);
   const practice = currentPracticeSkillState();
-  const books = groupBooks(entries).slice(0, 8).map(group => ({
-    title: group.book.title,
-    author: group.book.author || "",
-    chapters: group.entries.filter(chapter => chapter.status !== "Draft").length,
-    drafts: group.entries.filter(chapter => chapter.status === "Draft").length,
-    total_chapters: group.book.totalChapters || null,
+  const books = uniqueBookSummaries(entries).slice(0, 8).map(book => ({
+    title: book.title,
+    author: book.author || "",
+    chapters: book.completed,
+    drafts: book.drafts,
+    total_chapters: book.total || null,
+    latest_chapter: book.latestChapter || "",
   }));
   const chapterSummary = chapter => ({
     book: chapter.bookTitle || "",
