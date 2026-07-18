@@ -10,6 +10,8 @@ const FOCUS_BOOK_KEY = "margin-focus-book-v1";
 const DISMISSED_AUTO_DRAFTS_KEY = "margin-dismissed-auto-drafts-v1";
 const LOGIN_PROMPT_KEY = "ember-login-prompt-index";
 const SESSION_PROMPT_KEY = "ember-session-login-prompt";
+const EMBER_WINDOW_KEY = "ember-chat-window-v1";
+const DEFAULT_EMBER_WINDOW = { width: 390, height: 470, margin: 12 };
 const DEFAULT_COLOR_THEME = "moss-paper";
 const DEFAULT_COLOR_MODE = "light";
 
@@ -1552,6 +1554,130 @@ function renderSidebarChatMessages() {
   log.scrollTop = log.scrollHeight;
 }
 
+function emberWindowDefaults() {
+  const width = Math.min(DEFAULT_EMBER_WINDOW.width, Math.max(280, window.innerWidth - DEFAULT_EMBER_WINDOW.margin * 2));
+  const height = Math.min(DEFAULT_EMBER_WINDOW.height, Math.max(240, window.innerHeight - DEFAULT_EMBER_WINDOW.margin * 2));
+  return {
+    left: Math.max(DEFAULT_EMBER_WINDOW.margin, window.innerWidth - width - DEFAULT_EMBER_WINDOW.margin),
+    top: Math.max(DEFAULT_EMBER_WINDOW.margin, window.innerHeight - height - DEFAULT_EMBER_WINDOW.margin),
+    height,
+    minimized: false
+  };
+}
+
+function loadEmberWindowState() {
+  try {
+    return { ...emberWindowDefaults(), ...(JSON.parse(localStorage.getItem(EMBER_WINDOW_KEY)) || {}) };
+  } catch {
+    return emberWindowDefaults();
+  }
+}
+
+function saveEmberWindowState(patch = {}) {
+  const current = loadEmberWindowState();
+  const next = { ...current, ...patch };
+  localStorage.setItem(EMBER_WINDOW_KEY, JSON.stringify(next));
+  return next;
+}
+
+function clampEmberWindowState(statePatch = loadEmberWindowState()) {
+  const companion = $("#ember-companion");
+  const width = companion?.offsetWidth || Math.min(DEFAULT_EMBER_WINDOW.width, window.innerWidth - DEFAULT_EMBER_WINDOW.margin * 2);
+  const minHeight = 240;
+  const maxHeight = Math.max(minHeight, window.innerHeight - DEFAULT_EMBER_WINDOW.margin * 2);
+  const height = Math.min(Math.max(Number(statePatch.height) || DEFAULT_EMBER_WINDOW.height, minHeight), maxHeight);
+  const maxLeft = Math.max(DEFAULT_EMBER_WINDOW.margin, window.innerWidth - width - DEFAULT_EMBER_WINDOW.margin);
+  const maxTop = Math.max(DEFAULT_EMBER_WINDOW.margin, window.innerHeight - height - DEFAULT_EMBER_WINDOW.margin);
+  return {
+    ...statePatch,
+    left: Math.min(Math.max(Number(statePatch.left) || DEFAULT_EMBER_WINDOW.margin, DEFAULT_EMBER_WINDOW.margin), maxLeft),
+    top: Math.min(Math.max(Number(statePatch.top) || DEFAULT_EMBER_WINDOW.margin, DEFAULT_EMBER_WINDOW.margin), maxTop),
+    height
+  };
+}
+
+function applyEmberWindowState(nextState = loadEmberWindowState()) {
+  const companion = $("#ember-companion");
+  const panel = $("#ember-companion-panel");
+  const minimized = $("#ember-companion-minimized");
+  if (!companion || !panel || !minimized) return;
+  const windowState = clampEmberWindowState(nextState);
+  companion.style.left = `${windowState.left}px`;
+  companion.style.top = `${windowState.top}px`;
+  companion.style.right = "auto";
+  companion.style.bottom = "auto";
+  panel.style.height = `${windowState.height}px`;
+  panel.hidden = Boolean(windowState.minimized);
+  minimized.hidden = !windowState.minimized;
+  saveEmberWindowState(windowState);
+}
+
+function minimizeEmberCompanion() {
+  applyEmberWindowState({ ...loadEmberWindowState(), minimized: true });
+}
+
+function restoreEmberCompanion() {
+  applyEmberWindowState({ ...loadEmberWindowState(), minimized: false });
+  $("#sidebar-guide-input")?.focus();
+}
+
+function initEmberFloatingWindow() {
+  const companion = $("#ember-companion");
+  const panel = $("#ember-companion-panel");
+  const dragHandle = $("#ember-guide-windowbar");
+  const resizeHandle = $("#ember-guide-resize");
+  if (!companion || !panel || !dragHandle || !resizeHandle) return;
+
+  dragHandle.addEventListener("pointerdown", event => {
+    if (event.target.closest("button")) return;
+    const start = loadEmberWindowState();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    companion.classList.add("is-dragging");
+    dragHandle.setPointerCapture(event.pointerId);
+    const onMove = moveEvent => {
+      applyEmberWindowState({
+        ...start,
+        left: start.left + moveEvent.clientX - startX,
+        top: start.top + moveEvent.clientY - startY,
+        minimized: false
+      });
+    };
+    const onUp = () => {
+      companion.classList.remove("is-dragging");
+      dragHandle.removeEventListener("pointermove", onMove);
+      dragHandle.removeEventListener("pointerup", onUp);
+      dragHandle.removeEventListener("pointercancel", onUp);
+    };
+    dragHandle.addEventListener("pointermove", onMove);
+    dragHandle.addEventListener("pointerup", onUp);
+    dragHandle.addEventListener("pointercancel", onUp);
+  });
+
+  resizeHandle.addEventListener("pointerdown", event => {
+    const start = loadEmberWindowState();
+    const startY = event.clientY;
+    companion.classList.add("is-resizing");
+    resizeHandle.setPointerCapture(event.pointerId);
+    const onMove = moveEvent => {
+      applyEmberWindowState({
+        ...start,
+        height: start.height + moveEvent.clientY - startY,
+        minimized: false
+      });
+    };
+    const onUp = () => {
+      companion.classList.remove("is-resizing");
+      resizeHandle.removeEventListener("pointermove", onMove);
+      resizeHandle.removeEventListener("pointerup", onUp);
+      resizeHandle.removeEventListener("pointercancel", onUp);
+    };
+    resizeHandle.addEventListener("pointermove", onMove);
+    resizeHandle.addEventListener("pointerup", onUp);
+    resizeHandle.addEventListener("pointercancel", onUp);
+  });
+}
+
 function buildEmberChatContext() {
   const entries = ensureUpNextChapterDrafts(migrateReviewsToFsrs(loadChapters()));
   const chapters = entries.filter(chapter => chapter.status !== "Draft");
@@ -1613,13 +1739,15 @@ function renderSidebarGuide() {
   const panel = $("#ember-companion-panel");
   if (!companion || !panel) return;
   companion.hidden = !isLoggedIn();
+  applyEmberWindowState();
   if (!isLoggedIn()) {
     panel.hidden = true;
+    $("#ember-companion-minimized")?.setAttribute("hidden", "");
     state.emberChatMessages = [];
     state.pendingEmberAssistantIndex = null;
     return;
   }
-  panel.hidden = false;
+  applyEmberWindowState(loadEmberWindowState());
   if (state.emberChatMessages.length) {
     renderSidebarChatMessages();
     return;
@@ -1677,22 +1805,18 @@ function closeProfileMenu({ returnFocus = false } = {}) {
 }
 
 function closeEmberCompanion({ returnFocus = false } = {}) {
-  const panel = $("#ember-companion-panel");
   const button = $("#ember-companion-button");
-  if (!panel || !button) return;
-  const wasOpen = !panel.hidden;
-  panel.hidden = true;
-  button.setAttribute("aria-expanded", "false");
-  if (returnFocus && wasOpen) button.focus();
+  minimizeEmberCompanion();
+  button?.setAttribute("aria-expanded", "false");
+  if (returnFocus) button?.focus();
 }
 
 function toggleEmberCompanion() {
-  const panel = $("#ember-companion-panel");
   const button = $("#ember-companion-button");
-  if (!panel || !button) return;
-  const willOpen = panel.hidden;
-  panel.hidden = !willOpen;
-  button.setAttribute("aria-expanded", String(willOpen));
+  const current = loadEmberWindowState();
+  const willOpen = current.minimized;
+  applyEmberWindowState({ ...current, minimized: !current.minimized });
+  button?.setAttribute("aria-expanded", String(willOpen));
   if (willOpen) $("#sidebar-guide-input")?.focus();
 }
 
@@ -6059,6 +6183,14 @@ $("#ember-companion-button")?.addEventListener("click", event => {
   closeProfileMenu();
   toggleEmberCompanion();
 });
+$("#ember-guide-minimize")?.addEventListener("click", event => {
+  event.stopPropagation();
+  minimizeEmberCompanion();
+});
+$("#ember-companion-minimized")?.addEventListener("click", event => {
+  event.stopPropagation();
+  restoreEmberCompanion();
+});
 $("#mobile-logo-button")?.addEventListener("click", event => {
   event.stopPropagation();
   closeProfileMenu();
@@ -6200,7 +6332,6 @@ $("#confirm-delete-draft")?.addEventListener("click", confirmDeleteDraft);
 document.addEventListener("click", event => {
   closeMobileLogoMenu();
   closeProfileMenu();
-  if (!event.target.closest("#ember-companion")) closeEmberCompanion();
 });
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
@@ -6275,6 +6406,7 @@ $("#confidence-info-dialog").addEventListener("click", event => {
 });
 
 window.matchMedia?.("(prefers-color-scheme: dark)")?.addEventListener?.("change", handleSystemColorSchemeChange);
+window.addEventListener("resize", () => applyEmberWindowState(loadEmberWindowState()));
 
 async function bootApp() {
   const startupRoute = initialRouteState();
@@ -6304,4 +6436,5 @@ window.addEventListener("popstate", () => {
   setView(viewForPath(), { updateUrl: false });
 });
 
+initEmberFloatingWindow();
 bootApp();
