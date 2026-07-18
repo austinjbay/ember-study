@@ -1528,14 +1528,27 @@ body.sidebar-collapsed .nav-item {
   width: 44px;
   height: 44px;
   min-height: 44px;
-  overflow: hidden;
+  border-radius: 10px;
+  overflow: visible;
   padding: 0;
+  background: transparent;
   color: transparent;
   font-size: 0;
+  transition: background .16s ease, border-color .16s ease, box-shadow .16s ease, color .16s ease, transform .16s ease;
 }
 body.sidebar-collapsed .nav-item span {
   color: var(--muted);
   font-size: .9rem;
+}
+body.sidebar-collapsed .nav-item:hover,
+body.sidebar-collapsed .nav-item.is-active {
+  background: var(--white);
+  box-shadow: 0 7px 16px rgba(47,49,45,.14), 0 1px 0 rgba(255,255,255,.8) inset;
+  transform: translateY(-1px);
+}
+body.sidebar-collapsed .nav-item:hover span,
+body.sidebar-collapsed .nav-item.is-active span {
+  transform: none;
 }
 body.sidebar-collapsed .nav-item .notification-icon svg,
 body.sidebar-collapsed .nav-item .home-icon svg,
@@ -1577,9 +1590,6 @@ body.sidebar-collapsed .sidebar-foot .avatar {
 }
 body.sidebar-collapsed .brand-mark,
 body.sidebar-collapsed .new-check-icon,
-body.sidebar-collapsed .nav-item .notification-icon,
-body.sidebar-collapsed .nav-item .home-icon,
-body.sidebar-collapsed .nav-item .practice-icon,
 body.sidebar-collapsed .sidebar-foot .avatar,
 body.sidebar-collapsed .signed-out-mark {
   transition: background .16s ease, border-color .16s ease, box-shadow .16s ease, color .16s ease, transform .16s ease;
@@ -1589,16 +1599,11 @@ body.sidebar-collapsed .nav-item .home-icon,
 body.sidebar-collapsed .nav-item .practice-icon {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid transparent;
-  border-radius: 50%;
+  width: 24px;
+  height: 24px;
 }
 body.sidebar-collapsed .brand:hover .brand-mark,
 body.sidebar-collapsed .new-check:hover .new-check-icon,
-body.sidebar-collapsed .nav-item:hover .notification-icon,
-body.sidebar-collapsed .nav-item:hover .home-icon,
-body.sidebar-collapsed .nav-item:hover .practice-icon,
 body.sidebar-collapsed .sidebar-foot button:hover .avatar,
 body.sidebar-collapsed .signed-out-note:hover .signed-out-mark {
   border-color: rgba(115,115,103,.22);
