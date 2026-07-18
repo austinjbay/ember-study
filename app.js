@@ -3968,7 +3968,7 @@ function homeModule(id, priority, visible, confidence, reason, html) {
 }
 
 function renderWhy(reason = "", confidence = "") {
-  return `<details class="why-this"><summary>Why this?</summary><p>${escapeHtml(reason || confidence || "Shown because it is relevant to your current reading state.")}</p></details>`;
+  return "";
 }
 
 function renderHomeInteractionPrototype(vm) {
