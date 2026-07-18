@@ -388,6 +388,10 @@ body.logged-out .landing-faq { display: grid; }
 .landing-cta-actions { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 25px; }
 .landing-cta .primary { margin-top: 0; border-color: white; background: white; color: var(--ink); }
 .landing-cta .text-button { color: white; text-decoration: underline; text-decoration-color: rgba(255,255,255,.35); text-underline-offset: 5px; }
+.landing-footer { display: none; align-items: center; justify-content: flex-end; gap: 18px; width: min(1140px, 100%); margin: 28px auto 0; padding: 0 0 8px; color: var(--muted); font-size: .72rem; text-align: right; }
+body.logged-out .landing-footer { display: flex; }
+.landing-footer button { border: 0; background: transparent; color: var(--ink); padding: 0; font: inherit; font-weight: 750; text-decoration: underline; text-decoration-color: var(--line-dark); text-underline-offset: 5px; }
+.landing-footer button:hover { color: var(--green); text-decoration-color: currentColor; }
 .dashboard-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 26px 42px; align-items: start; width: min(1140px, 100%); margin: 0 auto; animation: homeRise .38s ease .12s both; }
 .dashboard-section { min-width: 0; }
 .dashboard-section:not(.practice-promo) { grid-column: span 6; border-top: 1px solid var(--line-dark); padding-top: 18px; }
@@ -1598,6 +1602,7 @@ body.logged-out.sidebar-collapsed .signed-out-note {
   .recall-rubric > div { grid-template-columns: 1fr; }
   .hero-actions, .landing-cta-actions { align-items: stretch; flex-direction: column; gap: 14px; }
   .hero-actions button, .landing-cta-actions button { width: 100%; }
+  .landing-footer { align-items: flex-end; flex-direction: column; gap: 10px; }
   .deep-dive-steps { margin-left: 5px; }
   .deep-dive-steps article { grid-template-columns: 35px 1fr; padding-left: 25px; }
   .home-hero { margin-bottom: 55px; }
