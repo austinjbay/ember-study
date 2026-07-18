@@ -1606,6 +1606,11 @@ body.sidebar-collapsed .sidebar-foot span:not(.avatar):not(.signed-out-mark) {
 body.sidebar-collapsed .sidebar-foot .avatar {
   font-size: .78rem;
 }
+body.sidebar-collapsed .profile-menu {
+  right: auto;
+  left: calc(100% + 10px);
+  bottom: 0;
+}
 body.sidebar-collapsed .brand-mark,
 body.sidebar-collapsed .new-check-icon,
 body.sidebar-collapsed .nav-item .notification-icon,
