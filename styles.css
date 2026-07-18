@@ -510,6 +510,8 @@ body.logged-out .landing-footer { display: flex; }
 .library-carousel-card p { margin-top: 16px; color: var(--muted); font-size: .74rem; line-height: 1.35; }
 .library-carousel-card i { display: block; height: 4px; margin-top: auto; overflow: hidden; border-radius: 999px; background: var(--line); }
 .library-carousel-card b { display: block; height: 100%; border-radius: inherit; background: var(--green); }
+.library-card-action { justify-self: start; min-height: 34px; margin-top: 15px; border: 1px solid var(--line-dark); border-radius: 999px; background: var(--ink); color: var(--white); padding: 0 13px; font-size: .68rem; font-weight: 850; }
+.library-card-action:hover { background: #343730; }
 .library-carousel-empty { display: grid; gap: 6px; width: min(360px, 100%); border: 1px dashed var(--line-dark); border-radius: 8px; background: transparent; color: var(--ink); padding: 18px; text-align: left; }
 .library-carousel-empty strong { font-family: var(--serif); font-size: 1.1rem; }
 .library-carousel-empty span { color: var(--muted); font-size: .76rem; }

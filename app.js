@@ -4091,19 +4091,19 @@ function renderLibraryCarouselModule(vm) {
         <span class="eyebrow">Your library</span>
         <h2 id="library-carousel-title">${books.length ? "Keep your reading in view." : "Start your reading shelf."}</h2>
       </div>
-      <button class="text-button" type="button" data-action="home-start-new-book">Add chapter →</button>
     </div>
     ${books.length ? `<div class="library-carousel-track" aria-label="Books in your library">
       ${books.map(book => {
         const progress = book.total ? Math.min(100, Math.round(book.completed / book.total * 100)) : book.completed ? 100 : 0;
         const status = book.drafts && !book.completed ? `${book.drafts} draft${book.drafts === 1 ? "" : "s"}` : `${book.completed}${book.total ? ` of ${book.total}` : ""} checked`;
-        return `<button class="library-carousel-card" type="button" data-book-insights="${escapeHtml(book.key)}" aria-label="Open ${escapeHtml(book.title)}. ${escapeHtml(status)}.">
+        return `<article class="library-carousel-card" aria-label="${escapeHtml(book.title)}. ${escapeHtml(status)}.">
           <span>${escapeHtml(status)}</span>
           <strong>${escapeHtml(book.title)}</strong>
           <small>${escapeHtml(book.author || "Unknown author")}</small>
           ${book.latestChapter ? `<p>${escapeHtml(book.latestChapter)}</p>` : ""}
           <i aria-hidden="true"><b style="width: ${progress}%"></b></i>
-        </button>`;
+          <button class="library-card-action" type="button" data-action="home-start-next-chapter" data-book-title="${escapeHtml(book.title)}" data-author-name="${escapeHtml(book.author || "")}">Add chapter →</button>
+        </article>`;
       }).join("")}
     </div>` : `<button class="library-carousel-empty" type="button" data-action="home-start-new-book">
       <strong>Add your first chapter</strong>
