@@ -4190,6 +4190,7 @@ function renderAdaptiveLoggedInHome(vm) {
   const modules = buildHomeModules(vm);
   const moduleById = new Map(modules.map(module => [module.id, module.html]));
   const zone = id => moduleById.get(id) ? `<div class="home-module-shell" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
+  const topZone = id => moduleById.get(id) ? `<div class="home-top-module" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const supportModules = modules
     .filter(module => !["library-carousel", "skill-development", "primary-next-action", "reader-diagnostic", "library-activity", "memory-resurfacing", "today-practice", "progress-over-time"].includes(module.id))
     .map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`)
@@ -4204,8 +4205,8 @@ function renderAdaptiveLoggedInHome(vm) {
           ? "Find out what stayed with you—and strengthen what didn’t."
           : "Your homepage is organized around the highest-value next step, the strongest available evidence, and the ideas worth bringing back."}</p>
       </header>
-      ${zone("library-carousel")}
-      ${zone("progress-over-time")}
+      ${topZone("library-carousel")}
+      ${topZone("progress-over-time")}
       ${renderHomeInteractionPrototype(vm)}
       <div class="reading-world-layout" aria-label="Logged-in reading home">
         <section class="reading-world-zone skill-progression-zone" aria-label="Skill progression">

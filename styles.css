@@ -492,17 +492,18 @@ body.logged-out .landing-footer { display: flex; }
 .adaptive-home-header h1 em { color: var(--green); font-weight: 400; }
 .adaptive-home-header p { max-width: 680px; margin: 0; color: var(--muted); font-family: var(--serif); font-size: 1.05rem; line-height: 1.6; }
 .adaptive-module-stack { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 28px 42px; align-items: start; }
+.home-top-module { min-width: 0; width: 100%; }
 .home-module-shell { min-width: 0; grid-column: span 6; }
 .home-module-shell[data-module-id="primary-next-action"],
 .home-module-shell[data-module-id="reader-diagnostic"],
 .home-module-shell[data-module-id="progress-over-time"] { grid-column: 1 / -1; }
 .home-module-shell[data-module-id="memory-resurfacing"] { grid-column: span 7; }
 .home-module-shell[data-module-id="skill-development"] { grid-column: span 5; }
-.library-carousel-module { overflow: hidden; }
+.library-carousel-module { max-width: 100%; overflow: hidden; }
 .library-carousel-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 16px; }
 .library-carousel-heading h2 { margin-bottom: 0; }
-.library-carousel-track { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 28%); gap: 12px; overflow-x: auto; overscroll-behavior-inline: contain; scroll-snap-type: inline mandatory; padding: 2px 2px 12px; scrollbar-width: thin; }
-.library-carousel-card { display: grid; align-content: start; min-height: 178px; border: 1px solid var(--line-dark); border-radius: 8px; background: color-mix(in srgb, var(--white), var(--paper) 35%); color: var(--ink); padding: 18px; text-align: left; scroll-snap-align: start; box-shadow: 0 8px 16px rgba(47,49,45,.05); }
+.library-carousel-track { display: flex; gap: 12px; width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; overscroll-behavior-inline: contain; scroll-snap-type: inline mandatory; padding: 2px 2px 12px; scrollbar-width: thin; }
+.library-carousel-card { flex: 0 0 clamp(230px, 28vw, 320px); display: grid; align-content: start; min-height: 178px; border: 1px solid var(--line-dark); border-radius: 8px; background: color-mix(in srgb, var(--white), var(--paper) 35%); color: var(--ink); padding: 18px; text-align: left; scroll-snap-align: start; box-shadow: 0 8px 16px rgba(47,49,45,.05); }
 .library-carousel-card span { color: var(--green); font-size: .62rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .library-carousel-card strong { margin-top: 14px; font-family: var(--serif); font-size: 1.15rem; line-height: 1.08; }
 .library-carousel-card small { margin-top: 6px; color: var(--muted); font-size: .72rem; }
@@ -2319,7 +2320,7 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .calibration-card p { grid-column: 1 / -1; }
   .reading-world-layout { grid-template-columns: 1fr; gap: 26px; }
   .library-carousel-heading { align-items: start; }
-  .library-carousel-track { grid-auto-columns: minmax(240px, 82vw); }
+  .library-carousel-card { flex-basis: min(280px, 82vw); }
   .skill-progression-zone,
   .mission-zone,
   .library-zone,
