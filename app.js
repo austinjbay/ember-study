@@ -3868,7 +3868,7 @@ function firstBookNextAction(evidenceState = "establishing", why = "") {
     kind: "first-book",
     label: "Start here",
     marker: "01",
-    title: "Create your first book.",
+    title: "Review your first book",
     copy: "Start by adding the book you’re reading. Then Ember can help you review chapters from that source.",
     text: "Create book",
     why: why || (evidenceState === "establishing" ? "Recommended because Ember needs a book before it can organize chapter reviews." : "Recommended because there is no active reading activity."),
@@ -4516,7 +4516,7 @@ function renderLibraryCarouselModule(vm) {
     <div class="library-carousel-heading">
       <div>
         <span class="eyebrow">Your library</span>
-        <h2 id="library-carousel-title">${books.length ? "Keep your reading in view." : "Create your first book."}</h2>
+        <h2 id="library-carousel-title">${books.length ? "Keep your reading in view." : "Review your first book"}</h2>
       </div>
     </div>
     ${books.length ? `<div class="library-carousel-track" aria-label="Books in your library">
