@@ -3869,8 +3869,8 @@ function firstBookNextAction(evidenceState = "establishing", why = "") {
     label: "Start here",
     marker: "01",
     title: "Review your first book",
-    copy: "Start by adding the book you’re reading. Then Ember can help you review chapters from that source.",
-    text: "Create book",
+    copy: "Start by reviewing a book or an article you read. Then Ember can help you remember and apply what you learned.",
+    text: "Add reading",
     why: why || (evidenceState === "establishing" ? "Recommended because Ember needs a book before it can organize chapter reviews." : "Recommended because there is no active reading activity."),
     attrs: 'data-action="home-start-new-book"'
   };
