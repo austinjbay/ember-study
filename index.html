@@ -71,7 +71,7 @@
       </div>
 
       <div class="sidebar-foot">
-        <button id="profile-button" type="button" title="Reader profile" aria-haspopup="menu" aria-expanded="false"><span class="avatar">A</span><span>Reader profile</span><span>···</span></button>
+        <button id="profile-button" type="button" title="Reader profile" aria-haspopup="menu" aria-controls="profile-menu" aria-expanded="false"><span class="avatar">A</span><span>Reader profile</span><span>···</span></button>
         <div class="profile-menu" id="profile-menu" role="menu" hidden>
           <div class="profile-menu-head">
             <span class="avatar">A</span>
@@ -349,11 +349,11 @@
               <div class="continue-copy">
                 <div class="continue-kicker">
                   <span class="eyebrow" id="continue-state">Continue reading</span>
-                  <button class="focus-edit-button" id="focus-edit-button" type="button" aria-expanded="false" aria-controls="focus-book-panel" title="Change book in focus">✎</button>
+                  <button class="focus-edit-button" id="focus-edit-button" type="button" aria-expanded="false" aria-controls="focus-book-panel" aria-label="Change book in focus" title="Change book in focus">✎</button>
                 </div>
                 <h2 id="continue-book">Your latest book</h2>
                 <p id="continue-meta">Pick up where you left off.</p>
-                <div class="continue-progress" id="continue-progress" aria-label="Book progress" hidden>
+                <div class="continue-progress" id="continue-progress" role="progressbar" aria-label="Book progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
                   <span><i id="continue-progress-fill"></i></span>
                   <small id="continue-progress-label">0%</small>
                 </div>
@@ -408,7 +408,7 @@
                 <p id="practice-home-reason">Learn to separate what a passage discusses from what its author actually argues.</p>
                 <div class="home-practice-progress">
                   <span id="practice-home-progress-label">0 of 3 successful days</span>
-                  <div><i id="practice-home-progress-fill"></i></div>
+                  <div role="progressbar" aria-labelledby="practice-home-progress-label" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0"><i id="practice-home-progress-fill"></i></div>
                 </div>
               </div>
               <button class="secondary" id="practice-home-action" type="button" data-nav="practice">Try 3-minute practice <span>→</span></button>
@@ -436,7 +436,7 @@
               <span class="eyebrow" id="practice-focus-label">Today’s skill</span>
               <h2 id="practice-focus-title">Find the central claim</h2>
               <p id="practice-reason">Practice separating what a passage discusses from what its author actually argues.</p>
-              <div class="skill-proficiency"><span id="skill-proficiency-label">0 of 3 successful days</span><div><i id="skill-proficiency-fill"></i></div></div>
+              <div class="skill-proficiency"><span id="skill-proficiency-label">0 of 3 successful days</span><div role="progressbar" aria-labelledby="skill-proficiency-label" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0"><i id="skill-proficiency-fill"></i></div></div>
             </div>
             <span class="practice-time">3 min</span>
           </section>
@@ -474,7 +474,7 @@
             <blockquote id="daily-practice-passage">Many workplaces treat fast replies as evidence of commitment. Yet constant responsiveness fragments attention and pushes demanding work into evenings. Teams should establish shared response windows so employees can protect focused time without leaving colleagues uncertain.</blockquote>
             <label class="answer-box">
               <span class="sr-only" id="daily-answer-label">Practice answer</span>
-              <textarea id="practice-answer" rows="6" placeholder="State the author’s central claim in your own words."></textarea>
+              <textarea id="practice-answer" rows="6" aria-labelledby="daily-answer-label" placeholder="State the author’s central claim in your own words."></textarea>
             </label>
             <div class="practice-actions">
               <button class="secondary" type="button" data-action="reset-practice">Start over</button>
@@ -837,7 +837,7 @@
                 <div class="local-data-actions">
                   <button class="secondary" id="export-local-data" type="button">Export local data</button>
                   <label class="secondary file-button" for="import-local-data">Import local data</label>
-                  <input id="import-local-data" type="file" accept="application/json,.json">
+                  <input id="import-local-data" type="file" accept="application/json,.json" aria-describedby="account-local-data-status">
                 </div>
                 <p class="account-status" id="account-local-data-status">This only moves local prototype data between browser origins. It does not change your Supabase account.</p>
               </div>
@@ -884,7 +884,7 @@
                 <div class="book-path-panel" id="existing-book-panel" hidden>
                   <label>
                     <span>Choose a book <b>Required</b></span>
-                    <select id="existing-book" name="existingBook">
+                    <select id="existing-book" name="existingBook" required aria-describedby="existing-book-help">
                       <option value="">Select from your library</option>
                     </select>
                   </label>
@@ -893,7 +893,7 @@
 
                 <div class="book-path-panel" id="new-book-panel" hidden>
                   <div class="field-grid">
-                    <label><span>Book title <b>Required</b></span><input id="book-title" name="bookTitle" placeholder="e.g. Deep Work" autocomplete="off"></label>
+                    <label><span>Book title <b>Required</b></span><input id="book-title" name="bookTitle" placeholder="e.g. Deep Work" autocomplete="off" required></label>
                     <label><span>Author <i>Optional</i></span><input id="author-name" name="authorName" placeholder="e.g. Cal Newport" autocomplete="off"></label>
                   </div>
                 </div>
@@ -902,7 +902,7 @@
                   <input id="book-total-chapters" name="bookTotalChapters" type="number" min="1" step="1" placeholder="e.g. 12">
                   <small>Used only to show your progress through the book.</small>
                 </label>
-                <label><span>Chapter or section <b>Required</b></span><input id="chapter-title" name="chapterTitle" placeholder="e.g. Deep Work Is Valuable" autocomplete="off"></label>
+                <label><span>Chapter or section <b>Required</b></span><input id="chapter-title" name="chapterTitle" placeholder="e.g. Deep Work Is Valuable" autocomplete="off" required></label>
                 <fieldset class="source-kind">
                   <legend>What are you adding?</legend>
                   <label><input type="radio" name="sourceKind" value="full" checked><span><strong>Chapter text</strong><small>Best evidence</small></span></label>
@@ -920,7 +920,7 @@
                 </div>
                 <label class="source-input">
                   <span>Source material <b>Required</b></span>
-                  <textarea id="source-text" name="sourceText" rows="10" placeholder="Paste the chapter, excerpt, or detailed notes here."></textarea>
+                  <textarea id="source-text" name="sourceText" rows="10" placeholder="Paste the chapter, excerpt, or detailed notes here." required aria-describedby="source-status"></textarea>
                   <small id="source-status">Your text stays private in this prototype.</small>
                 </label>
               </div>
@@ -950,9 +950,9 @@
                 </div>
               </details>
               <label class="answer-box">
-                <span class="sr-only">Your recall</span>
-                <textarea id="recall" name="recall" rows="10" placeholder="Start with what feels most important."></textarea>
-                <small><span id="recall-words">0 words</span><span>There is no target length.</span></small>
+                <span class="sr-only" id="recall-label">Your recall</span>
+                <textarea id="recall" name="recall" rows="10" placeholder="Start with what feels most important." required aria-labelledby="recall-label" aria-describedby="recall-help"></textarea>
+                <small id="recall-help"><span id="recall-words">0 words</span><span>There is no target length.</span></small>
               </label>
               <div class="flow-actions">
                 <button class="secondary" type="button" data-action="back-source">Back</button>
@@ -1031,8 +1031,8 @@
               <div class="challenge-guide" id="repair-guide"></div>
               <div class="evidence-mini" id="repair-evidence"></div>
               <label class="answer-box">
-                <span class="sr-only">Your challenge response</span>
-                <textarea id="repair" name="repair" rows="7" placeholder="Take on the challenge in your own words."></textarea>
+                <span class="sr-only" id="repair-label">Your challenge response</span>
+                <textarea id="repair" name="repair" rows="7" placeholder="Take on the challenge in your own words." aria-labelledby="repair-label" aria-describedby="repair-prompt"></textarea>
               </label>
               <div class="flow-actions">
                 <button class="secondary" type="button" data-action="skip-repair">Skip challenge</button>
@@ -1072,9 +1072,9 @@
           <button class="back-link" type="button" data-nav="reviews">← Reviews</button>
           <div class="review-session-inner">
             <div class="closed-source"><span aria-hidden="true">◉</span><div><strong id="review-source-state">Source and prior answer hidden</strong><small id="review-source-note">This is a check of what lasted.</small></div></div>
-            <div class="review-progress" aria-label="Review progress">
+            <div class="review-progress">
               <span id="review-part-label">1 of 2 · Previous gap</span>
-              <div><i id="review-progress-fill"></i></div>
+              <div role="progressbar" aria-labelledby="review-part-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><i id="review-progress-fill"></i></div>
             </div>
             <section class="review-context-card" aria-labelledby="review-context-title">
               <div>
@@ -1095,8 +1095,8 @@
               <p>Explain this in your own words. The excerpt is support, not an answer to copy.</p>
             </div>
             <label class="answer-box">
-              <span class="sr-only">Delayed recall</span>
-              <textarea id="delayed-recall" rows="9" placeholder="Reconstruct the central claim and its most important support."></textarea>
+              <span class="sr-only" id="delayed-recall-label">Delayed recall</span>
+              <textarea id="delayed-recall" rows="9" placeholder="Reconstruct the central claim and its most important support." aria-labelledby="delayed-recall-label" aria-describedby="review-session-meta review-context-copy"></textarea>
             </label>
             <fieldset class="mini-confidence">
               <legend>How confident are you?</legend>
@@ -1124,13 +1124,13 @@
       </main>
     </div>
 
-    <dialog id="source-dialog">
+    <dialog id="source-dialog" aria-labelledby="dialog-title">
       <div class="dialog-head"><div><span class="eyebrow">Source material</span><h2 id="dialog-title">Chapter source</h2></div><button class="icon-button" type="button" data-action="close-dialog" aria-label="Close">×</button></div>
       <div class="dialog-source" id="dialog-source"></div>
     </dialog>
-    <dialog id="gap-info-dialog" class="gap-info-dialog">
+    <dialog id="gap-info-dialog" class="gap-info-dialog" aria-labelledby="gap-info-title">
       <div class="dialog-head">
-        <div><span class="eyebrow">Learning snapshot</span><h2>What “Common gap” means</h2></div>
+        <div><span class="eyebrow">Learning snapshot</span><h2 id="gap-info-title">What “Common gap” means</h2></div>
         <button class="icon-button" type="button" data-action="close-gap-info" aria-label="Close">×</button>
       </div>
       <div class="gap-glossary">
@@ -1144,9 +1144,9 @@
         </dl>
       </div>
     </dialog>
-    <dialog id="initial-check-info-dialog" class="gap-info-dialog">
+    <dialog id="initial-check-info-dialog" class="gap-info-dialog" aria-labelledby="initial-check-info-title">
       <div class="dialog-head">
-        <div><span class="eyebrow">Your result</span><h2>How the initial check is calculated</h2></div>
+        <div><span class="eyebrow">Your result</span><h2 id="initial-check-info-title">How the initial check is calculated</h2></div>
         <button class="icon-button" type="button" data-action="close-initial-check-info" aria-label="Close">×</button>
       </div>
       <div class="gap-glossary">
@@ -1160,9 +1160,9 @@
         <p class="dialog-caveat">This is guidance, not an objective grade. Feedback is less certain when only a summary or excerpt is supplied.</p>
       </div>
     </dialog>
-    <dialog id="confidence-info-dialog" class="gap-info-dialog">
+    <dialog id="confidence-info-dialog" class="gap-info-dialog" aria-labelledby="confidence-info-title">
       <div class="dialog-head">
-        <div><span class="eyebrow">Your estimate</span><h2>What confidence means</h2></div>
+        <div><span class="eyebrow">Your estimate</span><h2 id="confidence-info-title">What confidence means</h2></div>
         <button class="icon-button" type="button" data-action="close-confidence-info" aria-label="Close">×</button>
       </div>
       <div class="gap-glossary">
@@ -1175,13 +1175,13 @@
         <p class="dialog-caveat">Comparing confidence with demonstrated recall over time helps you judge your own understanding more accurately.</p>
       </div>
     </dialog>
-    <dialog id="auth-dialog" class="auth-dialog">
+    <dialog id="auth-dialog" class="auth-dialog" aria-labelledby="auth-dialog-title" aria-describedby="auth-dialog-copy">
       <div class="dialog-head">
         <div><span class="eyebrow">Your reading system</span><h2 id="auth-dialog-title">Log in to Ember</h2></div>
         <button class="icon-button" type="button" data-action="close-auth" aria-label="Close">×</button>
       </div>
       <div class="auth-dialog-body">
-        <p>Keep your chapter checks, scheduled reviews, and reading-skill progress connected to you.</p>
+        <p id="auth-dialog-copy">Keep your chapter checks, scheduled reviews, and reading-skill progress connected to you.</p>
         <button class="google-auth-button" id="google-auth-button" type="button">
           <span aria-hidden="true">G</span> Continue with Google
         </button>
@@ -1189,7 +1189,7 @@
         <form id="email-auth-form">
           <label class="field">
             <span>Email address</span>
-            <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com">
+            <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="auth-setup-note" required>
           </label>
           <button class="primary" id="email-auth-button" type="submit">Email me a sign-in link</button>
         </form>
@@ -1200,11 +1200,11 @@
         <form id="password-auth-form" hidden>
           <label class="field">
             <span>Email address</span>
-            <input id="password-auth-email" type="email" autocomplete="email" placeholder="you@example.com">
+            <input id="password-auth-email" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="auth-setup-note" required>
           </label>
           <label class="field">
             <span>Password</span>
-            <input id="password-auth-password" type="password" autocomplete="current-password">
+            <input id="password-auth-password" type="password" autocomplete="current-password" aria-describedby="auth-setup-note" required>
           </label>
           <button class="primary" id="password-auth-button" type="submit">Log in</button>
           <div class="password-auth-links">
@@ -1213,7 +1213,7 @@
           </div>
         </form>
         <p class="shared-device-note">Using a shared or public device? Log out when you finish.</p>
-        <div class="auth-setup-note" id="auth-setup-note" hidden>
+        <div class="auth-setup-note" id="auth-setup-note" role="status" aria-live="polite" hidden>
           <strong>Supabase isn’t connected yet.</strong>
           <p>Add your project URL and public anon key to <code>supabase-config.js</code>.</p>
         </div>

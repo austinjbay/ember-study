@@ -464,8 +464,10 @@ async function handleMagicLinkSignIn(event) {
     return;
   }
   const email = $("#auth-email").value.trim();
+  $("#auth-email").removeAttribute("aria-invalid");
   if (!email) {
     setAuthStatus("Enter an email address to continue.");
+    $("#auth-email").setAttribute("aria-invalid", "true");
     $("#auth-email").focus();
     return;
   }
@@ -492,9 +494,13 @@ async function handlePasswordSignIn(event) {
   }
   const email = $("#password-auth-email").value.trim();
   const password = $("#password-auth-password").value;
+  $("#password-auth-email").removeAttribute("aria-invalid");
+  $("#password-auth-password").removeAttribute("aria-invalid");
   if (!email || !password) {
     setAuthStatus("Enter both your email address and password.");
-    (!email ? $("#password-auth-email") : $("#password-auth-password")).focus();
+    const field = !email ? $("#password-auth-email") : $("#password-auth-password");
+    field.setAttribute("aria-invalid", "true");
+    field.focus();
     return;
   }
   const { data, error } = state.authMode === "signup"
@@ -1061,8 +1067,20 @@ function setStep(step) {
     const mapped = state.step === 2 ? 1 : state.step > 2 ? state.step - 1 : state.step;
     item.classList.toggle("is-active", index === mapped);
     item.classList.toggle("is-complete", index < mapped);
+    if (index === mapped) item.setAttribute("aria-current", "step");
+    else item.removeAttribute("aria-current");
   });
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function closeProfileMenu({ returnFocus = false } = {}) {
+  const menu = $("#profile-menu");
+  const button = $("#profile-button");
+  if (!menu || !button) return;
+  const wasOpen = !menu.hidden;
+  menu.hidden = true;
+  button.setAttribute("aria-expanded", "false");
+  if (returnFocus && wasOpen) button.focus();
 }
 
 function resetAnalysisTransition() {
@@ -1263,18 +1281,23 @@ function removePdf() {
 
 function validateSource() {
   const values = getValues();
+  ["#book-title", "#chapter-title", "#source-text", "#pdf-file"].forEach(selector => $(selector)?.removeAttribute("aria-invalid"));
   if (values.sourceKind === "pdf" && !values.pdfName) {
     toast("Attach a PDF before beginning recall.");
+    $("#pdf-file").setAttribute("aria-invalid", "true");
     $("#pdf-file").focus();
     return false;
   }
   if (!values.bookTitle || !values.chapterTitle || !values.sourceText) {
     toast("Add a book title, chapter, and source material first.");
-    (!values.bookTitle ? $("#book-title") : !values.chapterTitle ? $("#chapter-title") : $("#source-text")).focus();
+    const field = !values.bookTitle ? $("#book-title") : !values.chapterTitle ? $("#chapter-title") : $("#source-text");
+    field.setAttribute("aria-invalid", "true");
+    field.focus();
     return false;
   }
   if (wordCount(values.sourceText) < 25) {
     toast("Add a little more source material so the feedback has a reliable anchor.");
+    $("#source-text").setAttribute("aria-invalid", "true");
     $("#source-text").focus();
     return false;
   }
@@ -2979,6 +3002,7 @@ function renderDashboard() {
       : practiceReason;
     $("#practice-home-progress-label").textContent = `${practiceState.successfulDays} of 3 successful days`;
     $("#practice-home-progress-fill").style.width = `${practiceState.progressPercent}%`;
+    $(".home-practice-progress [role='progressbar']")?.setAttribute("aria-valuenow", String(practiceState.successfulDays));
     $("#practice-home-action").innerHTML = practiceState.completedToday
       ? "View practice <span>→</span>"
       : "Try 3-minute practice <span>→</span>";
@@ -3024,6 +3048,7 @@ function renderDashboard() {
     $("#continue-progress").hidden = !latestTotal || bookIsDraft;
     $("#continue-progress-fill").style.width = `${progressPercent}%`;
     $("#continue-progress-label").textContent = `${progressPercent}%`;
+    $("#continue-progress").setAttribute("aria-valuenow", String(progressPercent));
     $("#focus-book-select").innerHTML = '<option value="">Automatic focus</option>' +
       focusOptions.map(book => `<option value="${escapeHtml(book.key)}">${escapeHtml(book.title)}${book.author ? ` by ${escapeHtml(book.author)}` : ""}</option>`).join("");
     $("#focus-book-select").value = manualFocusKey && focusOptions.some(book => book.key === manualFocusKey) ? manualFocusKey : "";
@@ -3270,11 +3295,14 @@ function renderReviewStep(chapter) {
   if (state.reviewSession?.ids?.length) {
     const totalSteps = state.reviewSession.ids.length * 2;
     const currentStep = state.reviewSession.index * 2 + (isGapStep ? 1 : 2);
+    const reviewProgress = Math.round(currentStep / totalSteps * 100);
     $("#review-part-label").textContent = `${state.reviewSession.index + 1} of ${state.reviewSession.ids.length} chapters · ${isGapStep ? "Previous gap" : "Central claim"}`;
-    $("#review-progress-fill").style.width = `${Math.round(currentStep / totalSteps * 100)}%`;
+    $("#review-progress-fill").style.width = `${reviewProgress}%`;
+    $(".review-progress [role='progressbar']")?.setAttribute("aria-valuenow", String(reviewProgress));
   } else {
     $("#review-part-label").textContent = isGapStep ? "1 of 2 · Previous gap" : "2 of 2 · Central claim";
     $("#review-progress-fill").style.width = isGapStep ? "50%" : "100%";
+    $(".review-progress [role='progressbar']")?.setAttribute("aria-valuenow", isGapStep ? "50" : "100");
   }
   $("#review-step-eyebrow").textContent = isGapStep ? "Revisit the gap" : "Test the main idea";
   $("#review-session-title").textContent = isGapStep
@@ -3488,13 +3516,13 @@ function openChapter(id) {
       <p>${escapeHtml(chapter.authorName || "Author not added")} · ${escapeHtml(chapter.status)}</p>
     </header>
     <div class="chapter-tabs" role="tablist" aria-label="Chapter detail">
-      <button class="is-active" type="button" role="tab" aria-selected="true" data-chapter-tab="feedback">Feedback</button>
-      <button type="button" role="tab" aria-selected="false" data-chapter-tab="entry">My entry</button>
+      <button class="is-active" id="chapter-tab-feedback" type="button" role="tab" aria-selected="true" aria-controls="chapter-panel-feedback" data-chapter-tab="feedback">Feedback</button>
+      <button id="chapter-tab-entry" type="button" role="tab" aria-selected="false" aria-controls="chapter-panel-entry" data-chapter-tab="entry">My entry</button>
     </div>
-    <section class="chapter-tab-panel is-active" data-chapter-tab-panel="feedback" role="tabpanel">
+    <section class="chapter-tab-panel is-active" id="chapter-panel-feedback" data-chapter-tab-panel="feedback" role="tabpanel" aria-labelledby="chapter-tab-feedback">
       ${renderSavedChapterFeedback(chapter)}
     </section>
-    <section class="chapter-tab-panel" data-chapter-tab-panel="entry" role="tabpanel" hidden>
+    <section class="chapter-tab-panel" id="chapter-panel-entry" data-chapter-tab-panel="entry" role="tabpanel" aria-labelledby="chapter-tab-entry" hidden>
       ${renderSavedChapterEntry(chapter)}
     </section>
     <div class="detail-actions">
@@ -3813,6 +3841,7 @@ function renderDailyPractice(skillId, reviewing = false) {
   const successfulDays = successfulPracticeDays(skill);
   $("#skill-proficiency-label").textContent = `${Math.min(3, successfulDays)} of 3 successful days`;
   $("#skill-proficiency-fill").style.width = `${Math.min(100, successfulDays / 3 * 100)}%`;
+  $(".skill-proficiency [role='progressbar']")?.setAttribute("aria-valuenow", String(Math.min(3, successfulDays)));
   $("#daily-lesson-title").textContent = question.lessonTitle;
   $("#daily-lesson-copy").textContent = question.lessonCopy;
   $("#daily-example-one").innerHTML = question.exampleOne;
@@ -3858,6 +3887,7 @@ function renderPracticeProgress(preserveActivity = false) {
     const shownDays = successfulPracticeDays(shownSkill);
     $("#skill-proficiency-label").textContent = `${Math.min(3, shownDays)} of 3 successful days`;
     $("#skill-proficiency-fill").style.width = `${Math.min(100, shownDays / 3 * 100)}%`;
+    $(".skill-proficiency [role='progressbar']")?.setAttribute("aria-valuenow", String(Math.min(3, shownDays)));
   } else {
     renderDailyPractice(activeSkill.id);
   }
@@ -3996,8 +4026,12 @@ document.addEventListener("click", async event => {
     toast("Source revealed. Your attempt is still saved.");
   }
   if (action === "to-confidence") {
-    if (!$("#recall").value.trim()) toast("Write what you remember. Even “I don’t remember” is useful.");
-    else setStep(2);
+    $("#recall").removeAttribute("aria-invalid");
+    if (!$("#recall").value.trim()) {
+      $("#recall").setAttribute("aria-invalid", "true");
+      $("#recall").focus();
+      toast("Write what you remember. Even “I don’t remember” is useful.");
+    } else setStep(2);
   }
   if (action === "back-recall") setStep(1);
   if (action === "back-confidence") setStep(2);
@@ -4166,7 +4200,10 @@ $("#profile-button").addEventListener("click", event => {
 $("#profile-menu").addEventListener("click", event => {
   event.stopPropagation();
   const nav = event.target.closest("[data-nav]");
-  if (nav) setView(nav.dataset.nav);
+  if (nav) {
+    closeProfileMenu();
+    setView(nav.dataset.nav);
+  }
 });
 $("#logout-button").addEventListener("click", () => logOut());
 $("#login-button").addEventListener("click", () => openAuthDialog("login"));
@@ -4239,13 +4276,11 @@ $("#refresh-generated-feedback")?.addEventListener("click", async () => {
 });
 $("#save-entry-draft")?.addEventListener("click", saveEntryDraft);
 document.addEventListener("click", () => {
-  $("#profile-menu").hidden = true;
-  $("#profile-button").setAttribute("aria-expanded", "false");
+  closeProfileMenu();
 });
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
-    $("#profile-menu").hidden = true;
-    $("#profile-button").setAttribute("aria-expanded", "false");
+    closeProfileMenu({ returnFocus: true });
   }
 });
 $("#flow-exit").addEventListener("click", () => {
@@ -4257,7 +4292,11 @@ $("#load-sample")?.addEventListener("click", () => {
   setValues(sample);
   toast("Sample loaded. Begin when you are ready.");
 });
-$("#check-form").addEventListener("input", () => { updateCounts(); saveDraft(); });
+$("#check-form").addEventListener("input", event => {
+  event.target?.removeAttribute?.("aria-invalid");
+  updateCounts();
+  saveDraft();
+});
 $$('[name="bookPath"]').forEach(input => input.addEventListener("change", () => {
   if (input.value === "new" && input.checked) {
     $("#book-title").value = "";
