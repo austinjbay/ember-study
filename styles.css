@@ -1129,6 +1129,10 @@ dialog::backdrop { background: rgba(32,34,31,.36); backdrop-filter: blur(3px); }
 .primary,
 .secondary,
 .primary.compact,
+.new-check,
+.nav-item,
+.sidebar-foot button,
+.profile-menu > button,
 .marketing-nav button,
 .marketing-mobile-menu summary,
 .marketing-mobile-menu button,
@@ -1140,7 +1144,7 @@ dialog::backdrop { background: rgba(32,34,31,.36); backdrop-filter: blur(3px); }
 .account-control .secondary,
 .google-auth-button,
 .auth-switch {
-  font-size: .86rem;
+  font-size: .9rem;
 }
 
 .eyebrow,
@@ -1197,8 +1201,36 @@ label > span i,
 .auth-divider,
 .auth-note,
 .shared-device-note,
-.auth-setup-note code {
-  font-size: .74rem;
+.auth-setup-note code,
+.nav-item em,
+.book-progress small,
+.retained-list article > span,
+.gap-list strong,
+.signal-bands em,
+.stat-info-button,
+.focus-edit-button,
+.compounding-copy li span,
+.reinforcement-path > div > span,
+.date-tile,
+.practice-path-number,
+.pdf-upload-icon,
+.confidence-options small,
+.path-card.checkpoint-hero p {
+  font-size: .8rem;
+}
+
+.library-head,
+.loop-label,
+.frame-step,
+.chapter-tabs button,
+.chapter-signal-grid span,
+.chapter-diagnosis span,
+.question-prompt > span,
+.answer-panel > span,
+.review-result-row > div span,
+.edit-question-context span,
+.edit-response-group legend {
+  letter-spacing: .08em;
 }
 
 .book-group summary strong,
@@ -1294,7 +1326,26 @@ label > span i,
 .auth-setup-note p,
 .gap-glossary dd,
 .gap-glossary .dialog-caveat {
-  font-size: .82rem;
+  font-size: .9rem;
+}
+
+.book-group summary strong,
+.chapter-link strong,
+.item-copy strong,
+.practice-path-copy strong,
+.completed-practice-card strong,
+.chapter-signals button strong {
+  font-size: .98rem;
+}
+
+.book-group summary span,
+.chapter-link small,
+.item-copy small,
+.practice-path-copy small,
+.completed-practice-card small,
+.signed-out-note,
+.profile-menu-head small {
+  font-size: .84rem;
 }
 
 .item-copy strong,
@@ -1311,7 +1362,7 @@ label > span i,
 .review-result-row > div strong,
 .auth-setup-note strong,
 .gap-glossary dt {
-  font-size: 1rem;
+  font-size: 1.04rem;
 }
 
 .review-context-facts dd,
