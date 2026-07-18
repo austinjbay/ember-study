@@ -291,7 +291,7 @@ main:focus { outline: 0; }
 .returning-home { width: min(1140px, 100%); margin: 0 auto 52px; }
 .returning-home[hidden] { display: none; }
 .next-action-card { position: relative; display: grid; min-height: 248px; overflow: hidden; margin: 0 0 34px; background: var(--ink); color: white; padding: clamp(28px, 5vw, 54px); box-shadow: 16px 16px 0 #d8d2c7; animation: homeRise .38s ease both; }
-.next-action-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.18) 12%, transparent 24%) -70% 0 / 42% 100% no-repeat, linear-gradient(110deg, rgba(255,255,255,.08), transparent 38%), repeating-linear-gradient(90deg, rgba(255,255,255,.055) 0 1px, transparent 1px 58px); animation: primaryActionSheen 5.8s ease-in-out infinite; pointer-events: none; }
+.next-action-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, rgba(255,255,255,.13), rgba(255,255,255,.035) 42%, rgba(255,255,255,.11)), repeating-linear-gradient(90deg, rgba(255,255,255,.055) 0 1px, transparent 1px 58px); opacity: .62; animation: primaryActionSheen 5.8s ease-in-out infinite; pointer-events: none; }
 .next-action-card::after { content: ""; position: absolute; right: clamp(24px, 7vw, 90px); top: 50%; width: 1px; height: 72%; background: rgba(255,255,255,.18); transform: translateY(-50%); }
 .next-action-marker { position: absolute; right: clamp(30px, 6vw, 88px); bottom: clamp(20px, 4vw, 42px); color: rgba(255,255,255,.13); font-family: var(--serif); font-size: clamp(4rem, 11vw, 8.5rem); line-height: .8; pointer-events: none; }
 .next-action-copy { min-width: 0; }
@@ -302,9 +302,9 @@ main:focus { outline: 0; }
 .next-action-card .primary { position: relative; z-index: 1; align-self: center; border-color: white; background: white; color: var(--ink); white-space: nowrap; box-shadow: 0 12px 30px rgba(0,0,0,.14); }
 .next-action-card .primary:hover { transform: translateY(-1px); }
 @keyframes primaryActionSheen {
-  0%, 62% { background-position: -70% 0, 0 0, 0 0; opacity: .9; }
-  75% { opacity: 1; }
-  100% { background-position: 170% 0, 0 0, 0 0; opacity: .9; }
+  0%, 62%, 100% { opacity: .58; }
+  74% { opacity: .92; }
+  86% { opacity: .66; }
 }
 .learning-snapshot { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(18px, 4vw, 52px); margin: 0 0 34px; padding: 26px 0 6px; border-top: 1px solid var(--line-dark); border-bottom: 1px solid var(--line-dark); animation: homeRise .38s ease .08s both; }
 .learning-snapshot article { min-width: 0; padding: 0 0 18px; }
