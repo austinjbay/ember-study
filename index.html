@@ -59,6 +59,29 @@
         </button>
       </nav>
 
+      <section class="sidebar-guide" id="sidebar-guide" aria-labelledby="sidebar-guide-title">
+        <div class="sidebar-guide-head">
+          <span class="sidebar-guide-mark" aria-hidden="true"></span>
+          <div>
+            <h2 id="sidebar-guide-title">Ask Ember</h2>
+            <p id="sidebar-guide-state">Ready when you are.</p>
+          </div>
+        </div>
+        <div class="sidebar-guide-log" id="sidebar-guide-log" role="log" aria-live="polite">
+          <p>Want help deciding what to do next?</p>
+        </div>
+        <div class="sidebar-guide-actions" aria-label="Suggested questions">
+          <button type="button" data-action="sidebar-guide-suggestion" data-guide-intent="next">What should I do?</button>
+          <button type="button" data-action="sidebar-guide-suggestion" data-guide-intent="review">Any reviews?</button>
+          <button type="button" data-action="sidebar-guide-suggestion" data-guide-intent="skill">What skill needs work?</button>
+        </div>
+        <form class="sidebar-guide-form" id="sidebar-guide-form">
+          <label class="sr-only" for="sidebar-guide-input">Ask Ember a question</label>
+          <input id="sidebar-guide-input" type="text" autocomplete="off" placeholder="Ask what to read next">
+          <button type="submit" aria-label="Ask Ember">↵</button>
+        </form>
+      </section>
+
       <div class="library-head">
         <span>Your library</span>
         <span id="library-count">0 chapters</span>

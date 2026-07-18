@@ -398,6 +398,7 @@ function renderAuthState() {
   $("#profile-menu").hidden = true;
   $("#profile-button").setAttribute("aria-expanded", "false");
   renderDashboard();
+  renderSidebarGuide();
 }
 
 function setLoggedIn(loggedIn) {
@@ -1280,6 +1281,56 @@ function toast(message) {
   toast.timer = setTimeout(() => element.classList.remove("is-visible"), 2800);
 }
 
+function sidebarGuideState() {
+  const entries = migrateReviewsToFsrs(loadChapters());
+  const chapters = entries.filter(chapter => chapter.status !== "Draft");
+  const drafts = entries.filter(chapter => chapter.status === "Draft");
+  const scheduled = chapters.filter(reviewIsScheduled);
+  const due = scheduled.filter(reviewIsDue);
+  const practiceState = currentPracticeSkillState();
+  const gap = commonGapFromChapters(chapters)?.[0] || "";
+  return { entries, chapters, drafts, scheduled, due, practiceState, gap };
+}
+
+function sidebarGuideReplyFor(intent = "next", rawText = "") {
+  const guide = sidebarGuideState();
+  const text = rawText.toLowerCase();
+  const wantsReview = intent === "review" || text.includes("review") || text.includes("due");
+  const wantsSkill = intent === "skill" || text.includes("skill") || text.includes("practice");
+  const wantsAdd = intent === "add" || text.includes("add") || text.includes("read") || text.includes("chapter");
+  if (wantsReview) {
+    if (guide.due.length) return { title: `${guide.due.length} review${guide.due.length === 1 ? "" : "s"} due`, body: `${guide.due[0].chapterTitle} is ready first. Open Reviews when you want to start.`, nav: "reviews" };
+    return { title: "No reviews due", body: guide.scheduled.length ? `${guide.scheduled.length} review${guide.scheduled.length === 1 ? " is" : "s are"} scheduled for later.` : "Your review queue is clear. Add or practice a chapter to create the next return point." };
+  }
+  if (wantsSkill) {
+    const skill = skillTitleForGap(guide.gap);
+    return { title: skill, body: guide.chapters.length ? practiceReasonForGap(guide.gap) : "Once you complete a chapter check, I can point practice at the reading skill with the best evidence.", nav: guide.chapters.length ? "practice" : "" };
+  }
+  if (wantsAdd) {
+    return { title: "Add a chapter", body: "Bring in the chapter or notes you just read. Ember can then test recall, synthesis, and transfer.", action: "start-new" };
+  }
+  if (guide.due.length) return { title: "Start with the review", body: `${guide.due[0].chapterTitle} is ready to come back. A delayed recall is the highest-value move.` };
+  if (guide.drafts.length) return { title: "Resume your draft", body: `${guide.drafts[0].chapterTitle} is unfinished. Completing it will give Ember better evidence.`, chapterId: guide.drafts[0].id };
+  if (!guide.practiceState.completedToday && guide.chapters.length) return { title: "Do the short practice", body: `${guide.practiceState.skill.title} is ready and should take about three minutes.`, nav: "practice" };
+  return { title: "Add what you read", body: "The next useful move is a source-grounded chapter check. That gives Ember something real to test later.", action: "start-new" };
+}
+
+function setSidebarGuideReply(reply) {
+  const log = $("#sidebar-guide-log");
+  if (!log) return;
+  log.innerHTML = `<strong>${escapeHtml(reply.title)}</strong><p>${escapeHtml(reply.body)}</p>`;
+}
+
+function renderSidebarGuide() {
+  const guide = $("#sidebar-guide");
+  if (!guide) return;
+  guide.hidden = !isLoggedIn();
+  if (!isLoggedIn()) return;
+  const summary = sidebarGuideReplyFor("next");
+  $("#sidebar-guide-state").textContent = summary.title;
+  $("#sidebar-guide-log").innerHTML = `<strong>${escapeHtml(summary.title)}</strong><p>${escapeHtml(summary.body)}</p>`;
+}
+
 function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
   state.view = name;
   $$(".view").forEach(view => view.classList.toggle("is-active", view.dataset.view === name));
@@ -1293,6 +1344,7 @@ function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (name === "home" || name === "reviews") renderDashboard();
   if (name === "account") hydrateAccountSettings();
+  renderSidebarGuide();
 }
 
 function setStep(step) {
@@ -5198,6 +5250,10 @@ document.addEventListener("click", async event => {
   }
   if (action === "prototype-complete-mission") completePrototypeMission();
   if (action === "prototype-choice") choosePrototypePath(event.target.closest("[data-prototype-choice]")?.dataset.prototypeChoice || "");
+  if (action === "sidebar-guide-suggestion") {
+    const intent = event.target.closest("[data-guide-intent]")?.dataset.guideIntent || "next";
+    setSidebarGuideReply(sidebarGuideReplyFor(intent));
+  }
   if (action === "remove-pdf") removePdf();
   if (action === "reveal-source") {
     showSource(getValues().sourceText, getValues().chapterTitle);
@@ -5375,6 +5431,17 @@ $("#focus-book-select")?.addEventListener("change", event => {
 });
 $("#new-check").addEventListener("click", () => startNew());
 $("#mobile-new-check")?.addEventListener("click", () => startNew());
+$("#sidebar-guide-form")?.addEventListener("submit", event => {
+  event.preventDefault();
+  const input = $("#sidebar-guide-input");
+  const text = input.value.trim();
+  if (!text) {
+    input.focus();
+    return;
+  }
+  setSidebarGuideReply(sidebarGuideReplyFor("freeform", text));
+  input.value = "";
+});
 $("#mobile-logo-button")?.addEventListener("click", event => {
   event.stopPropagation();
   closeProfileMenu();
