@@ -55,14 +55,14 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .new-check { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 42px; border: 1px solid var(--line-dark); border-radius: 7px; background: rgba(255,255,255,.42); color: var(--ink); padding: 0 10px; font-size: .8rem; font-weight: 750; text-align: left; transition: background .15s ease, border-color .15s ease; }
 .new-check:hover { border-color: #aaa498; background: rgba(255,255,255,.75); }
 .new-check-icon { display: grid; flex: 0 0 auto; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: white; }
-.new-check-icon svg { width: 15px; height: 15px; }
+.new-check-icon svg { display: block; width: 15px; height: 15px; }
 .new-check-label { min-width: 0; }
 .side-nav { display: grid; gap: 3px; margin: 22px 0; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
 .nav-item { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 8px; min-height: 39px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); padding: 0 10px; font-size: .85rem; text-align: left; }
 .nav-item:hover, .nav-item.is-active { background: rgba(255,255,255,.58); color: var(--ink); }
 .nav-item.is-active { font-weight: 700; }
 .notification-icon, .home-icon, .practice-icon { display: grid; place-items: center; }
-.notification-icon svg, .home-icon svg, .practice-icon svg { width: 17px; height: 17px; }
+.notification-icon svg, .home-icon svg, .practice-icon svg { display: block; width: 17px; height: 17px; }
 .nav-item em { min-width: 21px; border-radius: 10px; background: rgba(73,101,83,.12); color: var(--green); padding: 2px 6px; font-size: .68rem; font-style: normal; text-align: center; }
 .nav-item em.is-due { background: var(--amber-soft); color: var(--amber); }
 .nav-item em.has-scheduled { background: var(--green-soft); color: var(--green); }
@@ -109,7 +109,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .avatar.has-image { overflow: hidden; background: transparent; }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
 .signed-out-mark { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--line-dark); border-radius: 50%; background: transparent; color: var(--muted); transition: border-color .15s ease, color .15s ease, background .15s ease; }
-.signed-out-mark svg { width: 22px; height: 22px; }
+.signed-out-mark svg { display: block; width: 22px; height: 22px; }
 .profile-menu { position: absolute; z-index: 35; right: 0; bottom: 48px; width: 224px; border: 1px solid var(--line-dark); border-radius: 6px; background: var(--white); padding: 7px; box-shadow: 0 16px 44px rgba(32,34,31,.16); }
 .profile-menu[hidden] { display: none; }
 .profile-menu-head { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); margin-bottom: 5px; padding: 9px 8px 12px; }
@@ -1612,13 +1612,19 @@ body:not(.logged-out) main {
   min-height: 100vh;
 }
 body.logged-out.sidebar-collapsed .signed-out-note {
+  display: grid;
+  place-items: center;
   justify-content: center;
+  width: 44px;
+  height: 44px;
+  line-height: 0;
   font-size: 0;
 }
 body.logged-out.sidebar-collapsed .signed-out-note span:not(.signed-out-mark) {
   display: none;
 }
 body.logged-out.sidebar-collapsed .signed-out-mark {
+  flex: 0 0 auto;
   width: 34px;
   height: 34px;
 }
