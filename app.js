@@ -3437,15 +3437,20 @@ function uniqueBookSummaries(entries = []) {
   entries.forEach(chapter => {
     const book = bookRecordForChapter(chapter);
     if (!book.key || books.has(book.key)) return;
+    const bookEntries = entries.filter(item => bookKey(item.bookTitle || "", item.authorName || "") === book.key);
+    const latest = [...bookEntries].sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0))[0] || {};
     books.set(book.key, {
       key: book.key,
       title: book.title,
       author: book.author,
       total: book.total,
-      completed: entries.filter(item => item.status !== "Draft" && bookKey(item.bookTitle || "", item.authorName || "") === book.key).length
+      completed: bookEntries.filter(item => item.status !== "Draft").length,
+      drafts: bookEntries.filter(item => item.status === "Draft").length,
+      latestChapter: latest.chapterTitle || "",
+      latestUpdatedAt: latest.updatedAt || latest.createdAt || ""
     });
   });
-  return [...books.values()];
+  return [...books.values()].sort((a, b) => new Date(b.latestUpdatedAt || 0) - new Date(a.latestUpdatedAt || 0));
 }
 
 function completedReviewCount(chapters = []) {
@@ -3678,6 +3683,7 @@ function buildReaderDiagnostic({ evidenceState, chapters, metrics, skillSignals 
 
 function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
   const books = uniqueBookSummaries(chapters);
+  const libraryBooks = uniqueBookSummaries(entries);
   const currentReading = chooseCurrentReadingState(entries);
   const practiceState = currentPracticeSkillState();
   const metrics = {
@@ -3697,6 +3703,7 @@ function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
     skillSignals,
     memoryCandidates: [chooseMemoryCandidate(chapters, scheduled)].filter(Boolean),
     progress: progressSummary(chapters),
+    libraryBooks,
     activeBooks: books.slice(0, 3),
     practiceState,
     unsupportedDiagnostics: unsupportedHomeDiagnostics
@@ -3712,6 +3719,7 @@ function fixtureHomeViewModel(evidenceState) {
       skillSignals: [{ title: "No personal reading signal yet.", copy: "Complete one check to begin the diagnostic profile.", basis: "Fixture preview.", confidence: "preview" }],
       memoryCandidates: [],
       progress: { chapters: 0, reviews: 0, recovered: 0, practiced: 0, durableLevel: "Not enough evidence" },
+      libraryBooks: [],
       activeBooks: []
     },
     emerging: {
@@ -3721,6 +3729,7 @@ function fixtureHomeViewModel(evidenceState) {
       skillSignals: [{ title: "Central claims are coming back.", copy: "You recovered the main claim in most early checks.", basis: "4 completed checks.", confidence: "early" }, { title: "Connecting ideas is the growth area.", copy: "The same relationship gap appeared twice.", basis: "2 related gaps.", confidence: "early" }],
       memoryCandidates: [{ chapterId: "", title: "Deep Work Is Valuable", bookTitle: "Deep Work", prompt: "Before opening it: why did this chapter argue depth matters?", preview: "Depth creates rare value because it lets you produce at the edge of your ability while avoiding the shallow work that fragments attention.", reason: "Example resurfacing from a recent chapter." }],
       progress: { chapters: 4, reviews: 1, recovered: 1, practiced: 2, durableLevel: "Recalled after delay" },
+      libraryBooks: [{ key: "deep-work", title: "Deep Work", author: "Cal Newport", completed: 4, total: 12, drafts: 0, latestChapter: "Deep Work Is Valuable" }],
       activeBooks: [{ title: "Deep Work", author: "Cal Newport", completed: 4, total: 12 }]
     },
     established: {
@@ -3730,6 +3739,7 @@ function fixtureHomeViewModel(evidenceState) {
       skillSignals: [{ title: "Central claim recall is reliable.", copy: "This skill held up across recent delayed reviews.", basis: "8 delayed reviews.", confidence: "supported" }, { title: "Evidence connection is the focus.", copy: "Examples come back, but their role in the argument is less consistent.", basis: "6 related checks.", confidence: "supported" }],
       memoryCandidates: [{ chapterId: "", title: "Legacy", bookTitle: "The Road to Character", prompt: "Before opening it: what did this chapter suggest about résumé virtues and eulogy virtues?", preview: "", reason: "Example resurfacing from a previously difficult idea." }],
       progress: { chapters: 16, reviews: 8, recovered: 5, practiced: 7, durableLevel: "Recovered after meaningful delay" },
+      libraryBooks: [{ key: "road-character", title: "The Road to Character", author: "David Brooks", completed: 12, total: 12, drafts: 0, latestChapter: "Quiet Strength" }, { key: "know-person", title: "How to Know a Person", author: "David Brooks", completed: 4, total: 10, drafts: 1, latestChapter: "Good Talks" }],
       activeBooks: [{ title: "The Road to Character", author: "David Brooks", completed: 12, total: 12 }, { title: "How to Know a Person", author: "David Brooks", completed: 4, total: 10 }]
     }
   }[evidenceState];
@@ -4066,6 +4076,35 @@ function renderProgressModule(vm) {
   </section>`;
 }
 
+function renderLibraryCarouselModule(vm) {
+  const books = vm.libraryBooks || [];
+  return `<section class="adaptive-module library-carousel-module" aria-labelledby="library-carousel-title">
+    <div class="library-carousel-heading">
+      <div>
+        <span class="eyebrow">Your library</span>
+        <h2 id="library-carousel-title">${books.length ? "Keep your reading in view." : "Start your reading shelf."}</h2>
+      </div>
+      <button class="text-button" type="button" data-action="home-start-new-book">Add chapter →</button>
+    </div>
+    ${books.length ? `<div class="library-carousel-track" aria-label="Books in your library">
+      ${books.map(book => {
+        const progress = book.total ? Math.min(100, Math.round(book.completed / book.total * 100)) : book.completed ? 100 : 0;
+        const status = book.drafts && !book.completed ? `${book.drafts} draft${book.drafts === 1 ? "" : "s"}` : `${book.completed}${book.total ? ` of ${book.total}` : ""} checked`;
+        return `<button class="library-carousel-card" type="button" data-book-insights="${escapeHtml(book.key)}" aria-label="Open ${escapeHtml(book.title)}. ${escapeHtml(status)}.">
+          <span>${escapeHtml(status)}</span>
+          <strong>${escapeHtml(book.title)}</strong>
+          <small>${escapeHtml(book.author || "Unknown author")}</small>
+          ${book.latestChapter ? `<p>${escapeHtml(book.latestChapter)}</p>` : ""}
+          <i aria-hidden="true"><b style="width: ${progress}%"></b></i>
+        </button>`;
+      }).join("")}
+    </div>` : `<button class="library-carousel-empty" type="button" data-action="home-start-new-book">
+      <strong>Add your first chapter</strong>
+      <span>Ember will turn it into progress, practice, and reviews.</span>
+    </button>`}
+  </section>`;
+}
+
 function renderLibraryActivityModule(vm) {
   const books = vm.activeBooks || [];
   return `<section class="adaptive-module library-activity-module" aria-labelledby="library-activity-title">
@@ -4126,6 +4165,7 @@ function renderFutureWorkModule(vm) {
 
 function buildHomeModules(vm) {
   return [
+    homeModule("library-carousel", 5, true, confidenceForEvidence(vm.evidenceState), `${vm.libraryBooks.length} books`, renderLibraryCarouselModule(vm)),
     homeModule("primary-next-action", 10, true, confidenceForEvidence(vm.evidenceState), vm.nextAction?.why, renderPrimaryNextActionModule(vm)),
     homeModule("reader-diagnostic", 20, true, vm.diagnostic?.confidence, vm.diagnostic?.basis, renderDiagnosticModule(vm)),
     homeModule("memory-resurfacing", vm.evidenceState === "establishing" ? 50 : 30, true, confidenceForEvidence(vm.evidenceState), vm.memoryCandidates[0]?.reason, renderMemoryModule(vm)),
@@ -4151,7 +4191,7 @@ function renderAdaptiveLoggedInHome(vm) {
   const moduleById = new Map(modules.map(module => [module.id, module.html]));
   const zone = id => moduleById.get(id) ? `<div class="home-module-shell" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const supportModules = modules
-    .filter(module => !["skill-development", "primary-next-action", "reader-diagnostic", "library-activity", "memory-resurfacing", "today-practice", "progress-over-time"].includes(module.id))
+    .filter(module => !["library-carousel", "skill-development", "primary-next-action", "reader-diagnostic", "library-activity", "memory-resurfacing", "today-practice", "progress-over-time"].includes(module.id))
     .map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`)
     .join("");
   $("#returning-home").innerHTML = `
@@ -4164,6 +4204,7 @@ function renderAdaptiveLoggedInHome(vm) {
           ? "Find out what stayed with you—and strengthen what didn’t."
           : "Your homepage is organized around the highest-value next step, the strongest available evidence, and the ideas worth bringing back."}</p>
       </header>
+      ${zone("library-carousel")}
       ${zone("progress-over-time")}
       ${renderHomeInteractionPrototype(vm)}
       <div class="reading-world-layout" aria-label="Logged-in reading home">
