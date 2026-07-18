@@ -917,7 +917,7 @@ function saveDraft() {
   autosaveVisibleDraft(values);
 }
 
-function restoreSavedDraft({ notify = true } = {}) {
+function restoreSavedDraft() {
   if (state.draftRestored) return true;
   if (!isLoggedIn()) {
     renderBookOptions();
@@ -930,7 +930,6 @@ function restoreSavedDraft({ notify = true } = {}) {
       state.currentId = draft.id || null;
       renderBookOptions(draft.bookTitle, draft.authorName);
       setValues(draft);
-      if (notify) toast("Your earlier draft is ready when you are.");
       return true;
     }
   } catch {
