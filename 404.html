@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ember</title>
+    <script>
+      (function () {
+        var routes = ["/how-it-works", "/reading-skills", "/why-it-works", "/examples", "/trust"];
+        var path = window.location.pathname.replace(/\/+$/, "") || "/";
+        if (routes.indexOf(path) >= 0) {
+          sessionStorage.setItem("ember-pending-route", path);
+        }
+        window.location.replace("/");
+      }());
+    </script>
+  </head>
+  <body></body>
+</html>

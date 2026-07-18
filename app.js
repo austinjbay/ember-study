@@ -163,6 +163,56 @@ const stopWords = new Set(["about","after","again","also","because","before","be
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
+const MARKETING_ROUTES = {
+  "how-it-works": "/how-it-works",
+  "reading-skills": "/reading-skills",
+  "why-it-works": "/why-it-works",
+  examples: "/examples",
+  trust: "/trust"
+};
+const ROUTE_VIEWS = Object.fromEntries(Object.entries(MARKETING_ROUTES).map(([view, path]) => [path, view]));
+const PENDING_ROUTE_KEY = "ember-pending-route";
+
+function routeForView(name) {
+  return MARKETING_ROUTES[name] || "/";
+}
+
+function viewForPath(pathname = window.location.pathname) {
+  const path = pathname.replace(/\/+$/, "") || "/";
+  return ROUTE_VIEWS[path] || "home";
+}
+
+function cleanHashRoute(hash = window.location.hash) {
+  if (!hash || hash === "#app") return null;
+  const cleaned = hash.replace(/^#!/, "").replace(/^#\/?/, "");
+  if (!cleaned) return "/";
+  const normalized = `/${cleaned.replace(/^\/+/, "").replace(/\/+$/, "")}`;
+  return ROUTE_VIEWS[normalized] ? normalized : null;
+}
+
+function syncUrlForView(name, mode = "push") {
+  const target = routeForView(name);
+  const current = `${window.location.pathname}${window.location.search}`;
+  if (current === target && !window.location.hash) return;
+  const method = mode === "replace" ? "replaceState" : "pushState";
+  window.history?.[method]?.({ view: name }, "", target);
+}
+
+function authRedirectUrl() {
+  return window.location.origin || window.location.href.split("#")[0];
+}
+
+function initialRouteState() {
+  const pending = sessionStorage.getItem(PENDING_ROUTE_KEY);
+  if (pending) {
+    sessionStorage.removeItem(PENDING_ROUTE_KEY);
+    return { path: pending, replace: true };
+  }
+  const hashRoute = cleanHashRoute();
+  if (hashRoute) return { path: hashRoute, replace: true };
+  return { path: window.location.pathname, replace: false };
+}
+
 function isLoggedIn() {
   return Boolean(state.supabaseSession);
 }
@@ -422,7 +472,7 @@ async function handleMagicLinkSignIn(event) {
   const { error } = await client.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: window.location.href.split("#")[0],
+      emailRedirectTo: authRedirectUrl(),
       shouldCreateUser: state.authMode === "signup"
     }
   });
@@ -451,7 +501,7 @@ async function handlePasswordSignIn(event) {
     ? await client.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: window.location.href.split("#")[0] }
+      options: { emailRedirectTo: authRedirectUrl() }
     })
     : await client.auth.signInWithPassword({ email, password });
   if (error) {
@@ -989,13 +1039,16 @@ function toast(message) {
   toast.timer = setTimeout(() => element.classList.remove("is-visible"), 2800);
 }
 
-function setView(name) {
+function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
   state.view = name;
   $$(".view").forEach(view => view.classList.toggle("is-active", view.dataset.view === name));
   $$(".nav-item").forEach(item => item.classList.toggle("is-active", item.dataset.nav === name));
+  $$("[data-marketing-nav]").forEach(item => item.classList.toggle("is-active", item.dataset.marketingNav === name));
   document.body.classList.remove("mobile-nav-open");
+  $("#marketing-mobile-menu")?.removeAttribute("open");
   $("#profile-menu").hidden = true;
   $("#profile-button").setAttribute("aria-expanded", "false");
+  if (updateUrl && (MARKETING_ROUTES[name] || name === "home")) syncUrlForView(name, replaceUrl ? "replace" : "push");
   window.scrollTo({ top: 0, behavior: "smooth" });
   $("#app").focus({ preventScroll: true });
   if (name === "home" || name === "reviews") renderDashboard();
@@ -3901,7 +3954,10 @@ function revisitPractice(skillId) {
 
 document.addEventListener("click", async event => {
   const nav = event.target.closest("[data-nav]");
-  if (nav) setView(nav.dataset.nav);
+  if (nav) {
+    event.preventDefault();
+    setView(nav.dataset.nav);
+  }
 
   const bookInsights = event.target.closest("[data-book-insights]");
   if (bookInsights) renderBookInsights(bookInsights.dataset.bookInsights);
@@ -4136,7 +4192,7 @@ $("#forgot-password")?.addEventListener("click", async () => {
   const email = $("#password-auth-email").value.trim() || $("#auth-email").value.trim();
   if (!client) { setAuthStatus("Supabase is not connected yet. Check supabase-config.js."); return; }
   if (!email) { toast("Enter your email first."); return; }
-  const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split("#")[0] });
+  const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: authRedirectUrl() });
   toast(error ? error.message : "Password reset email sent.");
 });
 $("#google-auth-button")?.addEventListener("click", async () => {
@@ -4144,7 +4200,7 @@ $("#google-auth-button")?.addEventListener("click", async () => {
   if (!client) { setAuthStatus("Supabase is not connected yet. Check supabase-config.js."); return; }
   const { error } = await client.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: window.location.href.split("#")[0] }
+    options: { redirectTo: authRedirectUrl() }
   });
   if (error) toast(error.message);
 });
@@ -4243,6 +4299,12 @@ $("#confidence-info-dialog").addEventListener("click", event => {
 window.matchMedia?.("(prefers-color-scheme: dark)")?.addEventListener?.("change", handleSystemColorSchemeChange);
 
 async function bootApp() {
+  const startupRoute = initialRouteState();
+  const startupPath = startupRoute.path;
+  const startupView = viewForPath(startupPath);
+  if (startupRoute.replace) {
+    window.history.replaceState({ view: startupView }, "", routeForView(startupView));
+  }
   renderAuthState();
   const bootSupabaseClient = getSupabaseClient();
   if (bootSupabaseClient) {
@@ -4255,6 +4317,13 @@ async function bootApp() {
     await refreshSupabaseSession(true);
   }
   restoreSavedDraft();
+  if (MARKETING_ROUTES[startupView] || startupView === "home") {
+    setView(startupView, { updateUrl: false });
+  }
 }
+
+window.addEventListener("popstate", () => {
+  setView(viewForPath(), { updateUrl: false });
+});
 
 bootApp();
