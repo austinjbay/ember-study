@@ -1588,7 +1588,7 @@ body.sidebar-collapsed .sidebar-foot {
   justify-items: center;
   width: 100%;
 }
-body.sidebar-collapsed .sidebar-foot button {
+body.sidebar-collapsed .sidebar-foot > button {
   display: grid;
   grid-template-columns: 1fr;
   place-items: center;
@@ -1600,10 +1600,10 @@ body.sidebar-collapsed .sidebar-foot button {
   padding: 0;
   font-size: 0;
 }
-body.sidebar-collapsed .sidebar-foot span:not(.avatar):not(.signed-out-mark) {
+body.sidebar-collapsed .sidebar-foot > button > span:not(.avatar):not(.signed-out-mark) {
   display: none;
 }
-body.sidebar-collapsed .sidebar-foot .avatar {
+body.sidebar-collapsed .sidebar-foot > button > .avatar {
   font-size: .78rem;
 }
 body.sidebar-collapsed .profile-menu {
@@ -1620,7 +1620,7 @@ body.sidebar-collapsed .nav-item .practice-icon,
 body.sidebar-collapsed .nav-item .notification-icon svg,
 body.sidebar-collapsed .nav-item .home-icon svg,
 body.sidebar-collapsed .nav-item .practice-icon svg,
-body.sidebar-collapsed .sidebar-foot .avatar,
+body.sidebar-collapsed .sidebar-foot > button > .avatar,
 body.sidebar-collapsed .signed-out-mark {
   transition: color .18s ease;
 }
@@ -1637,7 +1637,7 @@ body.sidebar-collapsed .new-check:hover .new-check-icon,
 body.sidebar-collapsed .nav-item:hover .notification-icon svg,
 body.sidebar-collapsed .nav-item:hover .home-icon svg,
 body.sidebar-collapsed .nav-item:hover .practice-icon svg,
-body.sidebar-collapsed .sidebar-foot button:hover .avatar,
+body.sidebar-collapsed .sidebar-foot > button:hover > .avatar,
 body.sidebar-collapsed .signed-out-note:hover .signed-out-mark {
   color: var(--ink);
 }
@@ -1667,7 +1667,7 @@ body.sidebar-collapsed .brand:hover .brand-mark {
   body.sidebar-collapsed .nav-item .notification-icon svg,
   body.sidebar-collapsed .nav-item .home-icon svg,
   body.sidebar-collapsed .nav-item .practice-icon svg,
-  body.sidebar-collapsed .sidebar-foot .avatar,
+  body.sidebar-collapsed .sidebar-foot > button > .avatar,
   body.sidebar-collapsed .signed-out-mark {
     transition: color .01ms linear;
   }
