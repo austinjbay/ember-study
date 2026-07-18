@@ -4069,6 +4069,7 @@ $("#profile-menu").addEventListener("click", event => {
 });
 $("#logout-button").addEventListener("click", () => logOut());
 $("#login-button").addEventListener("click", () => openAuthDialog("login"));
+$("#signed-out-login")?.addEventListener("click", () => openAuthDialog("login"));
 $("#signup-button").addEventListener("click", () => openAuthDialog("signup"));
 $("#email-auth-form")?.addEventListener("submit", handleMagicLinkSignIn);
 $("#password-auth-form")?.addEventListener("submit", handlePasswordSignIn);
