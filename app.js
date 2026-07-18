@@ -1602,10 +1602,17 @@ function applyEmberWindowState(nextState = loadEmberWindowState()) {
   const minimized = $("#ember-companion-minimized");
   if (!companion || !panel || !minimized) return;
   const windowState = clampEmberWindowState(nextState);
-  companion.style.left = `${windowState.left}px`;
-  companion.style.top = `${windowState.top}px`;
-  companion.style.right = "auto";
-  companion.style.bottom = "auto";
+  if (windowState.minimized) {
+    companion.style.left = "auto";
+    companion.style.top = "auto";
+    companion.style.right = `${DEFAULT_EMBER_WINDOW.margin}px`;
+    companion.style.bottom = `${DEFAULT_EMBER_WINDOW.margin}px`;
+  } else {
+    companion.style.left = `${windowState.left}px`;
+    companion.style.top = `${windowState.top}px`;
+    companion.style.right = "auto";
+    companion.style.bottom = "auto";
+  }
   panel.style.height = `${windowState.height}px`;
   panel.hidden = Boolean(windowState.minimized);
   minimized.hidden = !windowState.minimized;
