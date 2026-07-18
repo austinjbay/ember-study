@@ -106,6 +106,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .sidebar-foot { position: relative; margin-top: auto; border-top: 1px solid var(--line); padding-top: 12px; }
 .sidebar-foot button { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 9px; width: 100%; border: 0; background: transparent; color: var(--muted); font-size: .78rem; text-align: left; }
 .avatar { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #d8d2c6; color: var(--ink); font-family: var(--serif); }
+.avatar.has-image { overflow: hidden; background: transparent; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
 .signed-out-mark { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--line-dark); border-radius: 50%; background: transparent; color: var(--muted); transition: border-color .15s ease, color .15s ease, background .15s ease; }
 .signed-out-mark svg { width: 22px; height: 22px; }
 .profile-menu { position: absolute; z-index: 35; right: 0; bottom: 48px; width: 224px; border: 1px solid var(--line-dark); border-radius: 6px; background: var(--white); padding: 7px; box-shadow: 0 16px 44px rgba(32,34,31,.16); }
@@ -117,7 +119,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .profile-menu > button { display: block; min-height: 36px; border-radius: 4px; padding: 0 9px; color: var(--ink); font-size: .73rem; }
 .profile-menu > button:hover { background: var(--soft); }
 .profile-menu > .logout-button { color: var(--red); }
-.signed-out-note { display: none; align-items: center; gap: 9px; color: var(--muted); font-size: .73rem; }
+.sidebar-foot .signed-out-note { display: none; align-items: center; gap: 9px; color: var(--muted); font-size: .73rem; }
 .signed-out-note:hover .signed-out-mark { border-color: var(--ink); background: rgba(255,255,255,.5); color: var(--ink); }
 
 .shell { min-height: 100vh; margin-left: var(--sidebar); transition: margin-left .22s ease; }
@@ -1578,9 +1580,12 @@ body.logged-out #toggle-sidebar {
 body.logged-out .dashboard-grid {
   display: none;
 }
-body.logged-out .signed-out-note,
+body.logged-out .sidebar-foot .signed-out-note,
 body.logged-out .auth-actions {
   display: flex;
+}
+body:not(.logged-out) .sidebar-foot .signed-out-note {
+  display: none;
 }
 body.logged-out .sidebar-foot {
   width: 100%;

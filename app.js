@@ -244,16 +244,38 @@ function currentUserEmail() {
   return state.supabaseSession?.user?.email || loadLocalProfile().email || "";
 }
 
+function currentUserAvatarUrl() {
+  const metadata = currentUserMetadata();
+  return metadata.avatar_url || metadata.picture || metadata.photo_url || "";
+}
+
 function profileInitial(name = currentDisplayName(), email = currentUserEmail()) {
   const source = name || email || "Reader";
   return source.trim().charAt(0).toUpperCase() || "R";
+}
+
+function renderProfileAvatar(node, name = currentDisplayName(), email = currentUserEmail()) {
+  if (!node) return;
+  const avatarUrl = currentUserAvatarUrl();
+  node.textContent = "";
+  node.classList.toggle("has-image", Boolean(avatarUrl));
+  if (avatarUrl) {
+    const image = document.createElement("img");
+    image.src = avatarUrl;
+    image.alt = "";
+    image.referrerPolicy = "no-referrer";
+    node.append(image);
+    return;
+  }
+  node.textContent = profileInitial(name, email);
 }
 
 function updateProfileUI() {
   const name = currentDisplayName();
   const email = currentUserEmail();
   const label = name || "Reader profile";
-  $("#profile-button .avatar").textContent = profileInitial(name, email);
+  renderProfileAvatar($("#profile-button .avatar"), name, email);
+  renderProfileAvatar($(".profile-menu-head .avatar"), name, email);
   $("#profile-button span:nth-child(2)").textContent = label;
   const menuName = $(".profile-menu-head strong");
   const menuEmail = $(".profile-menu-head small");
