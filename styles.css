@@ -568,7 +568,6 @@ body.logged-out .landing-faq { display: grid; }
 :root[data-color-mode="dark"] dialog,
 :root[data-color-mode="dark"] .dialog-head,
 :root[data-color-mode="dark"] .google-auth-button,
-:root[data-color-mode="dark"] .prototype-auth-button,
 :root[data-color-mode="dark"] .gap-glossary dl div,
 :root[data-color-mode="dark"] .practice-lesson,
 :root[data-color-mode="dark"] .practice-activity,
@@ -1089,8 +1088,6 @@ dialog::backdrop { background: rgba(32,34,31,.36); backdrop-filter: blur(3px); }
 .auth-dialog-body > p:first-child { margin: 0 0 22px; color: var(--muted); font-family: var(--serif); line-height: 1.6; }
 .google-auth-button { display: flex; align-items: center; justify-content: center; gap: 11px; width: 100%; min-height: 46px; border: 1px solid var(--line-dark); border-radius: 4px; background: var(--white); color: var(--ink); font-size: .74rem; font-weight: 800; }
 .google-auth-button span { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%; font-family: var(--serif); }
-.prototype-auth-button { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 42px; margin-top: 10px; border: 1px solid rgba(73,101,83,.34); border-radius: 4px; background: var(--green-soft); color: var(--green); font-size: .7rem; font-weight: 850; }
-.prototype-auth-button:hover { border-color: var(--green); }
 .auth-divider { display: flex; align-items: center; gap: 12px; margin: 21px 0; color: var(--faint); font-size: .62rem; }
 .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 #email-auth-form { display: grid; gap: 15px; }
@@ -1138,7 +1135,6 @@ dialog::backdrop { background: rgba(32,34,31,.36); backdrop-filter: blur(3px); }
 .preview-reading-card button,
 .account-control .secondary,
 .google-auth-button,
-.prototype-auth-button,
 .auth-switch {
   font-size: .86rem;
 }

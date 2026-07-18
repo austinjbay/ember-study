@@ -163,7 +163,7 @@ const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
 function isLoggedIn() {
-  return Boolean(state.supabaseSession) || localStorage.getItem(AUTH_KEY) === "true";
+  return Boolean(state.supabaseSession);
 }
 
 function loadLocalProfile() {
@@ -362,22 +362,9 @@ function openAuthDialog(mode = "login") {
   $("#auth-dialog-title").textContent = isSignup ? "Create your Ember account" : "Log in to Ember";
   $("#email-auth-button").textContent = isSignup ? "Create account with email link" : "Email me a sign-in link";
   $("#password-auth-button").textContent = isSignup ? "Create account" : "Log in";
-  $("#prototype-auth-button").textContent = isSignup ? "Create local prototype account" : "Continue in prototype mode";
-  setAuthStatus(client ? "" : "Real auth is not connected yet. You can still continue locally in prototype mode.");
+  setAuthStatus(client ? "" : "Real auth is not connected yet. Check supabase-config.js.");
   dialog.showModal();
   setTimeout(() => $("#auth-email")?.focus(), 100);
-}
-
-function continueWithPrototypeAccount() {
-  const email = $("#auth-email")?.value.trim() || $("#password-auth-email")?.value.trim() || currentUserEmail() || "reader@example.com";
-  const existing = loadLocalProfile();
-  saveLocalProfile({
-    email,
-    display_name: existing.display_name || email.split("@")[0] || "Reader"
-  });
-  state.supabaseSession = null;
-  $("#auth-dialog")?.close();
-  setLoggedIn(true);
 }
 
 async function logOut() {
@@ -4074,7 +4061,6 @@ $("#profile-menu").addEventListener("click", event => {
 $("#logout-button").addEventListener("click", () => logOut());
 $("#login-button").addEventListener("click", () => openAuthDialog("login"));
 $("#signup-button").addEventListener("click", () => openAuthDialog("signup"));
-$("#prototype-auth-button")?.addEventListener("click", continueWithPrototypeAccount);
 $("#email-auth-form")?.addEventListener("submit", handleMagicLinkSignIn);
 $("#password-auth-form")?.addEventListener("submit", handlePasswordSignIn);
 $("#show-password-auth")?.addEventListener("click", () => {
