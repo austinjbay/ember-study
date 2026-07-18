@@ -744,6 +744,19 @@ function saveChapters(chapters) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(chapters));
 }
 
+function safeReadStorage(key, fallback = null) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function safeWriteStorage(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
 function bookKey(title, author = "") {
   return `${title.trim().toLocaleLowerCase()}::${author.trim().toLocaleLowerCase()}`;
 }
@@ -769,6 +782,106 @@ function saveBookMetadata(values) {
   };
   if (index >= 0) books[index] = book; else books.push(book);
   localStorage.setItem(BOOKS_KEY, JSON.stringify(books));
+}
+
+function libraryTransferPayload() {
+  return {
+    app: "ember",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    data: {
+      chapters: safeReadStorage(STORAGE_KEY, []),
+      books: safeReadStorage(BOOKS_KEY, []),
+      practice: safeReadStorage(PRACTICE_KEY, []),
+      collapsedBooks: safeReadStorage(COLLAPSED_BOOKS_KEY, []),
+      bookOrder: safeReadStorage(BOOK_ORDER_KEY, []),
+      focusBook: localStorage.getItem(FOCUS_BOOK_KEY) || ""
+    }
+  };
+}
+
+function sortNewestFirstValue(item = {}) {
+  return Date.parse(item.updatedAt || item.createdAt || item.completedAt || "") || 0;
+}
+
+function mergeByKey(current = [], incoming = [], keyForItem) {
+  const merged = new Map();
+  current.forEach(item => {
+    const key = keyForItem(item);
+    if (key) merged.set(key, item);
+  });
+  incoming.forEach(item => {
+    const key = keyForItem(item);
+    if (!key) return;
+    const existing = merged.get(key);
+    if (!existing || sortNewestFirstValue(item) >= sortNewestFirstValue(existing)) {
+      merged.set(key, { ...existing, ...item });
+    }
+  });
+  return [...merged.values()];
+}
+
+function normalizeLibraryTransferPayload(payload = {}) {
+  const data = payload.data || payload;
+  return {
+    chapters: Array.isArray(data.chapters) ? data.chapters : [],
+    books: Array.isArray(data.books) ? data.books : [],
+    practice: Array.isArray(data.practice) ? data.practice : [],
+    collapsedBooks: Array.isArray(data.collapsedBooks) ? data.collapsedBooks : [],
+    bookOrder: Array.isArray(data.bookOrder) ? data.bookOrder : [],
+    focusBook: typeof data.focusBook === "string" ? data.focusBook : ""
+  };
+}
+
+function exportLibraryData() {
+  const payload = libraryTransferPayload();
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `ember-library-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+  setAccountStatus("#account-transfer-status", "Library export created. Import that file on ember.study.", "success");
+}
+
+function importLibraryData(payload) {
+  const data = normalizeLibraryTransferPayload(payload);
+  if (!data.chapters.length && !data.books.length && !data.practice.length) {
+    throw new Error("That file does not include an Ember library export.");
+  }
+
+  const currentChapters = loadChapters();
+  const nextChapters = mergeByKey(currentChapters, data.chapters, chapter => (
+    chapter.id || `${bookKey(chapter.bookTitle || "", chapter.authorName || "")}::${(chapter.chapterTitle || "").trim().toLocaleLowerCase()}`
+  ));
+  saveChapters(nextChapters);
+
+  const currentBooks = loadBookMetadata();
+  const nextBooks = mergeByKey(currentBooks, data.books, book => (
+    book.key || bookKey(book.title || book.bookTitle || "", book.author || book.authorName || "")
+  ));
+  safeWriteStorage(BOOKS_KEY, nextBooks);
+
+  const currentPractice = safeReadStorage(PRACTICE_KEY, []);
+  const nextPractice = mergeByKey(currentPractice, data.practice, record => (
+    record.id || `${record.createdAt || ""}::${record.skillId || record.skill || ""}::${record.chapterId || record.chapterClientId || ""}`
+  ));
+  safeWriteStorage(PRACTICE_KEY, nextPractice);
+
+  safeWriteStorage(COLLAPSED_BOOKS_KEY, [...new Set([...(safeReadStorage(COLLAPSED_BOOKS_KEY, []) || []), ...data.collapsedBooks])]);
+  safeWriteStorage(BOOK_ORDER_KEY, [...new Set([...(safeReadStorage(BOOK_ORDER_KEY, []) || []), ...data.bookOrder])]);
+  if (!localStorage.getItem(FOCUS_BOOK_KEY) && data.focusBook) localStorage.setItem(FOCUS_BOOK_KEY, data.focusBook);
+
+  renderDashboard();
+  toast("Library imported.");
+  return {
+    chapters: Math.max(0, nextChapters.length - currentChapters.length),
+    books: Math.max(0, nextBooks.length - currentBooks.length),
+    practice: Math.max(0, nextPractice.length - currentPractice.length)
+  };
 }
 
 function bookRecordForChapter(chapter = {}, books = loadBookMetadata()) {
@@ -4565,6 +4678,24 @@ $("#color-mode-options")?.addEventListener("change", handleColorModeChange);
 $("#account-email-form")?.addEventListener("submit", handleAccountEmailSubmit);
 $("#account-password-form")?.addEventListener("submit", handleAccountPasswordSubmit);
 $("#account-recovery-form")?.addEventListener("submit", handleRecoveryEmailSubmit);
+$("#export-library-data")?.addEventListener("click", exportLibraryData);
+$("#import-library-data")?.addEventListener("change", async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const payload = JSON.parse(await file.text());
+    const result = importLibraryData(payload);
+    setAccountStatus(
+      "#account-transfer-status",
+      `Imported ${result.chapters} new chapters, ${result.books} new books, and ${result.practice} practice records.`,
+      "success"
+    );
+  } catch (error) {
+    setAccountStatus("#account-transfer-status", error.message || "Unable to import that file.", "error");
+  } finally {
+    event.target.value = "";
+  }
+});
 $("#logout-all-devices")?.addEventListener("click", async () => {
   const client = getSupabaseClient();
   if (client) await client.auth.signOut({ scope: "global" });

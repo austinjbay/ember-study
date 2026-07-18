@@ -679,6 +679,9 @@ body.logged-out .landing-footer { display: flex; }
 .account-status { min-height: 1em; color: var(--muted); font-size: .65rem; line-height: 1.5; }
 .account-status.is-success { color: var(--green); }
 .account-status.is-error { color: var(--red); }
+.library-transfer-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.file-action { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line-dark); border-radius: 6px; background: transparent; color: var(--ink); cursor: pointer; }
+#import-library-data { position: absolute; inline-size: 1px; block-size: 1px; opacity: 0; pointer-events: none; }
 :root[data-color-mode="dark"] { color-scheme: dark; }
 .color-mode-options { display: inline-grid; grid-template-columns: repeat(3, 1fr); width: min(340px, 100%); overflow: hidden; border: 1px solid var(--line-dark); border-radius: 999px; background: var(--paper); padding: 4px; }
 .color-mode-option { position: relative; display: grid; place-items: center; min-height: 34px; border-radius: 999px; color: var(--muted); cursor: pointer; font-size: .68rem; font-weight: 850; }

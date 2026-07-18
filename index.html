@@ -817,6 +817,21 @@
               </div>
             </section>
 
+            <section class="account-setting" aria-labelledby="account-transfer-title">
+              <div>
+                <h2 id="account-transfer-title">Library transfer</h2>
+                <p>Move your saved books and chapters from another Ember browser into this one.</p>
+              </div>
+              <div class="account-control">
+                <div class="library-transfer-actions">
+                  <button class="secondary" id="export-library-data" type="button">Export library</button>
+                  <label class="secondary file-action" for="import-library-data">Import library</label>
+                  <input id="import-library-data" type="file" accept="application/json,.json">
+                </div>
+                <p class="account-status" id="account-transfer-status" role="status">Export from your local prototype, then import that file on ember.study.</p>
+              </div>
+            </section>
+
             <section class="account-setting" aria-labelledby="account-feedback-title">
               <div>
                 <h2 id="account-feedback-title">Generated feedback</h2>
