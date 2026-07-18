@@ -488,7 +488,7 @@ body.logged-out .landing-footer { display: flex; }
 .dashboard-grid[hidden] { display: none; }
 .adaptive-home { display: grid; gap: 34px; animation: homeRise .38s ease .08s both; }
 .adaptive-home-header { max-width: 860px; padding-bottom: 0; }
-.adaptive-home-header h1 { margin: 12px 0 14px; font-family: var(--serif); font-size: clamp(2.45rem, 5vw, 5rem); font-weight: 500; letter-spacing: -.045em; line-height: .98; }
+.adaptive-home-header h1 { margin: 0; font-family: var(--serif); font-size: clamp(2.45rem, 5vw, 5rem); font-weight: 500; letter-spacing: -.045em; line-height: .98; }
 .adaptive-home-header h1 em { color: var(--green); font-weight: 400; }
 .adaptive-home-header p { max-width: 680px; margin: 0; color: var(--muted); font-family: var(--serif); font-size: 1.05rem; line-height: 1.6; }
 .adaptive-module-stack { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 28px 42px; align-items: start; }

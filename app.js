@@ -738,6 +738,13 @@ function localGreeting(date = new Date()) {
   return "Good evening.";
 }
 
+function formatGreetingQuestion(greeting = "", question = "") {
+  const cleanGreeting = greeting.trim().replace(/[.?!]+$/, "");
+  const cleanQuestion = question.trim();
+  const inlineQuestion = cleanQuestion ? cleanQuestion.charAt(0).toLocaleLowerCase() + cleanQuestion.slice(1) : "";
+  return [cleanGreeting, inlineQuestion].filter(Boolean).join(", ");
+}
+
 const loggedInReadingPrompts = [
   "What are you reading today?",
   "What chapter is worth keeping?",
@@ -4191,6 +4198,7 @@ function renderAdaptiveLoggedInHome(vm) {
   const moduleById = new Map(modules.map(module => [module.id, module.html]));
   const zone = id => moduleById.get(id) ? `<div class="home-module-shell" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const topZone = id => moduleById.get(id) ? `<div class="home-top-module" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
+  const homePrompt = activeLoggedInPrompt();
   const supportModules = modules
     .filter(module => !["library-carousel", "skill-development", "primary-next-action", "reader-diagnostic", "library-activity", "memory-resurfacing", "today-practice", "progress-over-time"].includes(module.id))
     .map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`)
@@ -4199,11 +4207,7 @@ function renderAdaptiveLoggedInHome(vm) {
     ${renderHomeFixtureSwitcher(state.homeFixture)}
     <div class="adaptive-home" data-evidence-state="${escapeHtml(vm.evidenceState)}">
       <header class="adaptive-home-header">
-        <span class="eyebrow">${escapeHtml(vm.evidenceState)} evidence</span>
-        <h1><span data-local-greeting>${escapeHtml(localGreeting())}</span><br><em>${escapeHtml(activeLoggedInPrompt())}</em></h1>
-        <p>${vm.evidenceState === "establishing"
-          ? "Find out what stayed with you—and strengthen what didn’t."
-          : "Your homepage is organized around the highest-value next step, the strongest available evidence, and the ideas worth bringing back."}</p>
+        <h1 data-home-greeting-question data-home-question="${escapeHtml(homePrompt)}">${escapeHtml(formatGreetingQuestion(localGreeting(), homePrompt))}</h1>
       </header>
       ${topZone("library-carousel")}
       ${topZone("progress-over-time")}
@@ -4233,6 +4237,9 @@ function renderAdaptiveLoggedInHome(vm) {
 function renderDashboard() {
   $$("[data-local-greeting]").forEach(element => {
     element.textContent = localGreeting();
+  });
+  $$("[data-home-greeting-question]").forEach(element => {
+    element.textContent = formatGreetingQuestion(localGreeting(), element.dataset.homeQuestion || activeLoggedInPrompt());
   });
   const entries = migrateReviewsToFsrs(loadChapters()).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   const chapters = entries.filter(chapter => chapter.status !== "Draft");
