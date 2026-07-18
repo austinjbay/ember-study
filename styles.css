@@ -120,7 +120,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .profile-menu > button:hover { background: var(--soft); }
 .profile-menu > .logout-button { color: var(--red); }
 .sidebar-foot .signed-out-note { display: none; align-items: center; gap: 9px; color: var(--muted); font-size: .73rem; }
-.signed-out-note:hover .signed-out-mark { border-color: var(--ink); background: rgba(255,255,255,.5); color: var(--ink); }
+.signed-out-note:hover .signed-out-mark { border-color: currentColor; color: var(--ink); }
 
 .shell { min-height: 100vh; margin-left: var(--sidebar); transition: margin-left .22s ease; }
 .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: flex-end; min-height: 54px; border-bottom: 1px solid var(--line); background: rgba(244,241,234,.91); padding: 8px clamp(24px, 4vw, 62px); backdrop-filter: blur(12px); }
@@ -1534,21 +1534,15 @@ body.sidebar-collapsed .nav-item {
   background: transparent;
   color: transparent;
   font-size: 0;
-  transition: background .16s ease, border-color .16s ease, box-shadow .16s ease, color .16s ease, transform .16s ease;
+  transition: color .16s ease;
 }
 body.sidebar-collapsed .nav-item span {
   color: var(--muted);
   font-size: .9rem;
 }
-body.sidebar-collapsed .nav-item:hover,
-body.sidebar-collapsed .nav-item.is-active {
-  background: var(--white);
-  box-shadow: 0 7px 16px rgba(47,49,45,.14), 0 1px 0 rgba(255,255,255,.8) inset;
-  transform: translateY(-1px);
-}
 body.sidebar-collapsed .nav-item:hover span,
 body.sidebar-collapsed .nav-item.is-active span {
-  transform: none;
+  transform: translateY(-1px);
 }
 body.sidebar-collapsed .nav-item .notification-icon svg,
 body.sidebar-collapsed .nav-item .home-icon svg,
@@ -1590,9 +1584,12 @@ body.sidebar-collapsed .sidebar-foot .avatar {
 }
 body.sidebar-collapsed .brand-mark,
 body.sidebar-collapsed .new-check-icon,
+body.sidebar-collapsed .nav-item .notification-icon,
+body.sidebar-collapsed .nav-item .home-icon,
+body.sidebar-collapsed .nav-item .practice-icon,
 body.sidebar-collapsed .sidebar-foot .avatar,
 body.sidebar-collapsed .signed-out-mark {
-  transition: background .16s ease, border-color .16s ease, box-shadow .16s ease, color .16s ease, transform .16s ease;
+  transition: color .16s ease, filter .16s ease, transform .16s ease;
 }
 body.sidebar-collapsed .nav-item .notification-icon,
 body.sidebar-collapsed .nav-item .home-icon,
@@ -1604,17 +1601,17 @@ body.sidebar-collapsed .nav-item .practice-icon {
 }
 body.sidebar-collapsed .brand:hover .brand-mark,
 body.sidebar-collapsed .new-check:hover .new-check-icon,
+body.sidebar-collapsed .nav-item:hover .notification-icon,
+body.sidebar-collapsed .nav-item:hover .home-icon,
+body.sidebar-collapsed .nav-item:hover .practice-icon,
 body.sidebar-collapsed .sidebar-foot button:hover .avatar,
 body.sidebar-collapsed .signed-out-note:hover .signed-out-mark {
-  border-color: rgba(115,115,103,.22);
-  background: var(--white);
   color: var(--ink);
-  box-shadow: 0 7px 16px rgba(47,49,45,.14), 0 1px 0 rgba(255,255,255,.8) inset;
+  filter: drop-shadow(0 5px 6px rgba(47,49,45,.18));
   transform: translateY(-1px);
 }
 body.sidebar-collapsed .new-check:hover .new-check-icon,
 body.sidebar-collapsed .brand:hover .brand-mark {
-  background: var(--ink);
   color: var(--paper);
 }
 body.logged-out .new-check,
