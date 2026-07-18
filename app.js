@@ -4471,7 +4471,7 @@ function renderSkillModule(vm) {
     return { ...skill, index, days, status, progress, stateName };
   });
   return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
-    <span class="eyebrow">Skill development</span>
+    <span class="eyebrow">Build Reading Skills</span>
     <h2 id="skill-development-title">${escapeHtml(vm.skillSignals[0]?.title || "Build your first signal.")}</h2>
     <div class="skill-signal-list">
       ${vm.skillSignals.map(signal => `<article>
