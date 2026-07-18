@@ -14,6 +14,14 @@
   --red: #8b4740;
   --red-soft: #f4e3df;
   --blue: #415f73;
+  --skill-unexplored: #7b7e76;
+  --skill-emerging: var(--ink);
+  --skill-developing: #496b59;
+  --skill-strengthening: var(--green);
+  --skill-durable: var(--green);
+  --skill-highlight: var(--amber);
+  --skill-surface: color-mix(in srgb, var(--white), var(--paper) 35%);
+  --skill-shadow: rgba(47,49,45,.08);
   --sidebar: 272px;
   --serif: Georgia, "Times New Roman", serif;
   --sans: "Source Sans 3", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -511,6 +519,13 @@ body.logged-out .landing-footer { display: flex; }
 .library-zone .library-activity-module { min-height: 100%; }
 .memory-zone .memory-module,
 .practice-zone .today-practice-module { min-height: 100%; }
+.today-practice-heading { display: flex; align-items: center; gap: 12px; margin: 8px 0 11px; }
+.today-practice-heading h2 { margin: 0; }
+.today-practice-heading[data-skill-state="unexplored"] .skill-icon-wrap { color: var(--skill-unexplored); }
+.today-practice-heading[data-skill-state="emerging"] .skill-icon-wrap { color: var(--skill-emerging); }
+.today-practice-heading[data-skill-state="developing"] .skill-icon-wrap { color: var(--skill-developing); }
+.today-practice-heading[data-skill-state="strengthening"] .skill-icon-wrap { color: var(--skill-strengthening); }
+.today-practice-heading[data-skill-state="durable"] .skill-icon-wrap { color: var(--skill-durable); --skill-highlight: var(--amber); }
 .today-practice-progress { display: grid; gap: 8px; margin: 16px 0 12px; }
 .today-practice-progress span { display: block; height: 5px; overflow: hidden; border-radius: 999px; background: var(--line); }
 .today-practice-progress i { display: block; height: 100%; border-radius: inherit; background: var(--green); }
@@ -532,14 +547,26 @@ body.logged-out .landing-footer { display: flex; }
 .skill-signal-list strong, .active-book-list strong { display: block; margin-top: 6px; font-family: var(--serif); font-size: 1rem; }
 .skill-signal-list p { margin-top: 7px; }
 .skill-path-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0 16px; }
-.skill-path-node { position: relative; display: grid; gap: 8px; min-width: 0; overflow: hidden; border: 1px solid var(--line-dark); border-radius: 8px; background: color-mix(in srgb, var(--white), var(--paper) 35%); color: inherit; padding: 16px 14px 14px; text-align: left; box-shadow: 0 7px 14px rgba(47,49,45,.05); cursor: pointer; transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s ease, box-shadow .2s ease; }
+.skill-path-node { position: relative; display: grid; gap: 8px; min-width: 0; overflow: hidden; border: 1px solid var(--line-dark); border-radius: 8px; background: var(--skill-surface); color: inherit; padding: 16px 14px 14px; text-align: left; box-shadow: 0 7px 14px rgba(47,49,45,.05); cursor: pointer; transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s ease, box-shadow .2s ease; }
 .skill-path-node::before { content: ""; position: absolute; inset: -40% auto -40% -70%; width: 55%; background: linear-gradient(105deg, transparent, rgba(255,255,255,.72), transparent); transform: rotate(12deg); animation: skillBadgeSheen 4.8s ease-in-out infinite; pointer-events: none; }
 .skill-path-node:nth-child(2)::before { animation-delay: .7s; }
 .skill-path-node:nth-child(3)::before { animation-delay: 1.4s; }
 .skill-path-node:nth-child(4)::before { animation-delay: 2.1s; }
 .skill-path-node:hover { transform: translateY(-2px); border-color: var(--green); box-shadow: 0 12px 20px rgba(47,49,45,.09); }
 .skill-path-node:active { transform: translateY(1px) scale(.99); box-shadow: 0 3px 8px rgba(47,49,45,.08); }
-.skill-path-node > span { position: relative; color: var(--green); font-family: var(--serif); font-size: 1rem; font-style: italic; }
+.skill-icon-wrap { position: relative; display: grid; place-items: center; width: 38px; height: 38px; color: var(--muted); filter: drop-shadow(0 4px 5px var(--skill-shadow)); transition: color .2s ease, filter .2s ease, transform .2s cubic-bezier(.2,.8,.2,1); }
+.skill-icon { display: block; overflow: visible; }
+.skill-icon path { fill: none; stroke: currentColor; stroke-width: 1.85; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.skill-icon .skill-icon-quiet { opacity: .48; }
+.skill-icon .skill-icon-accent { stroke: var(--skill-highlight, var(--green)); opacity: .78; }
+.skill-path-node[data-skill-state="unexplored"] .skill-icon-wrap { color: var(--skill-unexplored); }
+.skill-path-node[data-skill-state="emerging"] .skill-icon-wrap { color: var(--skill-emerging); }
+.skill-path-node[data-skill-state="developing"] .skill-icon-wrap { color: var(--skill-developing); }
+.skill-path-node[data-skill-state="strengthening"] .skill-icon-wrap { color: var(--skill-strengthening); }
+.skill-path-node[data-skill-state="durable"] .skill-icon-wrap { color: var(--skill-durable); --skill-highlight: var(--amber); }
+.skill-path-node:hover .skill-icon-wrap { color: var(--green); filter: drop-shadow(0 7px 8px rgba(47,49,45,.14)); transform: translateY(-1px); }
+.skill-path-node:active .skill-icon-wrap { filter: drop-shadow(0 2px 3px rgba(47,49,45,.1)); transform: translateY(1px) scale(.98); }
+.skill-path-node > span:not(.skill-icon-wrap) { position: relative; color: var(--green); font-family: var(--serif); font-size: 1rem; font-style: italic; }
 .skill-path-node strong { position: relative; min-height: 2.25em; color: var(--ink); font-family: var(--serif); font-size: .98rem; line-height: 1.12; }
 .skill-path-desc { position: relative; color: var(--muted); font-size: .72rem; line-height: 1.45; }
 .skill-path-node small { position: relative; color: var(--faint); font-size: .64rem; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
@@ -2073,6 +2100,10 @@ body.sidebar-collapsed .brand:hover .brand-mark {
   }
   .skill-path-node:hover,
   .skill-path-node:active {
+    transform: none;
+  }
+  .skill-path-node:hover .skill-icon-wrap,
+  .skill-path-node:active .skill-icon-wrap {
     transform: none;
   }
 }

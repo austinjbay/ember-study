@@ -3984,13 +3984,47 @@ function renderMemoryModule(vm) {
   </section>`;
 }
 
+function readingSkillIconKey(skillId = "") {
+  return {
+    "central-claim": "central-claim",
+    "connect-ideas": "connect-ideas",
+    "match-evidence": "evaluate-evidence",
+    "build-explanation": "clear-explanations",
+    "calibrate-confidence": "calibrate-confidence",
+    "apply-with-judgment": "apply-with-judgment"
+  }[skillId] || "central-claim";
+}
+
+function skillDevelopmentState(days = 0, isCurrent = false) {
+  if (days >= 3) return "durable";
+  if (days >= 2) return "strengthening";
+  if (days >= 1) return "developing";
+  if (isCurrent) return "emerging";
+  return "unexplored";
+}
+
+function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", size = 32) {
+  const key = readingSkillIconKey(skillId);
+  const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
+  const icons = {
+    "central-claim": `<svg ${common}><path class="skill-icon-quiet" d="M5.5 8.5 8 7M16 7l2.5 1.5M5.5 15.5 8 17M16 17l2.5-1.5"/><path d="M9 5.5h6M9 18.5h6M6.5 10v4M17.5 10v4"/><path class="skill-icon-accent" d="m12 9 3 3-3 3-3-3 3-3Z"/></svg>`,
+    "connect-ideas": `<svg ${common}><path d="M7.5 8.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM16.5 10.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/><path class="skill-icon-accent" d="M9.7 12.2c1.7-1.5 3.1-1.4 4.6.4"/></svg>`,
+    "evaluate-evidence": `<svg ${common}><path d="M6 7.5h12"/><path class="skill-icon-accent" d="M8 16.5 10.5 12l2.5 4.5M13 16.5l2-3.2 2 3.2"/><path class="skill-icon-quiet" d="M5.5 14.5h1.8"/></svg>`,
+    "clear-explanations": `<svg ${common}><path d="M5.5 7.5h4M8.5 12h5M12.5 16.5h6"/><path class="skill-icon-accent" d="M10.5 8.4 12 12l2 3.1"/></svg>`,
+    "calibrate-confidence": `<svg ${common}><path d="M7 7.5v9M17 7.5v9"/><path class="skill-icon-quiet" d="M7 10.5h3.5M13.5 13.5H17"/><path class="skill-icon-accent" d="M9.5 12h5"/></svg>`,
+    "apply-with-judgment": `<svg ${common}><path d="M5.5 12h5M11.5 6.5v11"/><path class="skill-icon-quiet" d="M12 12c2-2 3.7-2.8 5.8-2.8M12 12c1.7 1.9 3.3 2.8 5.5 2.8"/><path class="skill-icon-accent" d="M12 12c2.1.2 3.6-.6 5.2-2.5"/></svg>`
+  };
+  return icons[key] || icons["central-claim"];
+}
+
 function renderSkillModule(vm) {
   const practice = vm.practiceState || currentPracticeSkillState();
   const path = practiceSequence.map((skill, index) => {
     const days = successfulPracticeDays(skill);
     const status = days >= 3 ? "Durable" : skill.id === practice.skill.id ? "Recommended" : days > 0 ? "Developing" : "Available";
     const progress = Math.min(100, Math.round(Math.min(3, days) / 3 * 100));
-    return { ...skill, index, days, status, progress };
+    const stateName = skillDevelopmentState(days, skill.id === practice.skill.id);
+    return { ...skill, index, days, status, progress, stateName };
   });
   return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
     <span class="eyebrow">Skill development</span>
@@ -4003,7 +4037,8 @@ function renderSkillModule(vm) {
       </article>`).join("")}
     </div>
     <div class="skill-path-grid" aria-label="Available reading skills">
-      ${path.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.days >= 3 ? " is-durable" : ""}" type="button" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.status)}. ${skill.days} of 3 successful days.">
+      ${path.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.days >= 3 ? " is-durable" : ""}" type="button" data-skill-state="${escapeHtml(skill.stateName)}" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.status)}. ${skill.days} of 3 successful days.">
+        <span class="skill-icon-wrap">${renderSkillIcon(skill.id, skill.stateName, 32)}</span>
         <span>${String(skill.index + 1).padStart(2, "0")}</span>
         <strong>${escapeHtml(skill.title)}</strong>
         <span class="skill-path-desc">${escapeHtml(skill.description)}</span>
@@ -4047,9 +4082,13 @@ function renderLibraryActivityModule(vm) {
 function renderTodayPracticeModule(vm) {
   const practice = vm.practiceState || currentPracticeSkillState();
   const complete = Boolean(practice.completedToday);
+  const stateName = skillDevelopmentState(practice.successfulDays, !complete);
   return `<section class="adaptive-module today-practice-module" aria-labelledby="today-practice-title">
     <span class="eyebrow">${complete ? "Practice complete" : "Today’s practice"}</span>
-    <h2 id="today-practice-title">${escapeHtml(practice.skill.title)}</h2>
+    <div class="today-practice-heading" data-skill-state="${escapeHtml(stateName)}">
+      <span class="skill-icon-wrap">${renderSkillIcon(practice.skill.id, stateName, 36)}</span>
+      <h2 id="today-practice-title">${escapeHtml(practice.skill.title)}</h2>
+    </div>
     <p>${complete
       ? "Today’s practice is logged. You can review the skill, or let the next question return tomorrow."
       : "A short exercise keeps the current reading skill active without starting a full chapter check."}</p>
