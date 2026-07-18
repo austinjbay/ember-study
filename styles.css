@@ -144,6 +144,7 @@ body.logged-out .marketing-nav { display: flex; }
 .text-button:hover { color: var(--ink); text-decoration: underline; }
 .mobile-menu { display: none; }
 main { position: relative; min-height: calc(100vh - 54px); }
+main:focus { outline: 0; }
 .view { display: none; }
 .view.is-active { display: block; animation: rise .28s ease; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
