@@ -1240,9 +1240,12 @@ body.logged-out .landing-footer { display: flex; }
 .back-link { border: 0; background: transparent; color: var(--muted); padding: 4px 0; font-size: .75rem; font-weight: 700; }
 .back-link:hover { color: var(--ink); }
 .save-draft-button { border: 0; border-left: 1px solid var(--line-dark); background: transparent; color: var(--amber); padding: 4px 0 4px 16px; font-size: .72rem; font-weight: 800; }
+.delete-draft-button { border: 0; border-left: 1px solid var(--line-dark); background: transparent; color: var(--red); padding: 4px 0 4px 16px; font-size: .72rem; font-weight: 800; }
+.delete-draft-button[hidden] { display: none; }
 .autosave-state { border-left: 1px solid var(--line-dark); color: var(--muted); padding: 4px 0 4px 16px; font-size: .66rem; }
 .autosave-state.is-saved { color: var(--green); }
 .save-draft-button:hover { color: #74491f; text-decoration: underline; }
+.delete-draft-button:hover { color: #6f3027; text-decoration: underline; }
 .progress { display: flex; align-items: center; margin: 0; padding: 0; list-style: none; }
 .progress li { display: flex; align-items: center; color: var(--faint); font-size: .64rem; font-weight: 700; }
 .progress li:not(:last-child)::after { content: ""; width: clamp(18px, 4vw, 52px); height: 1px; margin: 0 8px; background: var(--line-dark); }
@@ -1632,6 +1635,7 @@ dialog::backdrop { background: rgba(32,34,31,.36); backdrop-filter: blur(3px); }
 .marketing-mobile-menu a,
 .back-link,
 .save-draft-button,
+.delete-draft-button,
 .item-action,
 .reschedule-options button,
 .preview-reading-card button,
@@ -1894,7 +1898,8 @@ label > span i,
 .item-action,
 .text-button,
 .back-link,
-.save-draft-button {
+.save-draft-button,
+.delete-draft-button {
   line-height: 1.2;
 }
 
@@ -2902,6 +2907,7 @@ select:focus-visible,
 
 .text-button,
 .save-draft-button,
+.delete-draft-button,
 .back-link,
 .landing-footer a {
   font-weight: 600;
@@ -2911,6 +2917,7 @@ select:focus-visible,
 
 .text-button:hover,
 .save-draft-button:hover,
+.delete-draft-button:hover,
 .back-link:hover,
 .landing-footer a:hover {
   color: var(--ink);
