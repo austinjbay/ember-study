@@ -4498,7 +4498,7 @@ function renderSkillModule(vm) {
 
 function renderProgressModule(vm) {
   return `<section class="adaptive-module progress-module" aria-labelledby="progress-title">
-    <span class="eyebrow">Progress over time</span>
+    <span class="eyebrow">Track Your Progress</span>
     <h2 id="progress-title">${escapeHtml(vm.progress.durableLevel)}</h2>
     <div class="learning-snapshot adaptive-snapshot" aria-label="Learning evidence">
       <article><span>Chapters checked</span><strong>${vm.progress.chapters}</strong><small>Source-grounded checks</small></article>
