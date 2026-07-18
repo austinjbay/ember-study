@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700;8..60,800&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f312d'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia,serif' font-size='34' font-style='italic' fill='%23fffdf7'%3EE%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="styles.css?v=20260718-no-sidebar-add">
+    <link rel="stylesheet" href="styles.css?v=20260718-ember-companion">
   </head>
   <body>
     <a class="skip-link" href="#app">Skip to main content</a>
@@ -49,29 +49,6 @@
           </span> Practice
         </button>
       </nav>
-
-      <section class="sidebar-guide" id="sidebar-guide" aria-labelledby="sidebar-guide-title">
-        <div class="sidebar-guide-head">
-          <span class="sidebar-guide-mark" aria-hidden="true"></span>
-          <div>
-            <h2 id="sidebar-guide-title">Ask Ember</h2>
-            <p id="sidebar-guide-state">Ready when you are.</p>
-          </div>
-        </div>
-        <div class="sidebar-guide-log" id="sidebar-guide-log" role="log" aria-live="polite">
-          <p>Want help deciding what to do next?</p>
-        </div>
-        <div class="sidebar-guide-actions" aria-label="Suggested questions">
-          <button type="button" data-action="sidebar-guide-suggestion" data-guide-intent="next">What should I do?</button>
-          <button type="button" data-action="sidebar-guide-suggestion" data-guide-intent="review">Any reviews?</button>
-          <button type="button" data-action="sidebar-guide-suggestion" data-guide-intent="skill">What skill needs work?</button>
-        </div>
-        <form class="sidebar-guide-form" id="sidebar-guide-form">
-          <label class="sr-only" for="sidebar-guide-input">Ask Ember a question</label>
-          <input id="sidebar-guide-input" type="text" autocomplete="off" placeholder="Ask what to read next">
-          <button type="submit" aria-label="Ask Ember">↵</button>
-        </form>
-      </section>
 
       <div class="library-head">
         <span>Your library</span>
@@ -1259,6 +1236,34 @@
         </section>
       </main>
 
+      <div class="ember-companion" id="ember-companion" hidden>
+        <section class="ember-companion-panel" id="ember-companion-panel" role="dialog" aria-labelledby="sidebar-guide-title" hidden>
+          <div class="ember-guide-head">
+            <span class="ember-guide-mark" aria-hidden="true"></span>
+            <div>
+              <h2 id="sidebar-guide-title">Ask Ember</h2>
+              <p id="sidebar-guide-state">Ready when you are.</p>
+            </div>
+          </div>
+          <div class="ember-guide-log" id="sidebar-guide-log" role="log" aria-live="polite">
+            <p>Want help deciding what to do next?</p>
+          </div>
+          <div class="ember-guide-actions" aria-label="Suggested questions">
+            <button type="button" data-action="sidebar-guide-suggestion" data-guide-intent="next">What should I do?</button>
+            <button type="button" data-action="sidebar-guide-suggestion" data-guide-intent="review">Any reviews?</button>
+            <button type="button" data-action="sidebar-guide-suggestion" data-guide-intent="skill">What skill needs work?</button>
+          </div>
+          <form class="ember-guide-form" id="sidebar-guide-form">
+            <label class="sr-only" for="sidebar-guide-input">Ask Ember a question</label>
+            <input id="sidebar-guide-input" type="text" autocomplete="off" placeholder="Ask what to read next">
+            <button type="submit" aria-label="Ask Ember">↵</button>
+          </form>
+        </section>
+        <button class="ember-companion-button" id="ember-companion-button" type="button" aria-label="Ask Ember" aria-haspopup="dialog" aria-controls="ember-companion-panel" aria-expanded="false">
+          <span class="ember-companion-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+
       <nav class="marketing-bottom-nav" aria-label="Product information">
         <a href="/how-it-works" data-nav="how-it-works" data-marketing-nav="how-it-works">How</a>
         <a href="/reading-skills" data-nav="reading-skills" data-marketing-nav="reading-skills">Skills</a>
@@ -1416,6 +1421,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="vendor/ts-fsrs/dist/index.umd.js"></script>
     <script src="supabase-config.js"></script>
-    <script src="app.js?v=20260718-no-sidebar-add"></script>
+    <script src="app.js?v=20260718-ember-companion"></script>
   </body>
 </html>

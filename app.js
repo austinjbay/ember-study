@@ -1518,10 +1518,16 @@ function setSidebarGuideReply(reply) {
 }
 
 function renderSidebarGuide() {
-  const guide = $("#sidebar-guide");
-  if (!guide) return;
-  guide.hidden = !isLoggedIn();
-  if (!isLoggedIn()) return;
+  const companion = $("#ember-companion");
+  const panel = $("#ember-companion-panel");
+  const button = $("#ember-companion-button");
+  if (!companion || !panel || !button) return;
+  companion.hidden = !isLoggedIn();
+  if (!isLoggedIn()) {
+    panel.hidden = true;
+    button.setAttribute("aria-expanded", "false");
+    return;
+  }
   const summary = sidebarGuideReplyFor("next");
   $("#sidebar-guide-state").textContent = summary.title;
   $("#sidebar-guide-log").innerHTML = `<strong>${escapeHtml(summary.title)}</strong><p>${escapeHtml(summary.body)}</p>`;
@@ -1536,6 +1542,7 @@ function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
   $("#marketing-mobile-menu")?.removeAttribute("open");
   closeMobileLogoMenu();
   closeProfileMenu();
+  closeEmberCompanion();
   if (updateUrl && (MARKETING_ROUTES[name] || name === "home")) syncUrlForView(name, replaceUrl ? "replace" : "push");
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (name === "home" || name === "reviews") renderDashboard();
@@ -1570,6 +1577,26 @@ function closeProfileMenu({ returnFocus = false } = {}) {
     if (returnFocus && wasOpen && !focusTarget) focusTarget = button;
   });
   focusTarget?.focus();
+}
+
+function closeEmberCompanion({ returnFocus = false } = {}) {
+  const panel = $("#ember-companion-panel");
+  const button = $("#ember-companion-button");
+  if (!panel || !button) return;
+  const wasOpen = !panel.hidden;
+  panel.hidden = true;
+  button.setAttribute("aria-expanded", "false");
+  if (returnFocus && wasOpen) button.focus();
+}
+
+function toggleEmberCompanion() {
+  const panel = $("#ember-companion-panel");
+  const button = $("#ember-companion-button");
+  if (!panel || !button) return;
+  const willOpen = panel.hidden;
+  panel.hidden = !willOpen;
+  button.setAttribute("aria-expanded", String(willOpen));
+  if (willOpen) $("#sidebar-guide-input")?.focus();
 }
 
 function closeMobileLogoMenu({ returnFocus = false } = {}) {
@@ -5835,6 +5862,12 @@ $("#sidebar-guide-form")?.addEventListener("submit", event => {
   setSidebarGuideReply(sidebarGuideReplyFor("freeform", text));
   input.value = "";
 });
+$("#ember-companion-button")?.addEventListener("click", event => {
+  event.stopPropagation();
+  closeMobileLogoMenu();
+  closeProfileMenu();
+  toggleEmberCompanion();
+});
 $("#mobile-logo-button")?.addEventListener("click", event => {
   event.stopPropagation();
   closeProfileMenu();
@@ -5973,14 +6006,16 @@ $("#refresh-generated-feedback")?.addEventListener("click", async () => {
 $("#save-entry-draft")?.addEventListener("click", saveEntryDraft);
 $("#delete-entry-draft")?.addEventListener("click", deleteCurrentDraft);
 $("#confirm-delete-draft")?.addEventListener("click", confirmDeleteDraft);
-document.addEventListener("click", () => {
+document.addEventListener("click", event => {
   closeMobileLogoMenu();
   closeProfileMenu();
+  if (!event.target.closest("#ember-companion")) closeEmberCompanion();
 });
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
     closeMobileLogoMenu({ returnFocus: true });
     closeProfileMenu({ returnFocus: true });
+    closeEmberCompanion({ returnFocus: true });
   }
 });
 $("#flow-exit").addEventListener("click", () => {
