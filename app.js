@@ -4240,6 +4240,7 @@ function readingSkillIconKey(skillId = "") {
     "connect-ideas": "connect-ideas",
     "match-evidence": "evaluate-evidence",
     "build-explanation": "clear-explanations",
+    "clear-explanations": "clear-explanations",
     "calibrate-confidence": "calibrate-confidence",
     "apply-with-judgment": "apply-with-judgment"
   }[skillId] || "central-claim";
@@ -4257,14 +4258,92 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   const key = readingSkillIconKey(skillId);
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
   const icons = {
-    "central-claim": `<svg ${common}><path class="skill-icon-quiet" d="M5.5 8.5 8 7M16 7l2.5 1.5M5.5 15.5 8 17M16 17l2.5-1.5"/><path d="M9 5.5h6M9 18.5h6M6.5 10v4M17.5 10v4"/><path class="skill-icon-accent" d="m12 9 3 3-3 3-3-3 3-3Z"/></svg>`,
-    "connect-ideas": `<svg ${common}><path d="M7.5 8.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM16.5 10.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/><path class="skill-icon-accent" d="M9.7 12.2c1.7-1.5 3.1-1.4 4.6.4"/></svg>`,
-    "evaluate-evidence": `<svg ${common}><path d="M6 7.5h12"/><path class="skill-icon-accent" d="M8 16.5 10.5 12l2.5 4.5M13 16.5l2-3.2 2 3.2"/><path class="skill-icon-quiet" d="M5.5 14.5h1.8"/></svg>`,
-    "clear-explanations": `<svg ${common}><path d="M5.5 7.5h4M8.5 12h5M12.5 16.5h6"/><path class="skill-icon-accent" d="M10.5 8.4 12 12l2 3.1"/></svg>`,
-    "calibrate-confidence": `<svg ${common}><path d="M7 7.5v9M17 7.5v9"/><path class="skill-icon-quiet" d="M7 10.5h3.5M13.5 13.5H17"/><path class="skill-icon-accent" d="M9.5 12h5"/></svg>`,
-    "apply-with-judgment": `<svg ${common}><path d="M5.5 12h5M11.5 6.5v11"/><path class="skill-icon-quiet" d="M12 12c2-2 3.7-2.8 5.8-2.8M12 12c1.7 1.9 3.3 2.8 5.5 2.8"/><path class="skill-icon-accent" d="M12 12c2.1.2 3.6-.6 5.2-2.5"/></svg>`
+    "central-claim": `<svg ${common}><path class="skill-icon-noise" d="M5 7.5 7.3 6.6M16.7 6.7 19 7.6M5.2 16.4l2.1 1M16.8 17.3l2-1"/><path class="skill-icon-foundation" d="M8.7 5.9h6.6M8.7 18.1h6.6M6.7 9.6v4.8M17.3 9.6v4.8"/><path class="skill-icon-operation" d="m12 8.8 3.2 3.2-3.2 3.2L8.8 12 12 8.8Z"/><circle class="skill-icon-accent skill-icon-fill" cx="12" cy="12" r="1.15"/></svg>`,
+    "connect-ideas": `<svg ${common}><circle class="skill-icon-foundation" cx="7.6" cy="10.2" r="2.35"/><circle class="skill-icon-foundation" cx="16.4" cy="13.8" r="2.35"/><path class="skill-icon-noise" d="M5.2 15.7h2.2M16.8 8.1h2"/><path class="skill-icon-operation" d="M9.8 10.9c1.8-1.1 3.7-.3 4.7 1.3"/><path class="skill-icon-accent" d="M10.8 12.6c1.5 1 2.8.9 4.2-.2"/></svg>`,
+    "evaluate-evidence": `<svg ${common}><path class="skill-icon-foundation" d="M5.8 7.2h12.4"/><path class="skill-icon-noise" d="M5.3 15.4h2.5M16.8 16.9h2"/><path class="skill-icon-operation" d="M8.5 17.2 11 12l2.3 5.2"/><path class="skill-icon-operation" d="M12.9 17.2 15 13.6l2.2 3.6"/><path class="skill-icon-accent" d="M10.9 12h4.2"/></svg>`,
+    "clear-explanations": `<svg ${common}><path class="skill-icon-foundation" d="M5.6 7.3h4.2M9 12h5.1M13.9 16.7h4.5"/><path class="skill-icon-noise" d="M15.5 7.3h2.8M5.6 16.7h2.3"/><path class="skill-icon-operation" d="M10.2 8.4 12 12l2.5 3.6"/><path class="skill-icon-accent" d="M7.2 12h9.6"/></svg>`,
+    "calibrate-confidence": `<svg ${common}><path class="skill-icon-foundation" d="M6.8 7.2v9.6M17.2 7.2v9.6"/><path class="skill-icon-noise" d="M6.8 10.2h3.1M14.2 14.2h3"/><path class="skill-icon-operation" d="M8.8 12h6.4"/><circle class="skill-icon-accent skill-icon-fill" cx="12" cy="12" r="1.05"/><path class="skill-icon-accent" d="M10.1 9.4 12 12l2-2.6"/></svg>`,
+    "apply-with-judgment": `<svg ${common}><path class="skill-icon-foundation" d="M5.6 12h5.6M11.6 6.4v11.2"/><path class="skill-icon-noise" d="M12.3 12c1.8 2 3.3 2.9 5.7 2.9"/><path class="skill-icon-operation" d="M12.3 12c1.9-1.9 3.6-2.8 5.9-2.8"/><path class="skill-icon-accent" d="M12.2 12c2.3.2 3.7-.6 5.4-2.5"/></svg>`
   };
   return icons[key] || icons["central-claim"];
+}
+
+const marketingSkillIcons = [
+  { id: "central-claim", title: "Find the central claim", state: "durable", label: "01 · Earned" },
+  { id: "connect-ideas", title: "Connect ideas", state: "strengthening", label: "02 · In progress" },
+  { id: "match-evidence", title: "Evaluate evidence", state: "developing", label: "03 · Upcoming" },
+  { id: "build-explanation", title: "Build clear explanations", state: "emerging", label: "04 · Upcoming" },
+  { id: "calibrate-confidence", title: "Calibrate confidence", state: "unexplored", label: "05 · Upcoming" },
+  { id: "apply-with-judgment", title: "Apply with judgment", state: "unexplored", label: "06 · Upcoming" }
+];
+
+function skillIdForMarketingTitle(title = "") {
+  const normalized = title.toLowerCase();
+  if (normalized.includes("central claim")) return "central-claim";
+  if (normalized.includes("connect")) return "connect-ideas";
+  if (normalized.includes("evidence")) return "match-evidence";
+  if (normalized.includes("explanation")) return "build-explanation";
+  if (normalized.includes("confidence")) return "calibrate-confidence";
+  if (normalized.includes("apply")) return "apply-with-judgment";
+  return "central-claim";
+}
+
+function hydrateStaticSkillBadges() {
+  $$(".skill-badge-card").forEach(card => {
+    const badge = card.querySelector(".skill-badge");
+    const title = card.querySelector("h2, h3")?.textContent || "";
+    if (!badge || badge.dataset.iconHydrated === "true") return;
+    const skillId = skillIdForMarketingTitle(title);
+    const stateName = card.classList.contains("is-earned")
+      ? "durable"
+      : card.classList.contains("is-active") ? "strengthening" : "unexplored";
+    badge.innerHTML = renderSkillIcon(skillId, stateName, 36);
+    badge.dataset.iconHydrated = "true";
+  });
+}
+
+function renderSkillIconSpecimen() {
+  const target = $("#skill-icon-specimen");
+  if (!target) return;
+  const concepts = [
+    { name: "Signal in noise", copy: "The skill reveals the structure hidden inside fragments.", state: "emerging" },
+    { name: "Relationship path", copy: "The icon shows how the reader connects one idea to another.", state: "developing" },
+    { name: "Durable mark", copy: "The strongest version adds a stable ember point only after evidence accumulates.", state: "durable" }
+  ];
+  target.innerHTML = `<div class="skill-icon-specimen-head">
+    <span class="eyebrow">Icon system prototype</span>
+    <h2 id="skill-icon-specimen-title">A shared alphabet for reading skills.</h2>
+    <p>Each mark uses fragments, anchors, paths, and frames. Progress changes the structure itself instead of swapping in a generic trophy or checkmark.</p>
+  </div>
+  <div class="skill-concept-grid" aria-label="Reading skill icon concepts">
+    ${concepts.map(concept => `<article>
+      <span>${escapeHtml(concept.name)}</span>
+      <div class="skill-concept-icons">
+        ${marketingSkillIcons.slice(0, 3).map(skill => `<i>${renderSkillIcon(skill.id, concept.state, 24)}</i>`).join("")}
+      </div>
+      <p>${escapeHtml(concept.copy)}</p>
+    </article>`).join("")}
+  </div>
+  <div class="skill-specimen-panel">
+    <div class="skill-specimen-row" aria-label="All reading skill icons at 24 pixels">
+      ${marketingSkillIcons.map(skill => `<article>
+        <span class="skill-icon-wrap">${renderSkillIcon(skill.id, skill.state, 24)}</span>
+        <small>${escapeHtml(skill.label)}</small>
+        <strong>${escapeHtml(skill.title)}</strong>
+      </article>`).join("")}
+    </div>
+    <div class="skill-state-strip" aria-label="State changes for selected icons">
+      ${["central-claim", "connect-ideas", "calibrate-confidence"].map(skillId => `<article>
+        <strong>${escapeHtml(marketingSkillIcons.find(skill => skill.id === skillId)?.title || skillId)}</strong>
+        <div>${["unexplored", "emerging", "developing", "strengthening", "durable"].map(stateName => `<span title="${escapeHtml(stateName)}">${renderSkillIcon(skillId, stateName, 20)}</span>`).join("")}</div>
+      </article>`).join("")}
+    </div>
+    <div class="skill-scale-check" aria-label="Scale and ember comparison">
+      <article><strong>Scale check</strong><span>${renderSkillIcon("central-claim", "durable", 16)}${renderSkillIcon("central-claim", "durable", 48)}</span></article>
+      <article><strong>Color modes</strong><span class="skill-color-modes"><i>${renderSkillIcon("match-evidence", "strengthening", 32)}</i><i>${renderSkillIcon("match-evidence", "strengthening", 32)}</i></span></article>
+      <article><strong>Ember relationship</strong><span class="ember-compare-mark" aria-hidden="true">E</span>${renderSkillIcon("connect-ideas", "strengthening", 48)}</article>
+    </div>
+  </div>`;
 }
 
 function renderSkillModule(vm) {
@@ -4498,6 +4577,8 @@ function renderDashboard() {
   $$("[data-home-greeting-question]").forEach(element => {
     element.textContent = formatGreetingQuestion(localGreeting(), element.dataset.homeQuestion || activeLoggedInPrompt());
   });
+  hydrateStaticSkillBadges();
+  renderSkillIconSpecimen();
   const entries = ensureUpNextChapterDrafts(migrateReviewsToFsrs(loadChapters())).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   const chapters = entries.filter(chapter => chapter.status !== "Draft");
   const drafts = entries.filter(chapter => chapter.status === "Draft");
