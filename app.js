@@ -5822,7 +5822,7 @@ $("#focus-book-select")?.addEventListener("change", event => {
   $("#focus-edit-button").setAttribute("aria-expanded", "false");
   renderDashboard();
 });
-$("#new-check").addEventListener("click", () => startNew());
+$("#new-check")?.addEventListener("click", () => startNew());
 $("#mobile-new-check")?.addEventListener("click", () => startNew());
 $("#sidebar-guide-form")?.addEventListener("submit", event => {
   event.preventDefault();
