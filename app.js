@@ -147,7 +147,8 @@ const state = {
   supabaseClient: null,
   supabaseSession: null,
   draftRestored: false,
-  authMode: "login"
+  authMode: "login",
+  homeFixture: ""
 };
 
 const sample = {
@@ -3356,6 +3357,496 @@ function renderBookInsights(key) {
   setView("book-insights");
 }
 
+const readerEvidenceThresholds = {
+  emerging: {
+    completedChecks: 2,
+    completedReviews: 1
+  },
+  established: {
+    books: 3,
+    completedChecks: 10,
+    delayedReviews: 6,
+    representedSkills: 3
+  }
+};
+
+const unsupportedHomeDiagnostics = [
+  "Skill trajectories over time require repeated skill-level grades by date.",
+  "Cross-book idea connections require semantic concept mapping.",
+  "Favorites require a saved favorite marker on chapters or ideas."
+];
+
+function isHomeFixtureEnabled() {
+  return location.protocol === "file:" || ["localhost", "127.0.0.1"].includes(location.hostname);
+}
+
+function uniqueBookSummaries(entries = []) {
+  const books = new Map();
+  entries.forEach(chapter => {
+    const book = bookRecordForChapter(chapter);
+    if (!book.key || books.has(book.key)) return;
+    books.set(book.key, {
+      key: book.key,
+      title: book.title,
+      author: book.author,
+      total: book.total,
+      completed: entries.filter(item => item.status !== "Draft" && bookKey(item.bookTitle || "", item.authorName || "") === book.key).length
+    });
+  });
+  return [...books.values()];
+}
+
+function completedReviewCount(chapters = []) {
+  return chapters.reduce((total, chapter) => total + (chapter.delayedAttempts?.length || 0), 0);
+}
+
+function representedSkillCount(chapters = []) {
+  const represented = new Set();
+  chapters.forEach(chapter => {
+    const gap = chapter.evaluation?.gapType;
+    if (gap && gap !== "Optional challenge" && gap !== "Study challenge") represented.add(gap);
+    const rubric = chapter.evaluation?.rubricScores || {};
+    Object.entries(rubric).forEach(([key, value]) => {
+      if (Number(value) > 0) represented.add(key);
+    });
+  });
+  return represented.size;
+}
+
+function classifyReaderEvidence(metrics) {
+  if (
+    metrics.books >= readerEvidenceThresholds.established.books &&
+    metrics.completedChecks >= readerEvidenceThresholds.established.completedChecks &&
+    metrics.delayedReviews >= readerEvidenceThresholds.established.delayedReviews &&
+    metrics.representedSkills >= readerEvidenceThresholds.established.representedSkills
+  ) return "established";
+  if (
+    metrics.completedChecks >= readerEvidenceThresholds.emerging.completedChecks ||
+    metrics.completedReviews >= readerEvidenceThresholds.emerging.completedReviews ||
+    (metrics.books > 0 && metrics.completedChecks > 0)
+  ) return "emerging";
+  return "establishing";
+}
+
+function confidenceForEvidence(stateName) {
+  if (stateName === "established") return "supported";
+  if (stateName === "emerging") return "early";
+  return "preview";
+}
+
+function confidenceCopy(level, basis = "") {
+  if (level === "supported") return basis ? `Supported · ${basis}` : "Supported by repeated evidence";
+  if (level === "early") return basis ? `Early signal · ${basis}` : "Early signal";
+  return "Preview · personal evidence needed";
+}
+
+function commonGapFromChapters(chapters = []) {
+  const gapCounts = chapters.reduce((counts, chapter) => {
+    const gap = chapter.evaluation?.gapType;
+    if (gap && gap !== "Optional challenge" && gap !== "Study challenge") counts.set(gap, (counts.get(gap) || 0) + 1);
+    return counts;
+  }, new Map());
+  return [...gapCounts.entries()].sort((a, b) => b[1] - a[1])[0] || null;
+}
+
+function skillTitleForGap(gap = "") {
+  if (gap === "Missed central claim") return "Find the central claim";
+  if (gap === "Missed supporting evidence") return "Connect claims to evidence";
+  if (gap === "Weak synthesis") return "Connect ideas";
+  if (gap === "Weak application") return "Apply ideas with judgment";
+  if (gap === "Insufficient response") return "Build complete explanations";
+  return "Find the central claim";
+}
+
+function practiceReasonForGap(gap = "") {
+  if (gap === "Missed central claim") return "Recommended because central claims have appeared as a recurring opportunity.";
+  if (gap === "Missed supporting evidence") return "Recommended because supporting evidence needs a clearer link back to the argument.";
+  if (gap === "Weak synthesis") return "Recommended because connecting ideas is the next useful layer.";
+  if (gap === "Weak application") return "Recommended because transfer improves when the idea moves into a real decision.";
+  if (gap === "Insufficient response") return "Recommended because complete answers make later feedback more precise.";
+  return "Recommended because it gives every later reading skill a stronger foundation.";
+}
+
+function buildAdaptiveNextAction({ evidenceState, entries, chapters, drafts, due, currentReading, practiceState }) {
+  if (due.length) {
+    const review = due[0];
+    return {
+      kind: "review",
+      label: due.length === 1 ? "Review due" : `${due.length} reviews due`,
+      marker: "◉",
+      title: `Review ${review.chapterTitle}.`,
+      copy: `${review.bookTitle} is ready for delayed recall. Return with just enough context, then answer from memory.`,
+      text: "Start review",
+      why: `Recommended because FSRS says ${due.length === 1 ? "this chapter is" : "these chapters are"} due now.`,
+      attrs: `data-review-id="${escapeHtml(review.id)}"`
+    };
+  }
+  if (drafts.length) {
+    const draft = drafts[0];
+    return {
+      kind: "draft",
+      label: "Draft waiting",
+      marker: "✎",
+      title: `Resume ${draft.chapterTitle}.`,
+      copy: "You already started this chapter check. Finish it before starting a new thread.",
+      text: "Resume draft",
+      why: "Recommended because unfinished recall is the closest incomplete learning activity.",
+      attrs: `data-chapter-id="${escapeHtml(draft.id)}"`
+    };
+  }
+  if (practiceState && !practiceState.completedToday && chapters.length) {
+    return {
+      kind: "practice",
+      label: "Skill focus",
+      marker: "3m",
+      title: "Do today’s 3-minute question.",
+      copy: "A short practice question is the smallest useful move available right now.",
+      text: "Start practice",
+      why: "Recommended because daily practice strengthens the skill behind recent gaps.",
+      attrs: 'data-nav="practice"'
+    };
+  }
+  if (currentReading?.chapter) {
+    const latest = currentReading.chapter;
+    const book = currentReading.book;
+    const complete = currentReading.kind === "complete";
+    return {
+      kind: complete ? "new-book" : "next-chapter",
+      label: "Recommended next",
+      marker: "↗",
+      title: complete ? "Start another book." : "Check the next chapter.",
+      copy: complete ? "This book is checked. Keep the habit moving with a fresh source." : `Continue ${book?.title || latest.bookTitle} while the thread is still warm.`,
+      text: complete ? "Start another book" : "Check next chapter",
+      why: complete ? "Recommended because the current book is complete." : "Recommended because recent reading context is still active.",
+      attrs: complete
+        ? 'data-action="home-start-new-book"'
+        : `data-action="home-start-next-chapter" data-book-title="${escapeHtml(book?.title || latest.bookTitle || "")}" data-author-name="${escapeHtml(book?.author || latest.authorName || "")}"`
+    };
+  }
+  return {
+    kind: "first-check",
+    label: "First meaningful result",
+    marker: "01",
+    title: "Add a chapter worth remembering.",
+    copy: "Ember becomes personal after you complete a chapter check and later review what lasted.",
+    text: "Add a chapter",
+    why: evidenceState === "establishing" ? "Recommended because Ember needs one chapter check to begin learning your patterns." : "Recommended because there is no active reading activity.",
+    attrs: 'data-action="home-start-new-book"'
+  };
+}
+
+function buildSkillSignals(chapters = [], evidenceState = "establishing") {
+  const [gap, count] = commonGapFromChapters(chapters) || [];
+  const confidence = confidenceForEvidence(evidenceState);
+  const signals = [];
+  if (chapters.length) {
+    signals.push({
+      title: chapters.length >= 3 ? "You are building a reusable recall record." : "Your first checks are starting a pattern.",
+      copy: chapters.length >= 3
+        ? "Each completed check gives Ember another source-grounded sample of how you explain what you read."
+        : "A few more checks will make the early signals more useful.",
+      basis: `Based on ${chapters.length} completed ${chapters.length === 1 ? "check" : "checks"}.`,
+      confidence
+    });
+  }
+  if (gap) {
+    signals.push({
+      title: `${skillTitleForGap(gap)} is the current focus.`,
+      copy: practiceReasonForGap(gap),
+      basis: `Seen ${count} ${count === 1 ? "time" : "times"} across recent checks.`,
+      confidence: confidence === "preview" ? "early" : confidence
+    });
+  }
+  if (!signals.length) {
+    signals.push({
+      title: "No personal reading signal yet.",
+      copy: "Complete one chapter check and Ember can begin separating recall, understanding, synthesis, and transfer.",
+      basis: "Preview only.",
+      confidence: "preview"
+    });
+  }
+  return signals.slice(0, 2);
+}
+
+function chooseMemoryCandidate(chapters = [], scheduled = []) {
+  const reviewed = chapters.filter(chapter => chapter.delayedAttempts?.length);
+  const due = scheduled.find(reviewIsDue);
+  const candidate = due || reviewed[0] || chapters[0];
+  if (!candidate) return null;
+  const latestReview = candidate.delayedAttempts?.at?.(-1);
+  return {
+    chapterId: candidate.id,
+    title: candidate.chapterTitle,
+    bookTitle: candidate.bookTitle,
+    prompt: latestReview?.gapResponse ? "Before opening it: what earlier gap did you recover here?" : "Before opening it: what was the central idea?",
+    preview: latestReview?.gapResponse || candidate.recall || candidate.summary || "",
+    reason: due ? "Returning now because this chapter is due for review." : latestReview ? "Resurfaced because you recovered this after a delay." : "Resurfaced from your recent reading history."
+  };
+}
+
+function progressSummary(chapters = []) {
+  const reviews = completedReviewCount(chapters);
+  const recovered = chapters.filter(chapter => chapter.repairResolved || chapter.delayedAttempts?.some(attempt => attempt.gapBand === "Strong" || attempt.band === "Strong")).length;
+  const practiced = loadPracticeRecords().filter(record => record.completedAt || record.correct).length;
+  return {
+    chapters: chapters.length,
+    reviews,
+    recovered,
+    practiced,
+    durableLevel: reviews >= 4 ? "Recovered after meaningful delay" : reviews ? "Recalled after delay" : chapters.length ? "Encountered and explained" : "Not enough evidence"
+  };
+}
+
+function buildReaderDiagnostic({ evidenceState, chapters, metrics, skillSignals }) {
+  const confidence = confidenceForEvidence(evidenceState);
+  if (evidenceState === "establishing") {
+    return {
+      confidence,
+      title: "Ember is ready to learn how you read.",
+      copy: "Complete a chapter check, then return later for review. That gives Ember evidence about what you recall, explain, synthesize, and transfer.",
+      basis: "No completed personal checks yet."
+    };
+  }
+  if (evidenceState === "emerging") {
+    return {
+      confidence,
+      title: "Early patterns are beginning to show.",
+      copy: skillSignals[1]?.copy || "Your checks are starting to show where recall is holding and where the explanation needs another pass.",
+      basis: `Based on ${metrics.completedChecks} checks and ${metrics.delayedReviews} delayed reviews.`
+    };
+  }
+  return {
+    confidence,
+    title: "Your reading profile is supported by repeated evidence.",
+    copy: `${skillSignals[0]?.title || "You have a stable reading record."} ${skillSignals[1]?.copy || "The next useful move is to keep strengthening the weakest recurring skill."}`,
+    basis: `Across ${metrics.completedChecks} checks, ${metrics.delayedReviews} delayed reviews, and ${metrics.representedSkills} represented skills.`
+  };
+}
+
+function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
+  const books = uniqueBookSummaries(chapters);
+  const currentReading = chooseCurrentReadingState(entries);
+  const practiceState = currentPracticeSkillState();
+  const metrics = {
+    books: books.length,
+    completedChecks: chapters.length,
+    completedReviews: completedReviewCount(chapters),
+    delayedReviews: completedReviewCount(chapters),
+    representedSkills: representedSkillCount(chapters)
+  };
+  const evidenceState = classifyReaderEvidence(metrics);
+  const skillSignals = buildSkillSignals(chapters, evidenceState);
+  return {
+    evidenceState,
+    metrics,
+    nextAction: buildAdaptiveNextAction({ evidenceState, entries, chapters, drafts, due, currentReading, practiceState }),
+    diagnostic: buildReaderDiagnostic({ evidenceState, chapters, metrics, skillSignals }),
+    skillSignals,
+    memoryCandidates: [chooseMemoryCandidate(chapters, scheduled)].filter(Boolean),
+    progress: progressSummary(chapters),
+    activeBooks: books.slice(0, 3),
+    practiceState,
+    unsupportedDiagnostics: unsupportedHomeDiagnostics
+  };
+}
+
+function fixtureHomeViewModel(evidenceState) {
+  const base = {
+    establishing: {
+      metrics: { books: 0, completedChecks: 0, completedReviews: 0, delayedReviews: 0, representedSkills: 0 },
+      nextAction: { label: "First meaningful result", marker: "01", title: "Add a chapter worth remembering.", copy: "Start with one chapter check. Ember gets smarter after your first delayed review.", text: "Add a chapter", why: "Fixture preview: no personal evidence yet.", attrs: 'data-action="home-start-new-book"' },
+      diagnostic: { confidence: "preview", title: "Ember is ready to learn how you read.", copy: "After a few checks, this space will show what you recall reliably and what needs another pass.", basis: "Example insight only." },
+      skillSignals: [{ title: "No personal reading signal yet.", copy: "Complete one check to begin the diagnostic profile.", basis: "Fixture preview.", confidence: "preview" }],
+      memoryCandidates: [],
+      progress: { chapters: 0, reviews: 0, recovered: 0, practiced: 0, durableLevel: "Not enough evidence" },
+      activeBooks: []
+    },
+    emerging: {
+      metrics: { books: 1, completedChecks: 4, completedReviews: 1, delayedReviews: 1, representedSkills: 2 },
+      nextAction: { label: "Recommended next", marker: "3m", title: "Practice connecting supporting ideas.", copy: "This relationship was missing in a recent explanation.", text: "Start practice", why: "Fixture preview based on four checks.", attrs: 'data-nav="practice"' },
+      diagnostic: { confidence: "early", title: "Early patterns are beginning to show.", copy: "You are recovering central claims, while support-to-argument links are still developing.", basis: "Early signal across 4 checks and 1 delayed review." },
+      skillSignals: [{ title: "Central claims are coming back.", copy: "You recovered the main claim in most early checks.", basis: "4 completed checks.", confidence: "early" }, { title: "Connecting ideas is the growth area.", copy: "The same relationship gap appeared twice.", basis: "2 related gaps.", confidence: "early" }],
+      memoryCandidates: [{ chapterId: "", title: "Deep Work Is Valuable", bookTitle: "Deep Work", prompt: "Before opening it: why did this chapter argue depth matters?", preview: "", reason: "Example resurfacing from a recent chapter." }],
+      progress: { chapters: 4, reviews: 1, recovered: 1, practiced: 2, durableLevel: "Recalled after delay" },
+      activeBooks: [{ title: "Deep Work", author: "Cal Newport", completed: 4, total: 12 }]
+    },
+    established: {
+      metrics: { books: 4, completedChecks: 16, completedReviews: 8, delayedReviews: 8, representedSkills: 4 },
+      nextAction: { label: "Review due", marker: "◉", title: "Review a recovered gap.", copy: "A prior weak spot is ready for delayed recall.", text: "Start review", why: "Fixture preview: scheduled after a meaningful delay.", attrs: 'data-nav="reviews"' },
+      diagnostic: { confidence: "supported", title: "Your reading profile is supported by repeated evidence.", copy: "You identify central claims reliably, even after delay. The best next focus is reconnecting examples to the author’s argument.", basis: "Across 16 checks, 8 reviews, and 4 skill areas." },
+      skillSignals: [{ title: "Central claim recall is reliable.", copy: "This skill held up across recent delayed reviews.", basis: "8 delayed reviews.", confidence: "supported" }, { title: "Evidence connection is the focus.", copy: "Examples come back, but their role in the argument is less consistent.", basis: "6 related checks.", confidence: "supported" }],
+      memoryCandidates: [{ chapterId: "", title: "Legacy", bookTitle: "The Road to Character", prompt: "Before opening it: what did this chapter suggest about résumé virtues and eulogy virtues?", preview: "", reason: "Example resurfacing from a previously difficult idea." }],
+      progress: { chapters: 16, reviews: 8, recovered: 5, practiced: 7, durableLevel: "Recovered after meaningful delay" },
+      activeBooks: [{ title: "The Road to Character", author: "David Brooks", completed: 12, total: 12 }, { title: "How to Know a Person", author: "David Brooks", completed: 4, total: 10 }]
+    }
+  }[evidenceState];
+  return {
+    evidenceState,
+    practiceState: currentPracticeSkillState(),
+    unsupportedDiagnostics: unsupportedHomeDiagnostics,
+    ...base
+  };
+}
+
+function homeModule(id, priority, visible, confidence, reason, html) {
+  return { id, priority, visible, confidence, reason, html };
+}
+
+function renderWhy(reason = "", confidence = "") {
+  return `<details class="why-this"><summary>Why this?</summary><p>${escapeHtml(reason || confidence || "Shown because it is relevant to your current reading state.")}</p></details>`;
+}
+
+function renderPrimaryNextActionModule(vm) {
+  const action = vm.nextAction;
+  return `<section class="next-action-card adaptive-next-action" aria-labelledby="next-action-title">
+    <div class="next-action-marker" aria-hidden="true">${escapeHtml(action.marker)}</div>
+    <div class="next-action-copy">
+      <span class="eyebrow">${escapeHtml(action.label)}</span>
+      <h2 id="next-action-title">${escapeHtml(action.title)}</h2>
+      <p>${escapeHtml(action.copy)}</p>
+      ${renderWhy(action.why, confidenceCopy(confidenceForEvidence(vm.evidenceState)))}
+    </div>
+    <button class="primary" type="button" ${action.attrs}>${escapeHtml(action.text)} <span>→</span></button>
+  </section>`;
+}
+
+function renderDiagnosticModule(vm) {
+  const diagnostic = vm.diagnostic;
+  return `<section class="adaptive-module diagnostic-module" aria-labelledby="reader-diagnostic-title">
+    <div>
+      <span class="eyebrow">${escapeHtml(confidenceCopy(diagnostic.confidence, diagnostic.basis))}</span>
+      <h2 id="reader-diagnostic-title">${escapeHtml(diagnostic.title)}</h2>
+      <p>${escapeHtml(diagnostic.copy)}</p>
+      ${renderWhy(diagnostic.basis, diagnostic.confidence)}
+    </div>
+  </section>`;
+}
+
+function renderMemoryModule(vm) {
+  const candidate = vm.memoryCandidates[0];
+  if (!candidate) {
+    return `<section class="adaptive-module memory-module"><span class="eyebrow">Memory resurfacing</span><h2>Nothing to bring back yet.</h2><p>After a chapter check or delayed review, Ember can resurface an idea before revealing the source.</p>${renderWhy("Requires at least one completed chapter check.", "preview")}</section>`;
+  }
+  return `<section class="adaptive-module memory-module" aria-labelledby="memory-resurfacing-title">
+    <span class="eyebrow">${vm.evidenceState === "establishing" ? "Example memory prompt" : "Memory resurfacing"}</span>
+    <h2 id="memory-resurfacing-title">${escapeHtml(candidate.prompt)}</h2>
+    <p><strong>${escapeHtml(candidate.title)}</strong>${candidate.bookTitle ? ` · ${escapeHtml(candidate.bookTitle)}` : ""}</p>
+    <div class="memory-reveal">
+      <details>
+        <summary>Show saved context</summary>
+        <p>${escapeHtml(candidate.preview || "This is a fixture preview. Real saved context appears after a completed chapter check.")}</p>
+      </details>
+      ${candidate.chapterId ? `<button class="text-button" type="button" data-chapter-id="${escapeHtml(candidate.chapterId)}">Open chapter →</button>` : ""}
+    </div>
+    ${renderWhy(candidate.reason, confidenceCopy(confidenceForEvidence(vm.evidenceState)))}
+  </section>`;
+}
+
+function renderSkillModule(vm) {
+  return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
+    <span class="eyebrow">Skill development</span>
+    <h2 id="skill-development-title">${escapeHtml(vm.skillSignals[0]?.title || "Build your first signal.")}</h2>
+    <div class="skill-signal-list">
+      ${vm.skillSignals.map(signal => `<article>
+        <span>${escapeHtml(confidenceCopy(signal.confidence, signal.basis))}</span>
+        <strong>${escapeHtml(signal.title)}</strong>
+        <p>${escapeHtml(signal.copy)}</p>
+      </article>`).join("")}
+    </div>
+    <button class="text-button" type="button" data-nav="practice">Open daily practice →</button>
+  </section>`;
+}
+
+function renderProgressModule(vm) {
+  return `<section class="adaptive-module progress-module" aria-labelledby="progress-title">
+    <span class="eyebrow">Progress over time</span>
+    <h2 id="progress-title">${escapeHtml(vm.progress.durableLevel)}</h2>
+    <div class="learning-snapshot adaptive-snapshot" aria-label="Learning evidence">
+      <article><span>Chapters checked</span><strong>${vm.progress.chapters}</strong><small>Source-grounded checks</small></article>
+      <article><span>Reviews completed</span><strong>${vm.progress.reviews}</strong><small>Delayed retrievals</small></article>
+      <article><span>Weak spots recovered</span><strong>${vm.progress.recovered}</strong><small>Later strengthened</small></article>
+      <article><span>Practice logged</span><strong>${vm.progress.practiced}</strong><small>Skill exercises</small></article>
+    </div>
+    ${vm.progress.reviews ? renderWhy(`Based on ${vm.progress.reviews} completed delayed reviews.`, confidenceForEvidence(vm.evidenceState)) : renderWhy("No delayed reviews yet; progress is limited to checks and practice.", "preview")}
+  </section>`;
+}
+
+function renderLibraryActivityModule(vm) {
+  const books = vm.activeBooks || [];
+  return `<section class="adaptive-module library-activity-module" aria-labelledby="library-activity-title">
+    <span class="eyebrow">Library activity</span>
+    <h2 id="library-activity-title">${books.length ? "Books creating evidence" : "Your library starts with one chapter."}</h2>
+    ${books.length ? `<div class="active-book-list">${books.map(book => `<article>
+      <strong>${escapeHtml(book.title)}</strong>
+      <small>${escapeHtml(book.author || "Unknown author")} · ${book.completed}${book.total ? ` of ${book.total}` : ""} chapters checked</small>
+      <button class="text-button" type="button" data-book-insights="${escapeHtml(book.key)}">What’s sticking? →</button>
+    </article>`).join("")}</div>` : `<p>Add one chapter with enough source material for feedback. Ember will start building your reading profile from there.</p>`}
+  </section>`;
+}
+
+function renderPersonalizationModule(vm) {
+  if (vm.evidenceState !== "establishing") return "";
+  return `<section class="adaptive-module personalization-module" aria-labelledby="personalization-title">
+    <span class="eyebrow">Personalization setup</span>
+    <h2 id="personalization-title">Optional signals for better guidance.</h2>
+    <div class="setup-prompt-list">
+      <button type="button">I read to remember ideas</button>
+      <button type="button">I want stronger explanations</button>
+      <button type="button">Bring ideas back weekly</button>
+    </div>
+    ${renderWhy("These are local prototype prompts only. They do not change skill assessments yet.", "preview")}
+  </section>`;
+}
+
+function renderFutureWorkModule(vm) {
+  const visible = vm.evidenceState === "established";
+  if (!visible) return "";
+  return `<section class="adaptive-module future-work-module" aria-labelledby="future-work-title">
+    <span class="eyebrow">Future diagnostics</span>
+    <h2 id="future-work-title">What Ember will avoid overstating.</h2>
+    <ul>${vm.unsupportedDiagnostics.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+  </section>`;
+}
+
+function buildHomeModules(vm) {
+  return [
+    homeModule("primary-next-action", 10, true, confidenceForEvidence(vm.evidenceState), vm.nextAction?.why, renderPrimaryNextActionModule(vm)),
+    homeModule("reader-diagnostic", 20, true, vm.diagnostic?.confidence, vm.diagnostic?.basis, renderDiagnosticModule(vm)),
+    homeModule("memory-resurfacing", vm.evidenceState === "establishing" ? 50 : 30, true, confidenceForEvidence(vm.evidenceState), vm.memoryCandidates[0]?.reason, renderMemoryModule(vm)),
+    homeModule("skill-development", 40, true, confidenceForEvidence(vm.evidenceState), vm.skillSignals[0]?.basis, renderSkillModule(vm)),
+    homeModule("progress-over-time", 60, true, confidenceForEvidence(vm.evidenceState), `${vm.progress.reviews} delayed reviews`, renderProgressModule(vm)),
+    homeModule("library-activity", 70, true, confidenceForEvidence(vm.evidenceState), `${vm.activeBooks.length} active books`, renderLibraryActivityModule(vm)),
+    homeModule("personalization-setup", 35, vm.evidenceState === "establishing", "preview", "Optional setup while evidence is sparse.", renderPersonalizationModule(vm)),
+    homeModule("future-work", 80, vm.evidenceState === "established", "preview", "Unsupported diagnostics are marked as future work.", renderFutureWorkModule(vm))
+  ].filter(module => module.visible && module.html).sort((a, b) => a.priority - b.priority);
+}
+
+function renderHomeFixtureSwitcher(activeState) {
+  if (!isHomeFixtureEnabled()) return "";
+  return `<div class="home-fixture-switcher" aria-label="Development home state switcher">
+    <span>Preview state</span>
+    ${["", "establishing", "emerging", "established"].map(value => `<button type="button" data-action="home-fixture" data-fixture-state="${value}" class="${activeState === value ? "is-active" : ""}">${value || "Live"}</button>`).join("")}
+  </div>`;
+}
+
+function renderAdaptiveLoggedInHome(vm) {
+  const modules = buildHomeModules(vm);
+  $("#returning-home").innerHTML = `
+    ${renderHomeFixtureSwitcher(state.homeFixture)}
+    <div class="adaptive-home" data-evidence-state="${escapeHtml(vm.evidenceState)}">
+      <header class="adaptive-home-header">
+        <span class="eyebrow">${escapeHtml(vm.evidenceState)} evidence</span>
+        <h1><span data-local-greeting>${escapeHtml(localGreeting())}</span><br><em>${escapeHtml(activeLoggedInPrompt())}</em></h1>
+        <p>${vm.evidenceState === "establishing"
+          ? "Find out what stayed with you—and strengthen what didn’t."
+          : "Your homepage is organized around the highest-value next step, the strongest available evidence, and the ideas worth bringing back."}</p>
+      </header>
+      <div class="adaptive-module-stack">
+        ${modules.map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`).join("")}
+      </div>
+    </div>`;
+}
+
 function renderDashboard() {
   $$("[data-local-greeting]").forEach(element => {
     element.textContent = localGreeting();
@@ -3366,9 +3857,12 @@ function renderDashboard() {
   const scheduled = chapters.filter(reviewIsScheduled).sort((a, b) => new Date(a.reviewDue) - new Date(b.reviewDue));
   const due = scheduled.filter(reviewIsDue);
   const reviewSummary = reviewQueueSummary(due, scheduled);
-  const hasChapters = isLoggedIn() && entries.length > 0;
-  $("#onboarding-home").hidden = hasChapters;
-  $("#returning-home").hidden = !hasChapters;
+  const loggedIn = isLoggedIn();
+  const hasChapters = loggedIn && entries.length > 0;
+  $("#onboarding-home").hidden = loggedIn;
+  $("#returning-home").hidden = !loggedIn;
+  const dashboardGrid = $(".dashboard-grid");
+  if (dashboardGrid) dashboardGrid.hidden = loggedIn;
   $("#review-count").textContent = scheduled.length;
   $("#review-count").classList.toggle("is-due", due.length > 0);
   $("#review-count").classList.toggle("has-scheduled", scheduled.length > 0 && !due.length);
@@ -3379,6 +3873,17 @@ function renderDashboard() {
     reviewsNav.setAttribute("aria-label", `Reviews. ${reviewSummary}`);
   }
   renderLibrary(entries);
+  $("#all-reviews").innerHTML = scheduled.length
+    ? renderReviewQueue(scheduled)
+    : '<div class="empty-state"><strong>Your review queue is clear</strong>New checks return here when FSRS schedules them.</div>';
+  if (loggedIn) {
+    const homeViewModel = state.homeFixture
+      ? fixtureHomeViewModel(state.homeFixture)
+      : buildHomeViewModel({ entries, chapters, drafts, scheduled, due });
+    renderAdaptiveLoggedInHome(homeViewModel);
+    renderPracticeProgress();
+    return;
+  }
 
   if (hasChapters) {
     const completedReviews = chapters.reduce((total, chapter) => total + (chapter.delayedAttempts?.length || 0), 0);
@@ -4488,6 +4993,19 @@ document.addEventListener("click", async event => {
     setIntakeStep(2, { focus: false });
   }
   if (action === "start-landing-check") startNew();
+  if (action === "home-start-new-book") startNew({ bookPath: "new" });
+  if (action === "home-start-next-chapter") {
+    const button = event.target.closest("[data-book-title]");
+    startNew({
+      bookPath: "existing",
+      bookTitle: button?.dataset.bookTitle || "",
+      authorName: button?.dataset.authorName || ""
+    });
+  }
+  if (action === "home-fixture") {
+    state.homeFixture = event.target.closest("[data-fixture-state]")?.dataset.fixtureState || "";
+    renderDashboard();
+  }
   if (action === "remove-pdf") removePdf();
   if (action === "reveal-source") {
     showSource(getValues().sourceText, getValues().chapterTitle);
