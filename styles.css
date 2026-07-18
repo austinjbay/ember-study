@@ -161,13 +161,12 @@ body.logged-out .marketing-nav { display: flex; }
 .mobile-logo-menu-head strong, .mobile-logo-menu-head small, .mobile-logo-signed-out strong, .mobile-logo-signed-out small { display: block; }
 .mobile-logo-menu-head strong, .mobile-logo-signed-out strong { font-family: var(--serif); font-size: .9rem; }
 .mobile-logo-menu-head small, .mobile-logo-signed-out small { margin-top: 2px; color: var(--muted); font-size: .64rem; line-height: 1.35; }
-.mobile-logo-menu > button, .mobile-logo-auth-actions button { display: block; width: 100%; min-height: 38px; border: 0; border-radius: 5px; background: transparent; color: var(--ink); padding: 0 9px; font-size: .75rem; font-weight: 750; text-align: left; }
+.mobile-logo-menu > button, .mobile-logo-auth-actions button { display: block; width: 100%; min-height: 36px; border: 0; border-radius: 4px; background: transparent; color: var(--ink); padding: 0 9px; font-size: .73rem; font-weight: 750; text-align: left; }
 .mobile-logo-menu > button:hover, .mobile-logo-auth-actions button:hover { background: var(--paper); }
 .mobile-logo-signed-out { display: none; margin-top: 7px; border-top: 1px solid var(--line); border-bottom: 0; margin-bottom: 0; padding-top: 12px; }
 .mobile-logo-signed-out .signed-out-mark { width: 34px; height: 34px; }
 .mobile-logo-signed-out .signed-out-mark svg { width: 22px; height: 22px; }
-.mobile-logo-auth-actions { display: none; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 7px; }
-.mobile-logo-auth-actions button:last-child { background: var(--ink); color: var(--white); text-align: center; }
+.mobile-logo-auth-actions { display: none; gap: 0; margin-top: 7px; border-top: 1px solid var(--line); padding-top: 5px; }
 .marketing-mobile-menu { display: none; position: relative; margin-right: auto; }
 .marketing-mobile-menu summary { cursor: pointer; list-style: none; color: var(--muted); padding: 7px 9px; font-size: .7rem; font-weight: 750; }
 .marketing-mobile-menu summary::-webkit-details-marker { display: none; }
@@ -1935,7 +1934,7 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .mobile-top-logo { display: flex; }
   .mobile-top-logo span:not(.brand-mark) { display: none; }
   body.logged-out .mobile-logo-signed-out { display: grid; }
-  body.logged-out .mobile-logo-auth-actions { display: grid; }
+  body.logged-out .mobile-logo-auth-actions { display: block; }
   body.logged-out main { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
   body.logged-out .marketing-bottom-nav {
     position: fixed;
