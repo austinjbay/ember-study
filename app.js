@@ -3731,7 +3731,10 @@ function renderHomeInteractionPrototype(vm) {
             <div><dt>Evidence</dt><dd>${supportingChecks} checks</dd></div>
           </dl>
         </div>
-        <button class="primary" type="button" data-nav="practice">Open practice <span>→</span></button>
+        <details class="prototype-action-preview">
+          <summary>Preview the prompt</summary>
+          <p>Explain one relationship the chapter relies on: what does the supporting idea prove, complicate, or make possible?</p>
+        </details>
       </section>
 
       <section class="prototype-memory-card" aria-labelledby="prototype-memory-title">

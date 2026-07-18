@@ -527,6 +527,9 @@ body.logged-out .landing-footer { display: flex; }
 .prototype-next-object dl { display: flex; flex-wrap: wrap; gap: 12px 20px; margin: 16px 0 0; }
 .prototype-next-object dt { color: var(--faint); font-size: .62rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .prototype-next-object dd { margin: 2px 0 0; color: var(--ink); font-size: .78rem; font-weight: 800; }
+.prototype-action-preview { justify-self: end; min-width: 172px; border-left: 1px solid var(--line-dark); padding-left: 18px; }
+.prototype-action-preview summary { color: var(--ink); cursor: pointer; font-size: .76rem; font-weight: 850; }
+.prototype-action-preview p { margin-top: 10px; max-width: 220px; }
 .book-spine-object { display: flex; align-items: end; justify-content: center; padding: 12px 6px; border-right: 1px solid var(--line-dark); background: color-mix(in srgb, var(--green), var(--paper) 72%); }
 .book-spine-object span { writing-mode: vertical-rl; transform: rotate(180deg); color: var(--paper); font-family: var(--serif); font-size: .84rem; letter-spacing: .03em; }
 .memory-card-face { display: grid; gap: 14px; padding: 20px; }
@@ -2187,7 +2190,8 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .prototype-diagnostic-lens,
   .prototype-progress-trail { grid-column: 1; }
   .prototype-next-object { align-items: start; }
-  .prototype-next-object .primary { width: 100%; }
+  .prototype-action-preview { justify-self: stretch; min-width: 0; border-left: 0; border-top: 1px solid var(--line-dark); padding: 14px 0 0; }
+  .prototype-action-preview p { max-width: none; }
   .book-spine-object { min-height: 54px; align-items: center; border-right: 0; border-bottom: 1px solid var(--line-dark); }
   .book-spine-object span { writing-mode: horizontal-tb; transform: none; }
   .skill-map-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
