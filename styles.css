@@ -276,6 +276,29 @@ h1, h2, h3, p { overflow-wrap: break-word; }
 .primary.large { margin-top: 30px; min-height: 51px; padding: 0 21px; }
 .secondary { border: 1px solid var(--line-dark); background: transparent; color: var(--ink); }
 .secondary:hover { background: rgba(255,255,255,.7); }
+.primary,
+.secondary,
+.google-auth-button {
+  transform-origin: center;
+  transition: background .18s ease, border-color .18s ease, box-shadow .22s cubic-bezier(.2, .8, .2, 1), color .18s ease, transform .22s cubic-bezier(.2, .8, .2, 1);
+}
+.primary:hover,
+.secondary:hover,
+.google-auth-button:hover {
+  box-shadow: 0 8px 18px rgba(47,49,45,.12);
+  transform: translateY(-2px);
+}
+.primary:active,
+.secondary:active,
+.google-auth-button:active {
+  box-shadow: 0 4px 10px rgba(47,49,45,.1);
+  transform: translateY(0);
+}
+.primary:focus-visible,
+.secondary:focus-visible,
+.google-auth-button:focus-visible {
+  transform: none;
+}
 .loop-card { position: relative; border: 1px solid var(--line-dark); background: rgba(255,254,250,.64); padding: 25px 28px 18px; box-shadow: 14px 14px 0 #e4dfd4; }
 .loop-card::before { content: ""; position: absolute; inset: 8px -8px -8px 8px; z-index: -1; border: 1px solid var(--line); }
 .loop-label { display: block; border-bottom: 1px solid var(--line); padding-bottom: 14px; color: var(--muted); font-size: .66rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
@@ -1621,6 +1644,19 @@ body.sidebar-collapsed .brand:hover .brand-mark {
   color: var(--paper);
 }
 @media (prefers-reduced-motion: reduce) {
+  .primary,
+  .secondary,
+  .google-auth-button {
+    transition: background .01ms linear, border-color .01ms linear, box-shadow .01ms linear, color .01ms linear;
+  }
+  .primary:hover,
+  .secondary:hover,
+  .google-auth-button:hover,
+  .primary:active,
+  .secondary:active,
+  .google-auth-button:active {
+    transform: none;
+  }
   body.sidebar-collapsed .brand-mark,
   body.sidebar-collapsed .new-check-icon,
   body.sidebar-collapsed .nav-item .notification-icon svg,
