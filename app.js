@@ -3657,7 +3657,7 @@ function buildAdaptiveNextAction({ evidenceState, entries, chapters, drafts, due
       label: "Draft waiting",
       marker: "✎",
       title: `Resume ${draft.chapterTitle}`,
-      copy: "You already started this chapter check. Finish it before starting a new thread.",
+      copy: "You already started this chapter. Finish writing your review before moving on to the next one.",
       text: "Resume draft",
       why: "Recommended because unfinished recall is the closest incomplete learning activity.",
       attrs: `data-chapter-id="${escapeHtml(draft.id)}"`
@@ -4533,7 +4533,7 @@ function renderDashboard() {
         label: "Draft waiting",
         marker: "✎",
         title: `Resume ${latest.chapterTitle}`,
-        copy: "You already started this chapter check. Finish it before starting a new thread.",
+        copy: "You already started this chapter. Finish writing your review before moving on to the next one.",
         text: "Resume draft",
         action: () => openChapter(latest.id)
       };
