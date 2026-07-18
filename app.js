@@ -1530,11 +1530,9 @@ function setSidebarChatMessages(userMessage = "", assistantMessage = "", { loadi
   if (!log) return;
   $("#ember-companion-panel")?.classList.add("has-response");
   log.innerHTML = `<div class="ember-chat-message is-user">
-    <span>You</span>
     <p>${escapeHtml(userMessage)}</p>
   </div>
   <div class="ember-chat-message is-assistant">
-    <span>Response</span>
     <p>${escapeHtml(assistantMessage || (loading ? "Thinking..." : ""))}</p>
   </div>`;
 }
