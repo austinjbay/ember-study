@@ -4653,6 +4653,7 @@ function renderAdaptiveLoggedInHome(vm) {
   const moduleById = new Map(modules.map(module => [module.id, module.html]));
   const zone = id => moduleById.get(id) ? `<div class="home-module-shell" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const topZone = id => moduleById.get(id) ? `<div class="home-top-module" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
+  const hasLibraryActivity = moduleById.has("library-activity");
   const supportModules = modules
     .filter(module => !["primary-next-action", "skill-development", "progress-over-time", "library-carousel", "memory-resurfacing", "today-practice", "reader-diagnostic"].includes(module.id))
     .map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`)
@@ -4666,13 +4667,16 @@ function renderAdaptiveLoggedInHome(vm) {
       ${topZone("progress-over-time")}
       ${topZone("library-carousel")}
       ${renderHomeInteractionPrototype(vm)}
-      <div class="reading-world-layout" aria-label="Logged-in reading home">
+      <div class="reading-world-layout${hasLibraryActivity ? " has-library-activity" : ""}" aria-label="Logged-in reading home">
         <section class="reading-world-zone memory-zone" aria-label="Memory recovery">
           ${zone("memory-resurfacing")}
         </section>
         <section class="reading-world-zone practice-zone" aria-label="Today’s practice">
           ${zone("today-practice")}
         </section>
+        ${hasLibraryActivity ? `<section class="reading-world-zone library-zone" aria-label="Library activity">
+          ${zone("library-activity")}
+        </section>` : ""}
         <section class="reading-world-zone diagnostic-zone" aria-label="Reading profile">
           ${zone("reader-diagnostic")}
         </section>

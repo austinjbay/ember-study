@@ -577,6 +577,8 @@ body.logged-out .landing-footer { display: flex; }
 .memory-zone,
 .practice-zone,
 .library-zone { grid-column: span 4; }
+.reading-world-layout:not(.has-library-activity) .memory-zone,
+.reading-world-layout:not(.has-library-activity) .practice-zone { grid-column: span 6; }
 .diagnostic-zone { grid-column: 1 / -1; }
 .journey-zone,
 .support-zone { grid-column: 1 / -1; }
