@@ -3818,6 +3818,13 @@ function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
     libraryBooks,
     activeBooks: books.slice(0, 3),
     practiceState,
+    todayState: {
+      due: due.length,
+      scheduled: scheduled.length,
+      drafts: drafts.length,
+      skillTitle: practiceState?.skill?.title || skillSignals[0]?.title || "Find the central claim",
+      practiceDone: Boolean(practiceState?.completedToday)
+    },
     unsupportedDiagnostics: unsupportedHomeDiagnostics
   };
 }
@@ -4298,12 +4305,32 @@ function renderHomeFixtureSwitcher(activeState) {
   </div>`;
 }
 
+function renderAdaptiveHomeStateHeader(vm) {
+  const today = vm.todayState || {};
+  const reviewLabel = today.due
+    ? `${today.due} review${today.due === 1 ? "" : "s"} due`
+    : today.scheduled
+      ? `${today.scheduled} scheduled`
+      : "No reviews due";
+  const draftLabel = today.drafts
+    ? `${today.drafts} draft${today.drafts === 1 ? "" : "s"} waiting`
+    : "No drafts waiting";
+  const practiceLabel = today.practiceDone ? "Practice done" : `Skill: ${today.skillTitle || "Find the central claim"}`;
+  return `<header class="adaptive-home-state" aria-label="Today in Ember">
+    <h1>Today in Ember</h1>
+    <div class="adaptive-home-state-list" aria-label="Current reading state">
+      <span>${escapeHtml(reviewLabel)}</span>
+      <span>${escapeHtml(draftLabel)}</span>
+      <span>${escapeHtml(practiceLabel)}</span>
+    </div>
+  </header>`;
+}
+
 function renderAdaptiveLoggedInHome(vm) {
   const modules = buildHomeModules(vm);
   const moduleById = new Map(modules.map(module => [module.id, module.html]));
   const zone = id => moduleById.get(id) ? `<div class="home-module-shell" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const topZone = id => moduleById.get(id) ? `<div class="home-top-module" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
-  const homePrompt = activeLoggedInPrompt();
   const supportModules = modules
     .filter(module => !["library-carousel", "skill-development", "primary-next-action", "reader-diagnostic", "library-activity", "memory-resurfacing", "today-practice", "progress-over-time"].includes(module.id))
     .map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`)
@@ -4311,9 +4338,7 @@ function renderAdaptiveLoggedInHome(vm) {
   $("#returning-home").innerHTML = `
     ${renderHomeFixtureSwitcher(state.homeFixture)}
     <div class="adaptive-home" data-evidence-state="${escapeHtml(vm.evidenceState)}">
-      <header class="adaptive-home-header">
-        <h1 data-home-greeting-question data-home-question="${escapeHtml(homePrompt)}">${escapeHtml(formatGreetingQuestion(localGreeting(), homePrompt))}</h1>
-      </header>
+      ${renderAdaptiveHomeStateHeader(vm)}
       ${topZone("library-carousel")}
       ${topZone("progress-over-time")}
       ${renderHomeInteractionPrototype(vm)}
