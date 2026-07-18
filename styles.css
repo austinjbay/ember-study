@@ -2610,6 +2610,24 @@ select:focus-visible,
   color: var(--ink);
 }
 
+.profile-menu > button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+  text-align: left;
+  transform: none;
+}
+
+.profile-menu > button:hover {
+  background: var(--paper);
+}
+
+.profile-menu > .logout-button {
+  color: var(--red);
+}
+
 .chapter-link:hover {
   border-left-color: transparent;
   background: var(--control-hover);
