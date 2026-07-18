@@ -3965,7 +3965,7 @@ function renderPrimaryNextActionModule(vm) {
       <p>${escapeHtml(action.copy)}</p>
       ${renderWhy(action.why, confidenceCopy(confidenceForEvidence(vm.evidenceState)))}
     </div>
-    <button class="primary" type="button" ${action.attrs}>${escapeHtml(action.text)} <span>→</span></button>
+    <button class="primary" type="button" ${action.attrs}>${escapeHtml(action.text)}</button>
   </section>`;
 }
 
@@ -3995,7 +3995,7 @@ function renderMemoryModule(vm) {
         <summary>Show saved context</summary>
         <p>${escapeHtml(candidate.preview || "This is a fixture preview. Real saved context appears after a completed chapter check.")}</p>
       </details>
-      ${candidate.chapterId ? `<button class="text-button" type="button" data-chapter-id="${escapeHtml(candidate.chapterId)}">Open chapter →</button>` : ""}
+      ${candidate.chapterId ? `<button class="text-button" type="button" data-chapter-id="${escapeHtml(candidate.chapterId)}">Open chapter</button>` : ""}
     </div>
     ${renderWhy(candidate.reason, confidenceCopy(confidenceForEvidence(vm.evidenceState)))}
   </section>`;
@@ -4065,7 +4065,7 @@ function renderSkillModule(vm) {
         <small>${escapeHtml(skill.status)}${skill.days ? ` · ${skill.days}/3` : ""}</small>
       </button>`).join("")}
     </div>
-    <button class="text-button" type="button" data-nav="practice">Open daily practice →</button>
+    <button class="text-button" type="button" data-nav="practice">Open daily practice</button>
   </section>`;
 }
 
@@ -4120,7 +4120,7 @@ function renderLibraryActivityModule(vm) {
     ${books.length ? `<div class="active-book-list">${books.map(book => `<article>
       <strong>${escapeHtml(book.title)}</strong>
       <small>${escapeHtml(book.author || "Unknown author")} · ${book.completed}${book.total ? ` of ${book.total}` : ""} chapters checked</small>
-      <button class="text-button" type="button" data-book-insights="${escapeHtml(book.key)}">What’s sticking? →</button>
+      <button class="text-button" type="button" data-book-insights="${escapeHtml(book.key)}">What’s sticking?</button>
     </article>`).join("")}</div>` : `<p>Add one chapter with enough source material for feedback. Ember will start building your reading profile from there.</p>`}
   </section>`;
 }
@@ -4142,7 +4142,7 @@ function renderTodayPracticeModule(vm) {
       <span><i style="width: ${practice.progressPercent}%"></i></span>
       <small>${practice.successfulDays} of 3 successful days</small>
     </div>
-    <button class="text-button" type="button" data-nav="practice">${complete ? "View practice" : "Start practice"} →</button>
+    <button class="text-button" type="button" data-nav="practice">${complete ? "View practice" : "Start practice"}</button>
   </section>`;
 }
 

@@ -510,7 +510,7 @@ body.logged-out .landing-footer { display: flex; }
 .library-carousel-card p { margin-top: 16px; color: var(--muted); font-size: .74rem; line-height: 1.35; }
 .library-carousel-card i { display: block; height: 4px; margin-top: auto; overflow: hidden; border-radius: 999px; background: var(--line); }
 .library-carousel-card b { display: block; height: 100%; border-radius: inherit; background: var(--green); }
-.library-card-action { justify-self: start; min-height: 34px; margin-top: 15px; border: 1px solid var(--line-dark); border-radius: 6px; background: var(--ink); color: var(--white); padding: 0 14px; font-size: .68rem; font-weight: 850; }
+.library-card-action { min-height: 34px; margin-top: 15px; border: 1px solid var(--line-dark); border-radius: 6px; background: var(--ink); color: var(--white); padding: 0 14px; font-size: .68rem; font-weight: 850; }
 .library-card-action:hover { background: #343730; }
 .library-carousel-empty { display: grid; gap: 6px; width: min(360px, 100%); border: 1px dashed var(--line-dark); border-radius: 8px; background: transparent; color: var(--ink); padding: 18px; text-align: left; }
 .library-carousel-empty strong { font-family: var(--serif); font-size: 1.1rem; }
@@ -567,6 +567,17 @@ body.logged-out .landing-footer { display: flex; }
 .adaptive-home .memory-reveal details {
   border-top: 0;
   padding-top: 0;
+}
+.adaptive-home .primary,
+.adaptive-home .text-button,
+.adaptive-home .library-card-action {
+  justify-self: end;
+  margin-left: auto;
+  text-align: center;
+}
+.adaptive-home .next-action-card .primary,
+.mission-zone .next-action-card .primary {
+  width: auto;
 }
 .diagnostic-module { display: grid; grid-template-columns: minmax(0, .9fr); border-top: 0; background: color-mix(in srgb, var(--white), var(--paper) 34%); padding: clamp(24px, 4vw, 38px); box-shadow: 12px 12px 0 rgba(47,49,45,.07); }
 .diagnostic-module h2 { font-size: clamp(1.9rem, 3.4vw, 3.2rem); }
@@ -2416,6 +2427,7 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .next-action-card::after { display: none; }
   .next-action-marker { position: static; color: rgba(255,255,255,.28); font-size: 2.4rem; order: -1; }
   .next-action-card .primary { width: 100%; }
+  .adaptive-home .next-action-card .primary { justify-self: end; width: auto; }
   .continue-card { grid-template-columns: 1fr; align-items: stretch; }
   .continue-actions { align-items: stretch; flex-direction: column; }
   .continue-actions button { width: 100%; }
