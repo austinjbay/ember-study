@@ -60,7 +60,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .side-nav { display: grid; gap: 3px; margin: 22px 0; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
 .nav-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 39px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); padding: 0 10px; font-size: .85rem; text-align: left; transition: color .22s cubic-bezier(.2, .8, .2, 1); }
 .nav-item:hover { background: transparent; color: var(--ink); }
-.nav-item.is-active { background: rgba(255,255,255,.58); color: var(--ink); }
+.nav-item.is-active { background: transparent; color: var(--ink); }
 .nav-item.is-active { font-weight: 700; }
 .nav-item-content { display: inline-grid; grid-template-columns: 22px auto; align-items: center; gap: 8px; justify-self: start; min-width: 0; transform-origin: left center; transition: color .22s cubic-bezier(.2, .8, .2, 1), filter .22s cubic-bezier(.2, .8, .2, 1), transform .22s cubic-bezier(.2, .8, .2, 1); will-change: transform, filter; }
 .notification-icon, .home-icon, .practice-icon { display: grid; place-items: center; }
@@ -572,7 +572,6 @@ body.logged-out .landing-footer { display: flex; }
 :root[data-color-mode="dark"] select { background: var(--white); color: var(--ink); }
 :root[data-color-mode="dark"] .icon-button:hover,
 :root[data-color-mode="dark"] .new-check,
-:root[data-color-mode="dark"] .nav-item.is-active,
 :root[data-color-mode="dark"] .insights-stats article,
 :root[data-color-mode="dark"] .insights-panel,
 :root[data-color-mode="dark"] .chapter-signals,
