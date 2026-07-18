@@ -3656,7 +3656,7 @@ function buildAdaptiveNextAction({ evidenceState, entries, chapters, drafts, due
       kind: "draft",
       label: "Draft waiting",
       marker: "✎",
-      title: `Resume ${draft.chapterTitle}.`,
+      title: `Resume ${draft.chapterTitle}`,
       copy: "You already started this chapter check. Finish it before starting a new thread.",
       text: "Resume draft",
       why: "Recommended because unfinished recall is the closest incomplete learning activity.",
@@ -4531,7 +4531,7 @@ function renderDashboard() {
       nextAction = {
         label: "Draft waiting",
         marker: "✎",
-        title: `Resume ${latest.chapterTitle}.`,
+        title: `Resume ${latest.chapterTitle}`,
         copy: "You already started this chapter check. Finish it before starting a new thread.",
         text: "Resume draft",
         action: () => openChapter(latest.id)
