@@ -1584,6 +1584,12 @@ dialog::backdrop { background: rgba(32,34,31,.36); backdrop-filter: blur(3px); }
 .dialog-head h2 { margin: 4px 0 0; font-family: var(--serif); font-size: 1.2rem; }
 .dialog-source { padding: 24px; color: #454741; font-family: var(--serif); font-size: .96rem; line-height: 1.75; white-space: pre-wrap; }
 .gap-info-dialog { width: min(620px, calc(100% - 32px)); }
+.confirm-dialog { width: min(520px, calc(100% - 32px)); }
+.confirm-dialog-body { display: grid; gap: 24px; padding: 24px; }
+.confirm-dialog-body p { margin: 0; color: var(--muted); font-size: .95rem; line-height: 1.6; }
+.confirm-dialog-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.danger-button { min-height: 42px; border: 1px solid var(--red); border-radius: 6px; background: var(--red); color: var(--white); padding: 0 18px; font-size: .78rem; font-weight: 850; }
+.danger-button:hover { background: #704035; border-color: #704035; }
 .auth-dialog { width: min(470px, calc(100% - 32px)); }
 .auth-dialog-body { padding: 25px; }
 .auth-dialog-body > p:first-child { margin: 0 0 22px; color: var(--muted); font-family: var(--serif); line-height: 1.6; }
@@ -1641,6 +1647,7 @@ dialog::backdrop { background: rgba(32,34,31,.36); backdrop-filter: blur(3px); }
 .preview-reading-card button,
 .account-control .secondary,
 .google-auth-button,
+.danger-button,
 .auth-switch {
   font-size: .9rem;
 }
@@ -2841,6 +2848,7 @@ select:focus-visible,
 .primary,
 .secondary,
 .google-auth-button,
+.danger-button,
 .reschedule-options button,
 .preview-reading-card button,
 .account-control .secondary {
@@ -2855,6 +2863,7 @@ select:focus-visible,
 .primary:hover,
 .secondary:hover,
 .google-auth-button:hover,
+.danger-button:hover,
 .preview-reading-card button:hover,
 .account-control .secondary:hover {
   box-shadow: none;

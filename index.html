@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700;8..60,800&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f312d'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia,serif' font-size='34' font-style='italic' fill='%23fffdf7'%3EE%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="styles.css?v=20260718-delete-drafts">
+    <link rel="stylesheet" href="styles.css?v=20260718-delete-draft-modal">
   </head>
   <body>
     <a class="skip-link" href="#app">Skip to main content</a>
@@ -1318,6 +1318,19 @@
       <div class="dialog-head"><div><span class="eyebrow">Source material</span><h2 id="dialog-title">Chapter source</h2></div><button class="icon-button" type="button" data-action="close-dialog" aria-label="Close">×</button></div>
       <div class="dialog-source" id="dialog-source"></div>
     </dialog>
+    <dialog id="delete-draft-dialog" class="confirm-dialog" aria-labelledby="delete-draft-title" aria-describedby="delete-draft-copy">
+      <div class="dialog-head">
+        <div><span class="eyebrow">Draft in progress</span><h2 id="delete-draft-title">Delete this draft?</h2></div>
+        <button class="icon-button" type="button" data-action="close-delete-draft" aria-label="Close">×</button>
+      </div>
+      <div class="confirm-dialog-body">
+        <p id="delete-draft-copy">This draft will be removed from your library. You can start the chapter again later.</p>
+        <div class="confirm-dialog-actions">
+          <button class="secondary" type="button" data-action="close-delete-draft">Cancel</button>
+          <button class="danger-button" id="confirm-delete-draft" type="button">Delete draft</button>
+        </div>
+      </div>
+    </dialog>
     <dialog id="gap-info-dialog" class="gap-info-dialog" aria-labelledby="gap-info-title">
       <div class="dialog-head">
         <div><span class="eyebrow">Learning snapshot</span><h2 id="gap-info-title">What “Common gap” means</h2></div>
@@ -1412,6 +1425,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="vendor/ts-fsrs/dist/index.umd.js"></script>
     <script src="supabase-config.js"></script>
-    <script src="app.js?v=20260718-delete-drafts"></script>
+    <script src="app.js?v=20260718-delete-draft-modal"></script>
   </body>
 </html>
