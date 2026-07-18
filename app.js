@@ -1286,6 +1286,7 @@ function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
   $$("[data-marketing-nav]").forEach(item => item.classList.toggle("is-active", item.dataset.marketingNav === name));
   document.body.classList.remove("mobile-nav-open");
   $("#marketing-mobile-menu")?.removeAttribute("open");
+  closeMobileLogoMenu();
   closeProfileMenu();
   if (updateUrl && (MARKETING_ROUTES[name] || name === "home")) syncUrlForView(name, replaceUrl ? "replace" : "push");
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1320,6 +1321,16 @@ function closeProfileMenu({ returnFocus = false } = {}) {
     if (returnFocus && wasOpen && !focusTarget) focusTarget = button;
   });
   focusTarget?.focus();
+}
+
+function closeMobileLogoMenu({ returnFocus = false } = {}) {
+  const menu = $("#mobile-logo-menu");
+  const button = $("#mobile-logo-button");
+  if (!menu || !button) return;
+  const wasOpen = !menu.hidden;
+  menu.hidden = true;
+  button.setAttribute("aria-expanded", "false");
+  if (returnFocus && wasOpen) button.focus();
 }
 
 function resetAnalysisTransition() {
@@ -4654,8 +4665,30 @@ $("#focus-book-select")?.addEventListener("change", event => {
 });
 $("#new-check").addEventListener("click", () => startNew());
 $("#mobile-new-check")?.addEventListener("click", () => startNew());
+$("#mobile-logo-button")?.addEventListener("click", event => {
+  event.stopPropagation();
+  closeProfileMenu();
+  const menu = $("#mobile-logo-menu");
+  menu.hidden = !menu.hidden;
+  $("#mobile-logo-button").setAttribute("aria-expanded", String(!menu.hidden));
+});
+$("#mobile-logo-menu")?.addEventListener("click", event => {
+  event.stopPropagation();
+  const authAction = event.target.closest("[data-auth-action]")?.dataset.authAction;
+  if (authAction) {
+    closeMobileLogoMenu();
+    openAuthDialog(authAction);
+    return;
+  }
+  const nav = event.target.closest("[data-nav]");
+  if (nav) {
+    closeMobileLogoMenu();
+    setView(nav.dataset.nav);
+  }
+});
 $("#profile-button").addEventListener("click", event => {
   event.stopPropagation();
+  closeMobileLogoMenu();
   const menu = $("#profile-menu");
   $("#mobile-profile-menu").hidden = true;
   $("#mobile-profile-button")?.setAttribute("aria-expanded", "false");
@@ -4664,6 +4697,7 @@ $("#profile-button").addEventListener("click", event => {
 });
 $("#mobile-profile-button")?.addEventListener("click", event => {
   event.stopPropagation();
+  closeMobileLogoMenu();
   const menu = $("#mobile-profile-menu");
   $("#profile-menu").hidden = true;
   $("#profile-button")?.setAttribute("aria-expanded", "false");
@@ -4768,10 +4802,12 @@ $("#refresh-generated-feedback")?.addEventListener("click", async () => {
 });
 $("#save-entry-draft")?.addEventListener("click", saveEntryDraft);
 document.addEventListener("click", () => {
+  closeMobileLogoMenu();
   closeProfileMenu();
 });
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
+    closeMobileLogoMenu({ returnFocus: true });
     closeProfileMenu({ returnFocus: true });
   }
 });
