@@ -1525,6 +1525,20 @@ function setSidebarGuideStatus(title, body = "") {
   log.innerHTML = `<strong>${escapeHtml(title)}</strong>${body ? `<p>${escapeHtml(body)}</p>` : ""}`;
 }
 
+function setSidebarChatMessages(userMessage = "", assistantMessage = "", { loading = false } = {}) {
+  const log = $("#sidebar-guide-log");
+  if (!log) return;
+  $("#ember-companion-panel")?.classList.add("has-response");
+  log.innerHTML = `<div class="ember-chat-message is-user">
+    <span>You</span>
+    <p>${escapeHtml(userMessage)}</p>
+  </div>
+  <div class="ember-chat-message is-assistant">
+    <span>Response</span>
+    <p>${escapeHtml(assistantMessage || (loading ? "Thinking..." : ""))}</p>
+  </div>`;
+}
+
 function buildEmberChatContext() {
   const entries = ensureUpNextChapterDrafts(migrateReviewsToFsrs(loadChapters()));
   const chapters = entries.filter(chapter => chapter.status !== "Draft");
@@ -6007,13 +6021,13 @@ $("#sidebar-guide-form")?.addEventListener("submit", async event => {
   }
   input.disabled = true;
   if (button) button.disabled = true;
-  setSidebarGuideStatus("Thinking...", "Looking across your reading state.");
+  setSidebarChatMessages(text, "Looking across your reading state.", { loading: true });
   try {
     const answer = await withTimeout(askEmber(text), 30000, "Ember took too long to respond. Try again in a moment.");
-    setSidebarGuideStatus("Ember", answer);
+    setSidebarChatMessages(text, answer);
     input.value = "";
   } catch (error) {
-    setSidebarGuideStatus("Ember is not connected yet", error instanceof Error ? error.message : "Unable to ask Ember.");
+    setSidebarChatMessages(text, error instanceof Error ? error.message : "Unable to ask Ember.");
   } finally {
     input.disabled = false;
     if (button) button.disabled = false;
