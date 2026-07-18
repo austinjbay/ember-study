@@ -487,7 +487,7 @@ body.logged-out .landing-footer { display: flex; }
 .dashboard-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 26px 42px; align-items: start; width: min(1140px, 100%); margin: 0 auto; animation: homeRise .38s ease .12s both; }
 .dashboard-grid[hidden] { display: none; }
 .adaptive-home { display: grid; gap: 34px; animation: homeRise .38s ease .08s both; }
-.adaptive-home-header { max-width: 860px; border-bottom: 1px solid var(--line-dark); padding-bottom: 28px; }
+.adaptive-home-header { max-width: 860px; padding-bottom: 0; }
 .adaptive-home-header h1 { margin: 12px 0 14px; font-family: var(--serif); font-size: clamp(2.45rem, 5vw, 5rem); font-weight: 500; letter-spacing: -.045em; line-height: .98; }
 .adaptive-home-header h1 em { color: var(--green); font-weight: 400; }
 .adaptive-home-header p { max-width: 680px; margin: 0; color: var(--muted); font-family: var(--serif); font-size: 1.05rem; line-height: 1.6; }
@@ -548,6 +548,24 @@ body.logged-out .landing-footer { display: flex; }
 .adaptive-module { border-top: 1px solid var(--line-dark); padding-top: 18px; }
 .adaptive-module h2 { margin: 8px 0 11px; font-family: var(--serif); font-size: clamp(1.35rem, 2.3vw, 2.05rem); font-weight: 500; line-height: 1.16; }
 .adaptive-module p { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.65; }
+.adaptive-home .adaptive-module {
+  border: 1px solid var(--line-dark);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--white), var(--paper) 35%);
+  padding: clamp(22px, 3vw, 34px);
+  box-shadow: 10px 10px 0 rgba(47,49,45,.055);
+}
+.adaptive-home .learning-snapshot {
+  border: 0;
+  margin-bottom: 0;
+  padding: 0;
+}
+.adaptive-home .skill-signal-list article,
+.adaptive-home .active-book-list article,
+.adaptive-home .memory-reveal details {
+  border-top: 0;
+  padding-top: 0;
+}
 .diagnostic-module { display: grid; grid-template-columns: minmax(0, .9fr); border-top: 0; background: color-mix(in srgb, var(--white), var(--paper) 34%); padding: clamp(24px, 4vw, 38px); box-shadow: 12px 12px 0 rgba(47,49,45,.07); }
 .diagnostic-module h2 { font-size: clamp(1.9rem, 3.4vw, 3.2rem); }
 .why-this { margin-top: 14px; color: var(--muted); }
