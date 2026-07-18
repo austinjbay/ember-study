@@ -198,11 +198,11 @@ main:focus { outline: 0; }
 .ember-companion { position: fixed; right: 26px; bottom: 24px; z-index: 46; display: grid; justify-items: stretch; width: min(390px, calc(100vw - 24px)); pointer-events: auto; }
 .ember-companion[hidden] { display: none; }
 .ember-companion.is-dragging, .ember-companion.is-resizing { user-select: none; }
-.ember-companion-minimized { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 100%; min-height: 58px; border: 1px solid var(--line-dark); border-radius: 8px; background: color-mix(in srgb, var(--white), var(--paper) 34%); color: var(--muted); padding: 12px 14px 10px 16px; box-shadow: 8px 8px 0 rgba(47,49,45,.07), 0 16px 42px rgba(32,34,31,.1); font-size: .86rem; font-weight: 700; text-align: left; pointer-events: auto; }
+.ember-companion-minimized { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 100%; min-height: 72px; border: 2px solid var(--green); border-radius: 8px; background: var(--white); color: color-mix(in srgb, var(--muted), var(--paper) 28%); padding: 18px 18px 16px 24px; box-shadow: 7px 7px 0 rgba(47,49,45,.07), 0 0 0 5px rgba(93,111,100,.13); font-size: .92rem; font-weight: 650; text-align: left; pointer-events: auto; }
 .ember-companion-minimized[hidden] { display: none; }
 .ember-companion-minimized span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ember-companion-minimized span:last-child { color: var(--green); font-size: .86rem; font-weight: 850; }
-.ember-companion-minimized:hover { border-color: var(--green); color: var(--ink); }
+.ember-companion-minimized span:last-child { color: var(--green); font-size: 1.25rem; font-weight: 850; line-height: 1; }
+.ember-companion-minimized:hover { color: var(--muted); box-shadow: 7px 7px 0 rgba(47,49,45,.07), 0 0 0 5px rgba(93,111,100,.18); }
 .ember-companion-button { position: relative; display: grid; place-items: center; width: 52px; height: 52px; border: 0; border-radius: 999px; background: transparent; color: var(--paper); box-shadow: none; pointer-events: auto; transition: transform .22s cubic-bezier(.2,.8,.2,1); }
 .ember-companion-button::before { content: ""; position: absolute; inset: 4px; border-radius: 999px; background: radial-gradient(circle, rgba(246,210,148,.26), rgba(199,135,63,.13) 42%, transparent 72%); box-shadow: 0 13px 28px rgba(32,34,31,.12); opacity: 0; transform: scale(.78); transition: opacity .2s ease, transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s ease; }
 .ember-companion-button:hover, .ember-companion-button:focus-visible, .ember-companion-button[aria-expanded="true"] { transform: translateY(-1px); }
