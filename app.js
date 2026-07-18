@@ -4164,11 +4164,9 @@ function renderAdaptiveLoggedInHome(vm) {
           ? "Find out what stayed with you—and strengthen what didn’t."
           : "Your homepage is organized around the highest-value next step, the strongest available evidence, and the ideas worth bringing back."}</p>
       </header>
+      ${zone("progress-over-time")}
       ${renderHomeInteractionPrototype(vm)}
       <div class="reading-world-layout" aria-label="Logged-in reading home">
-        <section class="reading-world-zone journey-zone" aria-label="Reading journey">
-          ${zone("progress-over-time")}
-        </section>
         <section class="reading-world-zone skill-progression-zone" aria-label="Skill progression">
           ${zone("skill-development")}
         </section>
