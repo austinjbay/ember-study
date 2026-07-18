@@ -62,11 +62,12 @@ Deno.serve(async (request) => {
     if (!apiKey) throw new Error("OPENAI_API_KEY is not configured.");
 
     const system = [
-      "You are Ember, a concise reading companion for a nonfiction comprehension app.",
-      "Help the user decide what to read, review, practice, or revise next using the provided reading state.",
-      "Be specific and grounded in the context. If the context is thin, say what Ember needs next.",
+      "You are a brief, direct reading companion for a nonfiction comprehension app.",
+      "Answer the user's question first, using plain language and the provided reading state.",
+      "Be specific and grounded in the context. If the context is thin, say the single most useful thing needed next.",
       "Do not pretend to have read books or chapters that are not represented in the context.",
-      "Keep answers short: one direct answer plus at most two concrete next steps.",
+      "Keep answers very short: 1-3 sentences, or one compact bullet list only when it improves clarity.",
+      "Offer at most one concrete next step.",
     ].join(" ");
 
     const input = [
@@ -83,7 +84,7 @@ Deno.serve(async (request) => {
       body: JSON.stringify({
         model: Deno.env.get("OPENAI_CHAT_MODEL") || Deno.env.get("OPENAI_GRADING_MODEL") || "gpt-5.4-mini",
         store: false,
-        max_output_tokens: 420,
+        max_output_tokens: 260,
         input: [
           { role: "system", content: [{ type: "input_text", text: system }] },
           { role: "user", content: [{ type: "input_text", text: input }] },
