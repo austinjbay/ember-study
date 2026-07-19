@@ -4616,7 +4616,7 @@ const canonicalSkillTree = [
     id: "match-evidence",
     title: "Pick the proof",
     description: "Choose the example or reason that best supports a claim.",
-    level: "Test the support",
+    level: "See what backs it up",
     source: "CCRA.R.8",
     exercise: "Choose the evidence that does the most work.",
     supported: true
@@ -4625,7 +4625,7 @@ const canonicalSkillTree = [
     id: "evaluate-reasoning",
     title: "Check the argument",
     description: "Decide whether the reasons are strong enough to support the claim.",
-    level: "Test the support",
+    level: "See what backs it up",
     source: "CCRA.R.8 · PIRLS evaluate",
     exercise: "Test whether the evidence is relevant and strong enough.",
     supported: true
@@ -4650,9 +4650,9 @@ const canonicalSkillTree = [
   },
   {
     id: "compare-texts",
-    title: "Connect readings",
+    title: "Compare ideas",
     description: "Relate this reading to another source, idea, or author.",
-    level: "Connect readings",
+    level: "Compare ideas",
     source: "CCRA.R.9",
     exercise: "Compare how two sources approach the same idea.",
     supported: true
@@ -4812,13 +4812,13 @@ const skillMapPathways = [
   },
   {
     id: "evidence-judgment",
-    title: "Check the Support",
+    title: "What Backs It Up",
     capability: "Judge whether an argument is actually supported, not just whether it sounds persuasive.",
     skills: ["central-claim", "match-evidence", "evaluate-reasoning", "evaluate-boundaries"]
   },
   {
     id: "synthesis-transfer",
-    title: "Use Ideas Elsewhere",
+    title: "Use Ideas in New Places",
     capability: "Carry an idea across contexts, compare it with other texts, and use it with judgment.",
     skills: ["infer-implications", "compare-texts", "apply-with-judgment", "evaluate-boundaries"]
   },
@@ -5971,7 +5971,7 @@ const practiceSequence = [
   { id: "evaluate-reasoning", title: "Check the argument", description: "Decide whether the reasons are strong enough to support the claim." },
   { id: "build-explanation", title: "Explain it clearly", description: "Connect the main point, the reason, and a concrete example." },
   { id: "infer-implications", title: "Say what follows", description: "Draw a conclusion that fits the text, without inventing more than it supports." },
-  { id: "compare-texts", title: "Connect readings", description: "Relate this reading to another source, idea, or author." },
+  { id: "compare-texts", title: "Compare ideas", description: "Relate this reading to another source, idea, or author." },
   { id: "apply-with-judgment", title: "Use the idea wisely", description: "Apply the idea to real life while noticing where it may not fit." },
   { id: "evaluate-boundaries", title: "Find the limits", description: "Notice when an idea stops being useful, true, or fair." },
   { id: "calibrate-confidence", title: "Check what you really know", description: "Compare how confident you felt with what you could actually explain." }
