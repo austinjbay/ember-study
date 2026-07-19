@@ -3999,10 +3999,9 @@ function buildSkillSignals(chapters = [], evidenceState = "establishing") {
     });
   }
   if (!signals.length) {
-    const firstSkill = practiceSequence[0] || { title: "Name the main point", description: "Say what the author is really trying to argue." };
     signals.push({
-      title: "What do you still remember clearly?",
-      copy: firstSkill.description,
+      title: "Build science-backed reading skills.",
+      copy: "Practice the skills that help you remember what a text says, understand what it means, and use it beyond the page.",
       basis: "Recommended from Ember’s practice sequence.",
       confidence: "preview",
       focusArea: false
@@ -4532,6 +4531,7 @@ function renderSkillModule(vm) {
   return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
     <span class="eyebrow">Build Reading Skills</span>
     <h2 id="skill-development-title">${escapeHtml(vm.skillSignals[0]?.title || "Build your first signal.")}</h2>
+    <p class="skill-module-copy">${escapeHtml(vm.skillSignals[0]?.copy || "Practice reading skills that help ideas last beyond the page.")}</p>
     <div class="skill-path-grid" aria-label="Available reading skills">
       ${path.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.days >= 3 ? " is-durable" : ""}" type="button" data-skill-state="${escapeHtml(skill.stateName)}" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.status)}. ${skill.days} of 3 successful days.">
         <span class="skill-icon-wrap">${renderSkillIcon(skill.id, skill.stateName, 32)}</span>
