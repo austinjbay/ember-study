@@ -4818,6 +4818,25 @@ function skillMapPrimaryPathwayForSkill(skillId) {
   return skillMapPathwaysForSkill(skillId)[0] || skillMapPathways[0];
 }
 
+function skillMapPathwayBounds(skillIds = []) {
+  const points = skillIds
+    .map(skillId => skillMapPositions[skillId])
+    .filter(Boolean);
+  if (!points.length) return { left: 8, top: 16, width: 84, height: 68 };
+  const xs = points.map(point => point.x);
+  const ys = points.map(point => point.y);
+  const left = Math.max(3, Math.min(...xs) - 8);
+  const top = Math.max(8, Math.min(...ys) - 12);
+  const right = Math.min(97, Math.max(...xs) + 8);
+  const bottom = Math.min(96, Math.max(...ys) + 13);
+  return {
+    left,
+    top,
+    width: Math.max(18, right - left),
+    height: Math.max(18, bottom - top)
+  };
+}
+
 function skillMapIncomingEdges(skillId) {
   return skillMapEdges.filter(edge => edge.to === skillId);
 }
@@ -4877,6 +4896,8 @@ function renderSkillMapPage() {
   const earnedCount = canonicalSkillTree.filter(skill => skillMapStateFor(skill, currentSkill).days >= 3).length;
   const selectedPathway = skillMapPrimaryPathwayForSkill(selectedSkill.id);
   const pathwayIds = new Set(selectedPathway.skills);
+  const pathwayRegion = skillMapRegionForSkill(selectedSkill.id);
+  const pathwayBounds = skillMapPathwayBounds(selectedPathway.skills);
   const selectedParents = skillMapIncomingEdges(selectedSkill.id);
   const selectedChildren = skillMapOutgoingEdges(selectedSkill.id);
   const relatedIds = new Set([
@@ -4892,7 +4913,8 @@ function renderSkillMapPage() {
     const end = skillMapPositions[edge.to];
     if (!start || !end) return "";
     const line = skillMapTrimmedLine(start, end);
-    const active = edge.from === selectedSkill.id || edge.to === selectedSkill.id;
+    const pathwayEdge = pathwayIds.has(edge.from) && pathwayIds.has(edge.to);
+    const active = edge.from === selectedSkill.id || edge.to === selectedSkill.id || pathwayEdge;
     const regionEdge = selectedRegionIds.includes(edge.from) && selectedRegionIds.includes(edge.to);
     const edgeRegion = skillMapRegionForSkill(edge.from);
     return `<line class="relationship-${escapeHtml(edge.type)} edge-region-${escapeHtml(edgeRegion)}${active ? " is-active" : ""}${regionEdge ? " is-region-edge" : ""}" x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}">
@@ -4918,10 +4940,26 @@ function renderSkillMapPage() {
   const regionTabs = [`<button class="skill-map-region-tab${selectedRegion === "all" ? " is-active" : ""}" type="button" data-action="skill-map-region" data-skill-map-region="all">All skills</button>`]
     .concat(skillMapRegions.map(region => `<button class="skill-map-region-tab skill-region-${escapeHtml(region.id)}${selectedRegion === region.id ? " is-active" : ""}" type="button" data-action="skill-map-region" data-skill-map-region="${escapeHtml(region.id)}">${escapeHtml(region.label)}</button>`))
     .join("");
-  const regions = skillMapRegions.map(region => `<article class="skill-map-region ${escapeHtml(region.className)} skill-region-${escapeHtml(region.id)}">
-    <strong>${escapeHtml(region.label)}</strong>
-    <span>${escapeHtml(region.description)}</span>
-  </article>`).join("");
+  const activeRegion = skillMapRegions.find(region => region.id === (selectedRegion === "all" ? pathwayRegion : selectedRegion))
+    || skillMapRegions.find(region => region.id === pathwayRegion)
+    || skillMapRegions[0];
+  const regionStackControls = skillMapRegions.map(region => `<button class="skill-region-${escapeHtml(region.id)}${region.id === activeRegion.id ? " is-active" : ""}" type="button" data-action="skill-map-region" data-skill-map-region="${escapeHtml(region.id)}" aria-label="Show ${escapeHtml(region.label)} skills">${escapeHtml(region.label.slice(0, 1))}</button>`).join("");
+  const regionStack = `<aside class="skill-map-region-stack skill-region-${escapeHtml(activeRegion.id)}" aria-label="Skill type definitions">
+    <div class="skill-map-region-card">
+      <span>Skill type</span>
+      <strong>${escapeHtml(activeRegion.label)}</strong>
+      <p>${escapeHtml(activeRegion.description)}</p>
+    </div>
+    <div class="skill-map-region-card-controls" aria-label="Flip through skill types">${regionStackControls}</div>
+  </aside>`;
+  const pathwayArea = `<div class="skill-map-pathway-area skill-region-${escapeHtml(pathwayRegion)}" style="--area-left:${pathwayBounds.left}%; --area-top:${pathwayBounds.top}%; --area-width:${pathwayBounds.width}%; --area-height:${pathwayBounds.height}%;" aria-hidden="true"></div>`;
+  const pathwayCalloutLeft = Math.min(74, Math.max(4, pathwayBounds.left + 1));
+  const pathwayCalloutTop = Math.min(78, Math.max(8, pathwayBounds.top + 1));
+  const pathwayCallout = `<aside class="skill-map-pathway-callout skill-region-${escapeHtml(pathwayRegion)}" style="--callout-left:${pathwayCalloutLeft}%; --callout-top:${pathwayCalloutTop}%;" aria-label="Why these skills are connected">
+    <span>Connected pathway</span>
+    <strong>${escapeHtml(selectedPathway.title)}</strong>
+    <p>${escapeHtml(selectedPathway.capability)}</p>
+  </aside>`;
   const relationshipLegend = Object.entries(skillMapRelationshipTypes).map(([type, detail]) => `<span class="relationship-${escapeHtml(type)}"><i></i>${escapeHtml(detail.label)}</span>`).join("");
   const selectedRelationshipNotes = selectedParents.concat(selectedChildren).slice(0, 4).map(edge => {
     const connectedId = edge.to === selectedSkill.id ? edge.from : edge.to;
@@ -4946,8 +4984,10 @@ function renderSkillMapPage() {
       <div class="skill-map-region-tabs" aria-label="Skill categories">${regionTabs}</div>
       <div class="skill-map-relationship-legend" aria-label="Relationship types">${relationshipLegend}</div>
       <div class="skill-map-canvas" aria-label="Reading skill network">
+        ${pathwayArea}
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
-        ${regions}
+        ${pathwayCallout}
+        ${regionStack}
         ${nodes}
       </div>
       <div class="skill-map-inline-detail" aria-labelledby="skill-map-detail-title">

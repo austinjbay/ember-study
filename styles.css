@@ -1049,9 +1049,7 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-relationship-legend .relationship-extends i { border-top-style: dotted; }
 .skill-map-relationship-legend .relationship-metacognitive i { border-top-style: double; }
 .skill-map-canvas { position: relative; min-height: 760px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(180deg, rgba(255,253,247,.96), rgba(250,247,239,.88)); }
-.skill-map-canvas::before { content: ""; position: absolute; z-index: 0; inset: 72px 7% 56px; border-top: 1px solid rgba(47,49,45,.08); border-bottom: 1px solid rgba(47,49,45,.08); background:
-  linear-gradient(90deg, transparent 0 17.5%, rgba(47,49,45,.08) 17.5% 17.7%, transparent 17.7% 36%, rgba(47,49,45,.08) 36% 36.2%, transparent 36.2% 56%, rgba(47,49,45,.08) 56% 56.2%, transparent 56.2% 75%, rgba(47,49,45,.08) 75% 75.2%, transparent 75.2%);
-  opacity: .9; pointer-events: none; }
+.skill-map-canvas::before { content: none; }
 .skill-map-canvas::after { content: ""; position: absolute; z-index: 0; inset: 0; background:
   radial-gradient(circle, rgba(54,91,74,.11) 1px, transparent 1.5px) 0 0 / 34px 34px,
   linear-gradient(180deg, rgba(255,253,247,.22), transparent 26%, transparent 74%, rgba(255,253,247,.18)); opacity: .32; pointer-events: none; }
@@ -1071,11 +1069,20 @@ body.logged-out .landing-footer { display: flex; }
 .relationship-metacognitive { --relationship-color: #7b5f8f; }
 .skill-map-lines line.is-region-edge { stroke: var(--edge-color, var(--green)); stroke-width: 1.7; opacity: .56; }
 .skill-map-lines line.is-active { stroke: var(--edge-color, var(--green)); stroke-width: 2.4; opacity: .92; }
-.skill-map-region { position: absolute; z-index: 2; display: grid; gap: 3px; max-width: 176px; border: 1px solid color-mix(in srgb, var(--region-color, var(--green)), transparent 68%); border-radius: 8px; background: transparent; color: var(--region-color, var(--green)); padding: 9px 11px; pointer-events: none; }
-.skill-map-region strong { font-size: .62rem; font-weight: 850; letter-spacing: .14em; line-height: 1; text-transform: uppercase; }
-.skill-map-region span { color: var(--muted); font-size: .64rem; line-height: 1.25; }
-.skill-map-region strong,
-.skill-map-region span,
+.skill-map-pathway-area { position: absolute; z-index: 1; left: var(--area-left); top: var(--area-top); width: var(--area-width); height: var(--area-height); border: 1px solid color-mix(in srgb, var(--region-color, var(--green)), transparent 56%); border-radius: 18px; background: color-mix(in srgb, var(--region-color, var(--green)), transparent 92%); box-shadow: inset 0 0 0 1px rgba(255,253,247,.58), 0 16px 40px rgba(47,49,45,.05); pointer-events: none; transition: left .24s ease, top .24s ease, width .24s ease, height .24s ease, border-color .18s ease, background .18s ease; }
+.skill-map-pathway-callout { position: absolute; z-index: 4; left: var(--callout-left); top: var(--callout-top); display: grid; gap: 5px; width: min(270px, 27%); border: 1px solid color-mix(in srgb, var(--region-color, var(--green)), transparent 58%); border-radius: 8px; background: rgba(255,253,247,.96); color: var(--ink); padding: 12px 14px; box-shadow: 0 14px 28px rgba(47,49,45,.08); pointer-events: none; }
+.skill-map-pathway-callout span,
+.skill-map-region-card span { color: var(--region-color, var(--green)); font-size: .58rem; font-weight: 850; letter-spacing: .13em; line-height: 1; text-transform: uppercase; }
+.skill-map-pathway-callout strong { color: var(--ink); font-family: var(--serif); font-size: .94rem; line-height: 1.08; }
+.skill-map-pathway-callout p,
+.skill-map-region-card p { margin: 0; color: var(--muted); font-size: .68rem; line-height: 1.42; }
+.skill-map-region-stack { position: absolute; z-index: 5; top: 18px; right: 18px; display: grid; gap: 9px; width: min(248px, 27%); }
+.skill-map-region-card { display: grid; gap: 7px; min-height: 120px; border: 1px solid color-mix(in srgb, var(--region-color, var(--green)), transparent 55%); border-radius: 8px; background: rgba(255,253,247,.96); color: var(--ink); padding: 14px 15px; box-shadow: 0 12px 26px rgba(47,49,45,.08); }
+.skill-map-region-card strong { color: var(--region-color, var(--green)); font-size: .72rem; font-weight: 850; letter-spacing: .15em; line-height: 1; text-transform: uppercase; }
+.skill-map-region-card-controls { display: flex; justify-content: flex-end; gap: 7px; }
+.skill-map-region-card-controls button { display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid color-mix(in srgb, var(--region-color, var(--green)), transparent 55%); border-radius: 50%; background: rgba(255,253,247,.86); color: var(--region-color, var(--green)); font-family: var(--serif); font-size: .74rem; font-style: italic; font-weight: 700; transition: border-color .18s ease, background .18s ease, color .18s ease; }
+.skill-map-region-card-controls button.is-active { background: var(--region-color, var(--green)); color: var(--white); }
+.skill-map-region-card-controls button:hover { border-color: var(--region-color, var(--green)); }
 .skill-map-node strong,
 .skill-map-node em,
 .skill-map-node small {
@@ -1085,10 +1092,6 @@ body.logged-out .landing-footer { display: flex; }
   -webkit-box-decoration-break: clone;
   padding: 1px 4px;
 }
-.region-foundation { left: 4%; top: 4%; }
-.region-meaning { left: 22%; top: 4%; }
-.region-evaluate { left: 58%; top: 4%; }
-.region-transfer { right: 4%; top: 4%; }
 .skill-region-recall { --region-color: #5f7468; --region-soft: rgba(95,116,104,.14); }
 .skill-region-meaning { --region-color: #3f6f68; --region-soft: rgba(63,111,104,.14); }
 .skill-region-judgment { --region-color: #9a642c; --region-soft: rgba(154,100,44,.14); }
@@ -2598,7 +2601,11 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .skill-map-practice-quick { align-self: flex-end; }
   .skill-map-canvas { display: grid; gap: 12px; min-height: 0; padding: 16px; }
   .skill-map-lines { display: none; }
-  .skill-map-region { position: static; max-width: none; }
+  .skill-map-pathway-area { display: none; }
+  .skill-map-pathway-callout,
+  .skill-map-region-stack { position: static; width: auto; }
+  .skill-map-region-card { min-height: 0; }
+  .skill-map-region-card-controls { justify-content: flex-start; }
   .skill-map-node { position: static; width: 100%; transform: none; }
   .skill-map-node:hover { transform: none; }
   .skill-map-canvas:has(.skill-map-node.is-selected) .skill-map-node:not(.is-related) { opacity: 1; }
