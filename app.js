@@ -4001,7 +4001,7 @@ function buildSkillSignals(chapters = [], evidenceState = "establishing") {
   if (!signals.length) {
     const firstSkill = practiceSequence[0] || { title: "Name the main point", description: "Say what the author is really trying to argue." };
     signals.push({
-      title: `${firstSkill.title} is the best place to start.`,
+      title: "Start with what you can clearly remember.",
       copy: firstSkill.description,
       basis: "Recommended from Ember’s practice sequence.",
       confidence: "preview",
