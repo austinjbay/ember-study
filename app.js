@@ -4996,10 +4996,12 @@ function renderSkillMapPage() {
         <button class="secondary skill-map-practice-quick" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(currentSkill.id)}">Start current practice</button>
       </div>
       <p class="skill-map-earned-note">${earnedCount} of ${canonicalSkillTree.length} skills earned · earn each skill with three successful practice days.</p>
-      <div class="skill-map-relationship-legend" aria-label="Relationship types">${relationshipLegend}</div>
+      <div class="skill-map-maphead">
+        <div class="skill-map-relationship-legend" aria-label="Relationship types">${relationshipLegend}</div>
+        ${explanationStack}
+      </div>
       <div class="skill-map-canvas" aria-label="Reading skill network">
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
-        ${explanationStack}
         ${nodes}
       </div>
       <div class="skill-map-inline-detail" aria-labelledby="skill-map-detail-title">
