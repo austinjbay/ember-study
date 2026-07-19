@@ -665,10 +665,10 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon polyline,
 .skill-icon rect { fill: none; stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .skill-icon .skill-icon-fill { fill: currentColor; stroke: none; }
-.skill-icon .skill-icon-foundation { opacity: .74; }
-.skill-icon .skill-icon-operation { opacity: .82; }
-.skill-icon .skill-icon-noise { opacity: .34; }
-.skill-icon .skill-icon-accent { stroke: var(--skill-highlight, var(--green)); opacity: .78; }
+.skill-icon .skill-icon-foundation { opacity: .78; }
+.skill-icon .skill-icon-operation { opacity: .88; }
+.skill-icon .skill-icon-noise { opacity: .28; }
+.skill-icon .skill-icon-accent { stroke: var(--skill-highlight, var(--green)); opacity: .88; }
 .skill-icon .skill-icon-fill.skill-icon-accent { fill: var(--skill-highlight, var(--green)); }
 .skill-icon-unexplored .skill-icon-foundation { opacity: .44; }
 .skill-icon-unexplored .skill-icon-operation { opacity: .26; }
