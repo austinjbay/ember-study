@@ -691,8 +691,20 @@ body.logged-out .landing-footer { display: flex; }
 .skill-path-node strong { position: relative; min-height: 2.25em; color: var(--ink); font-family: var(--serif); font-size: .98rem; line-height: 1.12; }
 .skill-path-desc { position: relative; color: var(--muted); font-size: .72rem; line-height: 1.45; }
 .skill-path-node small { position: relative; color: var(--faint); font-size: .64rem; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
+.skill-path-node .skill-path-action {
+  justify-self: end;
+  min-height: 32px;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--white);
+  padding: 8px 12px;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: none;
+}
 .skill-path-node.is-current { border-color: var(--green); }
-.skill-path-node.is-current small { color: var(--green); }
+.skill-path-node.is-current small:not(.skill-path-action) { color: var(--green); }
 .skill-path-node.is-durable { border-color: var(--amber); }
 .skill-path-node.is-durable small { color: var(--amber); }
 .skill-path-progress { position: relative; height: 4px; overflow: hidden; border-radius: 999px; background: var(--line); }
