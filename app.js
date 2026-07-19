@@ -1580,6 +1580,34 @@ function restoreEmberCompanion() {
   $("#sidebar-guide-input")?.focus();
 }
 
+function emberChatPromptForView(viewName = state.view) {
+  const prompts = {
+    home: "Ask what to review next",
+    reviews: "Ask why this review is due",
+    practice: "Ask for help with today's skill",
+    "skill-map": "Ask how these skills connect",
+    "reading-skills": "Ask which skill to build next",
+    "how-it-works": "Ask how Ember reviews work",
+    "why-it-works": "Ask why delayed review helps",
+    examples: "Ask about this example",
+    trust: "Ask about privacy",
+    account: "Ask about your account",
+    flow: "Ask for help setting up this reading",
+    "review-session": "Ask for context before answering",
+    chapter: "Ask about this chapter",
+    "book-insights": "Ask about this book"
+  };
+  return prompts[viewName] || "Ask about your books";
+}
+
+function updateEmberChatPrompt() {
+  const prompt = emberChatPromptForView();
+  const input = $("#sidebar-guide-input");
+  const minimizedText = $("#ember-companion-minimized span:first-child");
+  if (input) input.placeholder = prompt;
+  if (minimizedText) minimizedText.textContent = prompt;
+}
+
 function buildEmberChatContext() {
   const entries = ensureUpNextChapterDrafts(migrateReviewsToFsrs(loadChapters()));
   const chapters = entries.filter(chapter => chapter.status !== "Draft");
@@ -1656,6 +1684,7 @@ function renderSidebarGuide() {
   panel.classList.remove("has-response");
   $("#sidebar-guide-state").textContent = "Reading companion";
   $("#sidebar-guide-log").innerHTML = "";
+  updateEmberChatPrompt();
 }
 
 function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
@@ -1673,6 +1702,7 @@ function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
   if (name === "home" || name === "reviews") renderDashboard();
   if (name === "skill-map") renderSkillMapPage();
   if (name === "account") hydrateAccountSettings();
+  updateEmberChatPrompt();
   renderSidebarGuide();
 }
 
@@ -4972,12 +5002,8 @@ function renderSkillMapPage() {
   }).join("");
   root.innerHTML = `<div class="skill-map-layout">
     <section class="skill-map-canvas-card" aria-labelledby="skill-map-network-title">
-      <div class="skill-map-card-head">
-        <div>
-          <span class="eyebrow">Skill Tree</span>
-          <h2 id="skill-map-network-title">Earn your way from recall to transfer.</h2>
-          <p>Explore the branches of reading comprehension. Choose a category or skill to see what it builds from, what it unlocks, and the standard or process it maps up to.</p>
-        </div>
+      <div class="skill-map-toolbar">
+        <h2 id="skill-map-network-title" class="sr-only">Reading skill network</h2>
         <button class="secondary skill-map-practice-quick" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(currentSkill.id)}">Start current practice</button>
       </div>
       <p class="skill-map-earned-note">${earnedCount} of ${canonicalSkillTree.length} skills earned · earn each skill with three successful practice days.</p>
