@@ -4427,12 +4427,10 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
   if (key === "retrieve-explicit") {
     return `<svg ${common}>
-      <circle class="skill-icon-body" cx="12" cy="12" r="7.8"></circle>
-      <path class="skill-icon-strawberry-leaf" d="M9.7 8.5 12 6.8l2.3 1.7M12 8.4l.1-2.3"></path>
-      <path class="skill-icon-strawberry" d="M12 8.7c-2.45 0-4.35 1.55-4.35 3.9 0 2.8 2.55 5.1 4.35 6 1.8-.9 4.35-3.2 4.35-6 0-2.35-1.9-3.9-4.35-3.9Z"></path>
-      <circle class="skill-icon-strawberry-seed" cx="10.4" cy="12" r=".45"></circle>
-      <circle class="skill-icon-strawberry-seed" cx="13.6" cy="12" r=".45"></circle>
-      <circle class="skill-icon-strawberry-seed" cx="12" cy="14.5" r=".45"></circle>
+      <path class="skill-icon-strawberry-leaf" d="M7.7 7.4 10.6 8.8 12 5.9l1.4 2.9 2.9-1.4M9.1 9.3h5.8"></path>
+      <circle class="skill-icon-strawberry-seed" cx="9.4" cy="13" r=".55"></circle>
+      <circle class="skill-icon-strawberry-seed" cx="14.6" cy="13" r=".55"></circle>
+      <circle class="skill-icon-strawberry-seed" cx="12" cy="16.3" r=".55"></circle>
     </svg>`;
   }
   return `<svg ${common}>
