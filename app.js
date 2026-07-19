@@ -3949,7 +3949,8 @@ function buildSkillSignals(chapters = [], evidenceState = "establishing") {
         ? "Each completed check gives Ember another source-grounded sample of how you explain what you read."
         : "A few more checks will make the early signals more useful.",
       basis: `Based on ${chapters.length} completed ${chapters.length === 1 ? "check" : "checks"}.`,
-      confidence
+      confidence,
+      focusArea: false
     });
   }
   if (gap) {
@@ -3957,7 +3958,8 @@ function buildSkillSignals(chapters = [], evidenceState = "establishing") {
       title: `${skillTitleForGap(gap)} is the current focus.`,
       copy: practiceReasonForGap(gap),
       basis: `Seen ${count} ${count === 1 ? "time" : "times"} across recent checks.`,
-      confidence: confidence === "preview" ? "early" : confidence
+      confidence: confidence === "preview" ? "early" : confidence,
+      focusArea: true
     });
   }
   if (!signals.length) {
@@ -3966,7 +3968,8 @@ function buildSkillSignals(chapters = [], evidenceState = "establishing") {
       title: `${firstSkill.title} is the best place to start.`,
       copy: firstSkill.description,
       basis: "Recommended from Ember’s practice sequence.",
-      confidence: "preview"
+      confidence: "preview",
+      focusArea: false
     });
   }
   return signals.slice(0, 2);
@@ -4076,7 +4079,7 @@ function fixtureHomeViewModel(evidenceState) {
       metrics: { books: 0, completedChecks: 0, completedReviews: 0, delayedReviews: 0, representedSkills: 0 },
       nextAction: firstBookNextAction("establishing", "Fixture preview: no book or chapter evidence yet."),
       diagnostic: { confidence: "preview", title: "Ember is ready to organize your first book.", copy: "Create a book first, then add chapters as you read so Ember can build reviews around that source.", basis: "Example insight only." },
-      skillSignals: [{ title: "No personal reading signal yet.", copy: "Create a book and complete one chapter check to begin the diagnostic profile.", basis: "Fixture preview.", confidence: "preview" }],
+      skillSignals: [{ title: "No personal reading signal yet.", copy: "Create a book and complete one chapter check to begin the diagnostic profile.", basis: "Fixture preview.", confidence: "preview", focusArea: false }],
       memoryCandidates: [],
       progress: { chapters: 0, reviews: 0, recovered: 0, practiced: 0, headline: "0 readings reviewed", copy: "Ember will track reviewed readings, delayed reviews, practice, and recovered weak spots here." },
       libraryBooks: [],
@@ -4086,7 +4089,7 @@ function fixtureHomeViewModel(evidenceState) {
       metrics: { books: 1, completedChecks: 4, completedReviews: 1, delayedReviews: 1, representedSkills: 2 },
       nextAction: { label: "Recommended next", marker: "3m", title: "Practice connecting supporting ideas.", copy: "This relationship was missing in a recent explanation.", text: "Start practice", why: "Fixture preview based on four checks.", attrs: 'data-nav="practice"' },
       diagnostic: { confidence: "early", title: "Early patterns are beginning to show.", copy: "You are recovering central claims, while support-to-argument links are still developing.", basis: "Early signal across 4 checks and 1 delayed review." },
-      skillSignals: [{ title: "Central claims are coming back.", copy: "You recovered the main claim in most early checks.", basis: "4 completed checks.", confidence: "early" }, { title: "Connecting ideas is the growth area.", copy: "The same relationship gap appeared twice.", basis: "2 related gaps.", confidence: "early" }],
+      skillSignals: [{ title: "Central claims are coming back.", copy: "You recovered the main claim in most early checks.", basis: "4 completed checks.", confidence: "early", focusArea: false }, { title: "Connecting ideas is the growth area.", copy: "The same relationship gap appeared twice.", basis: "2 related gaps.", confidence: "early", focusArea: true }],
       memoryCandidates: [{ chapterId: "", title: "Deep Work Is Valuable", bookTitle: "Deep Work", prompt: "Before opening it: why did this chapter argue depth matters?", preview: "Depth creates rare value because it lets you produce at the edge of your ability while avoiding the shallow work that fragments attention.", reason: "Example resurfacing from a recent chapter." }],
       progress: { chapters: 4, reviews: 1, recovered: 1, practiced: 2, headline: "4 readings reviewed", copy: "8 learning actions logged across reviews, practice, and recovered weak spots." },
       libraryBooks: [{ key: "deep-work", title: "Deep Work", author: "Cal Newport", completed: 4, total: 12, drafts: 0, latestChapter: "Deep Work Is Valuable" }],
@@ -4096,7 +4099,7 @@ function fixtureHomeViewModel(evidenceState) {
       metrics: { books: 4, completedChecks: 16, completedReviews: 8, delayedReviews: 8, representedSkills: 4 },
       nextAction: { label: "Review due", marker: "◉", title: "Review a recovered gap.", copy: "A prior weak spot is ready for delayed recall.", text: "Start review", why: "Fixture preview: scheduled after a meaningful delay.", attrs: 'data-nav="reviews"' },
       diagnostic: { confidence: "supported", title: "Your reading profile is supported by repeated evidence.", copy: "You identify central claims reliably, even after delay. The best next focus is reconnecting examples to the author’s argument.", basis: "Across 16 checks, 8 reviews, and 4 skill areas." },
-      skillSignals: [{ title: "Central claim recall is reliable.", copy: "This skill held up across recent delayed reviews.", basis: "8 delayed reviews.", confidence: "supported" }, { title: "Evidence connection is the focus.", copy: "Examples come back, but their role in the argument is less consistent.", basis: "6 related checks.", confidence: "supported" }],
+      skillSignals: [{ title: "Central claim recall is reliable.", copy: "This skill held up across recent delayed reviews.", basis: "8 delayed reviews.", confidence: "supported", focusArea: false }, { title: "Evidence connection is the focus.", copy: "Examples come back, but their role in the argument is less consistent.", basis: "6 related checks.", confidence: "supported", focusArea: true }],
       memoryCandidates: [{ chapterId: "", title: "Legacy", bookTitle: "The Road to Character", prompt: "Before opening it: what did this chapter suggest about résumé virtues and eulogy virtues?", preview: "", reason: "Example resurfacing from a previously difficult idea." }],
       progress: { chapters: 16, reviews: 8, recovered: 5, practiced: 7, headline: "16 readings reviewed", copy: "36 learning actions logged across reviews, practice, and recovered weak spots." },
       libraryBooks: [{ key: "road-character", title: "The Road to Character", author: "David Brooks", completed: 12, total: 12, drafts: 0, latestChapter: "Quiet Strength" }, { key: "know-person", title: "How to Know a Person", author: "David Brooks", completed: 4, total: 10, drafts: 1, latestChapter: "Good Talks" }],
@@ -4469,6 +4472,7 @@ function renderSkillIconSpecimen() {
 
 function renderSkillModule(vm) {
   const practice = vm.practiceState || currentPracticeSkillState();
+  const focusSignals = (vm.skillSignals || []).filter(signal => signal.focusArea);
   const path = practiceSequence.map((skill, index) => {
     const days = successfulPracticeDays(skill);
     const status = days >= 3 ? "Durable" : skill.id === practice.skill.id ? "Recommended" : days > 0 ? "Developing" : "Available";
@@ -4479,13 +4483,13 @@ function renderSkillModule(vm) {
   return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
     <span class="eyebrow">Build Reading Skills</span>
     <h2 id="skill-development-title">${escapeHtml(vm.skillSignals[0]?.title || "Build your first signal.")}</h2>
-    <div class="skill-signal-list">
-      ${vm.skillSignals.map(signal => `<article>
-        <span>${escapeHtml(confidenceCopy(signal.confidence, signal.basis))}</span>
+    ${focusSignals.length ? `<div class="skill-signal-list">
+      ${focusSignals.map(signal => `<article>
+        <span>Where to focus</span>
         <strong>${escapeHtml(signal.title)}</strong>
         <p>${escapeHtml(signal.copy)}</p>
       </article>`).join("")}
-    </div>
+    </div>` : ""}
     <div class="skill-path-grid" aria-label="Available reading skills">
       ${path.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.days >= 3 ? " is-durable" : ""}" type="button" data-skill-state="${escapeHtml(skill.stateName)}" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.status)}. ${skill.days} of 3 successful days.">
         <span class="skill-icon-wrap">${renderSkillIcon(skill.id, skill.stateName, 32)}</span>
