@@ -4365,13 +4365,22 @@ function renderMemoryModule(vm) {
 
 function readingSkillIconKey(skillId = "") {
   return {
+    "retrieve-explicit": "central-claim",
     "central-claim": "central-claim",
+    "supporting-ideas": "evaluate-evidence",
+    "source-fidelity": "calibrate-confidence",
     "connect-ideas": "connect-ideas",
+    "structure": "clear-explanations",
+    "point-of-view": "apply-with-judgment",
     "match-evidence": "evaluate-evidence",
+    "evaluate-reasoning": "evaluate-evidence",
     "build-explanation": "clear-explanations",
+    "infer-implications": "connect-ideas",
+    "compare-texts": "connect-ideas",
     "clear-explanations": "clear-explanations",
     "calibrate-confidence": "calibrate-confidence",
-    "apply-with-judgment": "apply-with-judgment"
+    "apply-with-judgment": "apply-with-judgment",
+    "evaluate-boundaries": "apply-with-judgment"
   }[skillId] || "central-claim";
 }
 
@@ -4504,49 +4513,180 @@ function renderSkillModule(vm) {
   </section>`;
 }
 
+const canonicalSkillTree = [
+  {
+    id: "retrieve-explicit",
+    title: "Retrieve explicit information",
+    description: "Recover important stated details before interpreting them.",
+    level: "Retrieve",
+    source: "PIRLS retrieve · CCRA.R.1",
+    exercise: "Find the sentence or detail the author actually states."
+  },
+  {
+    id: "central-claim",
+    title: "Find the central claim",
+    description: "Separate the topic from the author’s argument.",
+    level: "Establish meaning",
+    source: "CCRA.R.2 · PIRLS interpret",
+    exercise: "State the author’s central claim in one sentence.",
+    supported: true
+  },
+  {
+    id: "supporting-ideas",
+    title: "Identify supporting ideas",
+    description: "Recover the reasons, examples, and mechanisms that make the claim work.",
+    level: "Establish meaning",
+    source: "CCRA.R.2",
+    exercise: "Name the strongest support for the claim."
+  },
+  {
+    id: "source-fidelity",
+    title: "Preserve source fidelity",
+    description: "Keep your answer faithful to the text and avoid unsupported additions.",
+    level: "Establish meaning",
+    source: "CCRA.R.1",
+    exercise: "Separate what the text says from what you inferred."
+  },
+  {
+    id: "connect-ideas",
+    title: "Connect two ideas",
+    description: "Explain how one idea leads to, depends on, or qualifies another.",
+    level: "Integrate",
+    source: "CCRA.R.3 · PIRLS integrate",
+    exercise: "Explain the relationship between two ideas.",
+    supported: true
+  },
+  {
+    id: "structure",
+    title: "Notice structure",
+    description: "Use sequence, contrast, cause and effect, and section structure to understand the argument.",
+    level: "Craft",
+    source: "CCRA.R.5",
+    exercise: "Name the structure and explain how it shapes the meaning."
+  },
+  {
+    id: "point-of-view",
+    title: "Read purpose and point of view",
+    description: "Explain how the author’s purpose shapes what gets emphasized.",
+    level: "Craft",
+    source: "CCRA.R.6",
+    exercise: "Name the author’s purpose and what it changes."
+  },
+  {
+    id: "match-evidence",
+    title: "Match claims with evidence",
+    description: "Choose the reason or example that actually supports a claim.",
+    level: "Evaluate",
+    source: "CCRA.R.8",
+    exercise: "Choose the evidence that does the most work for the claim.",
+    supported: true
+  },
+  {
+    id: "evaluate-reasoning",
+    title: "Evaluate reasoning",
+    description: "Judge whether a claim is supported by relevant and sufficient reasons.",
+    level: "Evaluate",
+    source: "CCRA.R.8 · PIRLS evaluate",
+    exercise: "Test whether the evidence is relevant and sufficient."
+  },
+  {
+    id: "build-explanation",
+    title: "Build a complete explanation",
+    description: "Move from claim to reason to concrete example.",
+    level: "Explain",
+    source: "Ember rubric synthesis",
+    exercise: "Explain the claim, the reason behind it, and one concrete example.",
+    supported: true
+  },
+  {
+    id: "infer-implications",
+    title: "Infer implications",
+    description: "Draw a conclusion that follows from the text without inventing unsupported claims.",
+    level: "Infer",
+    source: "CCRA.R.1 · PIRLS infer",
+    exercise: "State what follows from the argument, and why."
+  },
+  {
+    id: "compare-texts",
+    title: "Compare across texts",
+    description: "Connect two sources by theme, argument, or approach.",
+    level: "Synthesize",
+    source: "CCRA.R.9",
+    exercise: "Compare how two authors approach the same idea."
+  },
+  {
+    id: "apply-with-judgment",
+    title: "Apply with judgment",
+    description: "Use an idea in a realistic situation while keeping its limits visible.",
+    level: "Transfer",
+    source: "Ember transfer rubric",
+    exercise: "Use the idea in practice and name where it might fail."
+  },
+  {
+    id: "evaluate-boundaries",
+    title: "Evaluate boundaries",
+    description: "Identify limits, assumptions, exceptions, and tradeoffs.",
+    level: "Transfer",
+    source: "PIRLS evaluate · Ember boundary challenge",
+    exercise: "Name when the argument stops being useful or true."
+  },
+  {
+    id: "calibrate-confidence",
+    title: "Calibrate confidence",
+    description: "Compare how well you thought you understood with what you could retrieve.",
+    level: "Metacognition",
+    source: "Ember confidence calibration",
+    exercise: "Compare your confidence estimate with the evidence in your answer."
+  }
+];
+
 const skillMapEdges = [
-  ["central-claim", "connect-ideas"],
+  ["retrieve-explicit", "central-claim"],
+  ["retrieve-explicit", "supporting-ideas"],
+  ["central-claim", "supporting-ideas"],
+  ["central-claim", "source-fidelity"],
+  ["supporting-ideas", "connect-ideas"],
+  ["source-fidelity", "infer-implications"],
+  ["connect-ideas", "structure"],
   ["connect-ideas", "match-evidence"],
+  ["structure", "point-of-view"],
+  ["match-evidence", "evaluate-reasoning"],
+  ["evaluate-reasoning", "build-explanation"],
   ["connect-ideas", "build-explanation"],
-  ["match-evidence", "build-explanation"]
+  ["infer-implications", "compare-texts"],
+  ["build-explanation", "apply-with-judgment"],
+  ["compare-texts", "apply-with-judgment"],
+  ["apply-with-judgment", "evaluate-boundaries"],
+  ["evaluate-boundaries", "calibrate-confidence"]
 ];
 
 const skillMapPositions = {
-  "central-claim": { x: 15, y: 28 },
-  "connect-ideas": { x: 48, y: 26 },
-  "match-evidence": { x: 80, y: 34 },
-  "build-explanation": { x: 54, y: 72 }
-};
-
-const skillMapDetails = {
-  "central-claim": {
-    level: "Establish meaning",
-    why: "Every later reading skill depends on knowing what the author wants you to believe.",
-    exercise: "State the author’s central claim in one sentence."
-  },
-  "connect-ideas": {
-    level: "Explain relationships",
-    why: "Readers often remember ideas separately before they can explain the logic between them.",
-    exercise: "Explain whether one idea supports, qualifies, contrasts with, or depends on another."
-  },
-  "match-evidence": {
-    level: "Explain relationships",
-    why: "Evidence is useful when it does work inside the argument, not merely when it is related.",
-    exercise: "Choose the example or reason that actually supports a claim, then explain why."
-  },
-  "build-explanation": {
-    level: "Explain clearly",
-    why: "A complete explanation moves from claim to reason to concrete example.",
-    exercise: "Explain the claim, the reason behind it, and one concrete example."
-  }
+  "retrieve-explicit": { x: 9, y: 46 },
+  "central-claim": { x: 24, y: 25 },
+  "supporting-ideas": { x: 24, y: 69 },
+  "source-fidelity": { x: 39, y: 12 },
+  "connect-ideas": { x: 42, y: 47 },
+  "structure": { x: 57, y: 24 },
+  "point-of-view": { x: 73, y: 16 },
+  "match-evidence": { x: 58, y: 66 },
+  "evaluate-reasoning": { x: 73, y: 60 },
+  "build-explanation": { x: 73, y: 82 },
+  "infer-implications": { x: 56, y: 8 },
+  "compare-texts": { x: 89, y: 32 },
+  "apply-with-judgment": { x: 89, y: 56 },
+  "evaluate-boundaries": { x: 89, y: 77 },
+  "calibrate-confidence": { x: 72, y: 94 }
 };
 
 function skillMapStateFor(skill, currentSkill) {
-  const days = successfulPracticeDays(skill);
-  const isCurrent = skill.id === currentSkill.id;
-  const stateName = skillDevelopmentState(days, isCurrent);
-  const label = isCurrent ? "Current focus" : days >= 3 ? "Durable" : days > 0 ? `${days}/3 successful days` : "Available";
-  return { days, isCurrent, stateName, label };
+  const practiceReady = Boolean(skill.supported || practiceSequence.some(item => item.id === skill.id));
+  const days = practiceReady ? successfulPracticeDays(skill) : 0;
+  const isCurrent = practiceReady && skill.id === currentSkill.id;
+  const stateName = practiceReady ? skillDevelopmentState(days, isCurrent) : "unexplored";
+  const label = !practiceReady
+    ? "Mapped future skill"
+    : isCurrent ? "Current focus" : days >= 3 ? "Durable" : days > 0 ? `${days}/3 successful days` : "Practice-ready";
+  return { days, isCurrent, practiceReady, stateName, label };
 }
 
 function renderSkillMapPage() {
@@ -4555,10 +4695,11 @@ function renderSkillMapPage() {
   const practice = currentPracticeSkillState();
   const currentSkill = practice.skill || practiceSequence[0];
   const selectedId = state.selectedSkillMapSkill || currentSkill.id;
-  const selectedSkill = practiceSequence.find(skill => skill.id === selectedId) || currentSkill;
+  const selectedSkill = canonicalSkillTree.find(skill => skill.id === selectedId)
+    || canonicalSkillTree.find(skill => skill.id === currentSkill.id)
+    || canonicalSkillTree[0];
   state.selectedSkillMapSkill = selectedSkill.id;
   const selectedState = skillMapStateFor(selectedSkill, currentSkill);
-  const selectedDetails = skillMapDetails[selectedSkill.id] || {};
   const edges = skillMapEdges.map(([from, to]) => {
     const start = skillMapPositions[from];
     const end = skillMapPositions[to];
@@ -4566,11 +4707,11 @@ function renderSkillMapPage() {
     const active = from === selectedSkill.id || to === selectedSkill.id;
     return `<line class="${active ? "is-active" : ""}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}" />`;
   }).join("");
-  const nodes = practiceSequence.map((skill, index) => {
+  const nodes = canonicalSkillTree.map((skill, index) => {
     const position = skillMapPositions[skill.id] || { x: 50, y: 50 };
     const nodeState = skillMapStateFor(skill, currentSkill);
     const selected = skill.id === selectedSkill.id;
-    return `<button class="skill-map-node${nodeState.isCurrent ? " is-current" : ""}${nodeState.days >= 3 ? " is-durable" : ""}${selected ? " is-selected" : ""}" type="button" style="--x:${position.x}%; --y:${position.y}%;" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skill.id)}" data-skill-state="${escapeHtml(nodeState.stateName)}" aria-pressed="${selected}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(nodeState.label)}.">
+    return `<button class="skill-map-node${nodeState.practiceReady ? " is-practice-ready" : " is-mapped"}${nodeState.isCurrent ? " is-current" : ""}${nodeState.days >= 3 ? " is-durable" : ""}${selected ? " is-selected" : ""}" type="button" style="--x:${position.x}%; --y:${position.y}%;" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skill.id)}" data-skill-state="${escapeHtml(nodeState.stateName)}" aria-pressed="${selected}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(nodeState.label)}.">
       <span class="skill-icon-wrap">${renderSkillIcon(skill.id, nodeState.stateName, 34)}</span>
       <span>${String(index + 1).padStart(2, "0")}</span>
       <strong>${escapeHtml(skill.title)}</strong>
@@ -4583,7 +4724,7 @@ function renderSkillMapPage() {
           <span class="eyebrow">Network</span>
           <h2 id="skill-map-network-title">How the reading skills connect.</h2>
         </div>
-        <button class="secondary skill-map-practice-quick" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(currentSkill.id)}">Start practice</button>
+        <button class="secondary skill-map-practice-quick" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(currentSkill.id)}">Start current practice</button>
       </div>
       <div class="skill-map-canvas" aria-label="Reading skill network">
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
@@ -4591,15 +4732,17 @@ function renderSkillMapPage() {
       </div>
     </section>
     <aside class="skill-map-detail" aria-labelledby="skill-map-detail-title">
-      <span class="eyebrow">${escapeHtml(selectedDetails.level || "Reading skill")}</span>
+      <span class="eyebrow">${escapeHtml(selectedSkill.level || "Reading skill")}</span>
       <h2 id="skill-map-detail-title">${escapeHtml(selectedSkill.title)}</h2>
       <p>${escapeHtml(selectedSkill.description)}</p>
       <dl>
         <div><dt>State</dt><dd>${escapeHtml(selectedState.label)}</dd></div>
-        <div><dt>Why it matters</dt><dd>${escapeHtml(selectedDetails.why || "This skill supports stronger chapter recall and review.")}</dd></div>
-        <div><dt>Exercise</dt><dd>${escapeHtml(selectedDetails.exercise || selectedSkill.description)}</dd></div>
+        <div><dt>Source</dt><dd>${escapeHtml(selectedSkill.source || "Ember skill model")}</dd></div>
+        <div><dt>Exercise</dt><dd>${escapeHtml(selectedSkill.exercise || selectedSkill.description)}</dd></div>
       </dl>
-      ${selectedState.isCurrent ? `<button class="primary" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}">Start practice</button>` : `<button class="secondary" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}">Practice this skill</button>`}
+      ${selectedState.practiceReady
+        ? `<button class="${selectedState.isCurrent ? "primary" : "secondary"}" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}">${selectedState.isCurrent ? "Start practice" : "Practice this skill"}</button>`
+        : `<button class="secondary" type="button" disabled>Practice coming later</button>`}
     </aside>
   </div>`;
 }
