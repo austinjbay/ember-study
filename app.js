@@ -4426,7 +4426,7 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   const key = readingSkillIconKey(skillId);
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
   const icons = {
-    "retrieve-explicit": `<svg ${common}><circle class="skill-icon-prize" cx="12" cy="7.2" r="2.1"/><path class="skill-icon-body" d="M8.8 5.6h6.4c.8 0 1.3.5 1.3 1.3v12.2L12 16.5l-4.5 2.6V6.9c0-.8.5-1.3 1.3-1.3Z"/><path class="skill-icon-cut" d="M10.1 9h3.8M10.1 12h3"/></svg>`,
+    "retrieve-explicit": `<svg ${common}><circle class="skill-icon-prize" cx="12" cy="7.2" r="2.25"/><path class="skill-icon-cut" d="M9.2 11h5.6M9.2 14h4.2"/><path class="skill-icon-cut" d="m9.4 17.2 2.6-1.5 2.6 1.5"/></svg>`,
     "central-claim": `<svg ${common}><circle class="skill-icon-body" cx="12" cy="12" r="6.2"/><circle class="skill-icon-cut" cx="12" cy="12" r="2.8"/><circle class="skill-icon-prize" cx="12" cy="12" r="1.4"/></svg>`,
     "supporting-ideas": `<svg ${common}><path class="skill-icon-body" d="M12 5.2 18.2 18H5.8Z"/><path class="skill-icon-cut" d="M9.1 16.1h5.8M10.4 12.7h3.2"/><circle class="skill-icon-prize" cx="12" cy="8.8" r="1.3"/></svg>`,
     "source-fidelity": `<svg ${common}><path class="skill-icon-body" d="M12 5.1 17.7 8v5.2c0 3-2.1 5-5.7 6.1-3.6-1.1-5.7-3.1-5.7-6.1V8Z"/><path class="skill-icon-cut" d="M9.3 12.4h5.4"/><path class="skill-icon-prize" d="m9.4 9.6 1.5 1.4 3.7-3.7"/></svg>`,

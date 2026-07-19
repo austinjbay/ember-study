@@ -705,7 +705,7 @@ body.logged-out .landing-footer { display: flex; }
 .skill-path-node[data-skill-state="developing"] .skill-icon-wrap { --badge-ink: var(--badge-accent); }
 .skill-path-node[data-skill-state="strengthening"] .skill-icon-wrap { --badge-ink: var(--badge-accent); }
 .skill-path-node[data-skill-state="durable"] .skill-icon-wrap { --skill-highlight: var(--amber); }
-.skill-icon-wrap:has(.skill-icon-retrieve-explicit) { --badge-accent: #5d7f71; --skill-highlight: #d9a441; --badge-radius: 50%; --badge-shape: circle(50%); --badge-tilt: -2deg; }
+.skill-icon-wrap:has(.skill-icon-retrieve-explicit) { --badge-accent: #5d7f71; --skill-highlight: #d9a441; --badge-radius: 14px; --badge-shape: polygon(18% 0, 82% 0, 82% 100%, 50% 78%, 18% 100%); --badge-tilt: -2deg; }
 .skill-icon-wrap:has(.skill-icon-central-claim) { --badge-accent: #3f7460; --skill-highlight: #e0ad45; --badge-radius: 18px; --badge-shape: inset(0 round 18px); --badge-tilt: 1deg; }
 .skill-icon-wrap:has(.skill-icon-supporting-ideas) { --badge-accent: #7d8a58; --skill-highlight: #d8a04a; --badge-radius: 12px; --badge-shape: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%); --badge-tilt: -3deg; }
 .skill-icon-wrap:has(.skill-icon-source-fidelity) { --badge-accent: #6d7464; --skill-highlight: #c89a5b; --badge-radius: 16px; --badge-shape: polygon(18% 0, 82% 0, 100% 20%, 100% 100%, 0 100%, 0 20%); --badge-tilt: 2deg; }
