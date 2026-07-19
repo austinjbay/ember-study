@@ -4749,12 +4749,16 @@ const skillMapPositions = {
 };
 
 function skillMapTrimmedLine(start, end) {
-  const iconRadius = 4.1;
   const dx = end.x - start.x;
   const dy = end.y - start.y;
   const length = Math.hypot(dx, dy) || 1;
-  const offsetX = (dx / length) * iconRadius;
-  const offsetY = (dy / length) * iconRadius;
+  const unitX = dx / length;
+  const unitY = dy / length;
+  const verticalWeight = Math.abs(unitY);
+  const horizontalWeight = Math.abs(unitX);
+  const clearance = 4.8 + (verticalWeight * 5.4) + (horizontalWeight * 2.2);
+  const offsetX = unitX * clearance;
+  const offsetY = unitY * clearance;
   return {
     x1: start.x + offsetX,
     y1: start.y + offsetY,
