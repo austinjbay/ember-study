@@ -665,10 +665,14 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon-wrap { --badge-accent: color-mix(in srgb, var(--green), var(--ink) 10%); --badge-ink: var(--ink); --skill-highlight: var(--amber); position: relative; align-self: center; display: grid; place-items: center; width: 60px; height: 60px; margin-top: 9px; border: 1px solid color-mix(in srgb, var(--badge-accent), var(--paper) 58%); border-radius: 50%; background: radial-gradient(circle at 34% 28%, rgba(255,255,255,.82) 0 12%, transparent 13%), linear-gradient(145deg, color-mix(in srgb, var(--white), var(--badge-accent) 8%), color-mix(in srgb, var(--paper), var(--badge-accent) 14%)); color: var(--badge-ink); box-shadow: inset 2px 3px 0 rgba(255,255,255,.64), inset -1px -4px 0 rgba(47,49,45,.08), 0 7px 15px rgba(47,49,45,.09); filter: none; transition: border-color .2s ease, box-shadow .2s ease, transform .2s cubic-bezier(.2,.8,.2,1); }
 .skill-icon { position: relative; z-index: 1; display: block; overflow: visible; filter: drop-shadow(0 1px 0 rgba(255,255,255,.72)); }
 .skill-icon .skill-icon-link { fill: none; stroke: color-mix(in srgb, var(--skill-highlight), var(--ink) 22%); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; opacity: .82; vector-effect: non-scaling-stroke; }
+.skill-icon .skill-icon-coal { stroke: none; }
 .skill-icon .skill-icon-body { fill: color-mix(in srgb, var(--ink), var(--white) 6%); stroke: color-mix(in srgb, var(--ink), var(--white) 28%); stroke-width: 1; opacity: .96; }
 .skill-icon .skill-icon-prize { fill: var(--skill-highlight, var(--amber)); stroke: rgba(255,253,247,.72); stroke-width: .8; opacity: 1; }
-.skill-icon-retrieve-explicit .skill-icon-body { stroke: color-mix(in srgb, var(--skill-highlight), var(--paper) 42%); }
-.skill-icon-retrieve-explicit .skill-icon-prize { stroke-width: .55; }
+.skill-icon-retrieve-explicit { filter: drop-shadow(0 7px 12px rgba(47,49,45,.18)); }
+.skill-icon-retrieve-explicit .skill-icon-coal { fill: #252721; stroke: color-mix(in srgb, #4b4e48, var(--paper) 14%); stroke-width: .65; }
+.skill-icon-retrieve-explicit .skill-icon-coal-light { fill: color-mix(in srgb, #4b4e48, var(--skill-highlight) 18%); opacity: .56; }
+.skill-icon-retrieve-explicit .skill-icon-link { stroke: color-mix(in srgb, var(--skill-highlight), var(--paper) 12%); stroke-width: 1.15; opacity: .78; }
+.skill-icon-retrieve-explicit .skill-icon-prize { stroke-width: .45; filter: drop-shadow(0 0 4px color-mix(in srgb, var(--skill-highlight), transparent 28%)); }
 .skill-icon-unexplored .skill-icon-body { opacity: .82; }
 .skill-icon-unexplored .skill-icon-link { opacity: .5; }
 .skill-icon-unexplored .skill-icon-prize { opacity: .78; }
@@ -676,7 +680,7 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon-developing .skill-icon-prize,
 .skill-icon-strengthening .skill-icon-prize,
 .skill-icon-durable .skill-icon-prize { opacity: 1; }
-.skill-icon-wrap:has(.skill-icon-retrieve-explicit) { --skill-highlight: #d8a642; }
+.skill-icon-wrap:has(.skill-icon-retrieve-explicit) { --skill-highlight: #d8a642; border-color: transparent; background: transparent; box-shadow: none; }
 .skill-icon-wrap:has(.skill-icon-central-claim) { --skill-highlight: #5f8f76; }
 .skill-icon-wrap:has(.skill-icon-supporting-ideas) { --skill-highlight: #9aa763; }
 .skill-icon-wrap:has(.skill-icon-source-fidelity) { --skill-highlight: #b98458; }
@@ -694,6 +698,8 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon-wrap:has(.skill-icon-evaluate-boundaries) { --skill-highlight: #988060; }
 .skill-path-node:hover .skill-icon-wrap,
 .skill-map-node:hover .skill-icon-wrap { border-color: color-mix(in srgb, var(--skill-highlight), var(--ink) 18%); animation: badge-pop .55s cubic-bezier(.2,.9,.25,1.25); box-shadow: inset 2px 3px 0 rgba(255,255,255,.7), inset -1px -4px 0 rgba(47,49,45,.08), 0 10px 18px color-mix(in srgb, var(--skill-highlight), transparent 76%); transform: translateY(-3px) scale(1.04); }
+.skill-path-node:hover .skill-icon-wrap:has(.skill-icon-retrieve-explicit),
+.skill-map-node:hover .skill-icon-wrap:has(.skill-icon-retrieve-explicit) { border-color: transparent; box-shadow: none; }
 .skill-path-node:active .skill-icon-wrap,
 .skill-map-node:active .skill-icon-wrap { box-shadow: inset 1px 2px 0 rgba(255,255,255,.5), inset -1px -2px 0 rgba(47,49,45,.08), 0 4px 8px rgba(47,49,45,.08); transform: translateY(2px) scale(.98); }
 .skill-path-node > span:not(.skill-icon-wrap) { position: relative; color: var(--green); font-family: var(--serif); font-size: 1rem; font-style: italic; }
@@ -715,6 +721,7 @@ body.logged-out .landing-footer { display: flex; }
 }
 .skill-path-node.is-current { border-color: var(--green); padding-bottom: 18px; }
 .skill-path-node.is-current .skill-icon-wrap { color: var(--badge-ink); box-shadow: inset 0 4px 0 rgba(255,255,255,.8), inset 0 -9px 0 rgba(47,49,45,.15), inset 0 0 0 6px rgba(255,255,255,.32), 0 10px 0 color-mix(in srgb, var(--badge-accent), var(--ink) 10%), 0 19px 26px color-mix(in srgb, var(--badge-accent), transparent 74%); }
+.skill-path-node.is-current .skill-icon-wrap:has(.skill-icon-retrieve-explicit) { box-shadow: none; }
 .skill-path-node.is-current small:not(.skill-path-action) { color: var(--green); }
 .skill-path-node.is-durable { border-color: var(--amber); }
 .skill-path-node.is-durable small { color: var(--amber); }
@@ -1118,6 +1125,10 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-node.is-current .skill-icon-wrap,
 .skill-map-node.is-selected .skill-icon-wrap { border-color: color-mix(in srgb, var(--skill-highlight), var(--ink) 18%); color: var(--region-color, var(--green)); box-shadow: inset 2px 3px 0 rgba(255,255,255,.72), inset -1px -4px 0 rgba(47,49,45,.08), 0 0 0 6px color-mix(in srgb, var(--skill-highlight), transparent 82%), 0 12px 22px rgba(47,49,45,.11); }
 .skill-map-node.is-durable .skill-icon-wrap { border-color: color-mix(in srgb, var(--skill-highlight), var(--ink) 20%); color: var(--region-color, var(--green)); box-shadow: inset 2px 3px 0 rgba(255,255,255,.7), inset -1px -4px 0 rgba(47,49,45,.08), 0 0 0 5px color-mix(in srgb, var(--skill-highlight), transparent 84%), 0 11px 20px rgba(47,49,45,.1); }
+.skill-map-node.is-pathway-member .skill-icon-wrap:has(.skill-icon-retrieve-explicit),
+.skill-map-node.is-current .skill-icon-wrap:has(.skill-icon-retrieve-explicit),
+.skill-map-node.is-selected .skill-icon-wrap:has(.skill-icon-retrieve-explicit),
+.skill-map-node.is-durable .skill-icon-wrap:has(.skill-icon-retrieve-explicit) { border-color: transparent; box-shadow: none; }
 .skill-map-node.is-durable small { color: var(--region-color, var(--green)); }
 .skill-map-node.is-region-dimmed { opacity: .32; }
 .skill-map-node.is-locked { color: var(--faint); opacity: 1; }

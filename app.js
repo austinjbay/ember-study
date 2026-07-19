@@ -4427,13 +4427,12 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
   if (key === "retrieve-explicit") {
     return `<svg ${common}>
-      <path class="skill-icon-link" d="M8 14.2 12.2 8.1 16.5 14.5M8 14.2h8.5"></path>
-      <circle class="skill-icon-body" cx="8" cy="14.2" r="3.3"></circle>
-      <circle class="skill-icon-body" cx="12.2" cy="8.1" r="3.3"></circle>
-      <circle class="skill-icon-body" cx="16.5" cy="14.5" r="3.3"></circle>
-      <circle class="skill-icon-prize" cx="8" cy="14.2" r="1.35"></circle>
-      <circle class="skill-icon-prize" cx="12.2" cy="8.1" r="1.35"></circle>
-      <circle class="skill-icon-prize" cx="16.5" cy="14.5" r="1.35"></circle>
+      <path class="skill-icon-coal" d="M5.1 9.9 7.4 5.7 12 4.5l4.7 1.8 2.3 4.4-1.5 5.2-4.5 3.4-5.1-1.1-3.1-3.6Z"></path>
+      <path class="skill-icon-coal-light" d="M7.6 10.2 9 7.8l3.4-.8 3.3 1.3 1.4 3-1.3 3.2-3 1.7-3.4-.8-2.1-2.4Z"></path>
+      <path class="skill-icon-link" d="M8.6 14.2 12.1 9.5 15.7 14.2M8.6 14.2h7.1"></path>
+      <circle class="skill-icon-prize" cx="8.6" cy="14.2" r="1.45"></circle>
+      <circle class="skill-icon-prize" cx="12.1" cy="9.5" r="1.45"></circle>
+      <circle class="skill-icon-prize" cx="15.7" cy="14.2" r="1.45"></circle>
     </svg>`;
   }
   return `<svg ${common}>
