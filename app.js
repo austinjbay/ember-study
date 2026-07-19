@@ -4043,6 +4043,7 @@ function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
   return {
     evidenceState,
     metrics,
+    entryCount: entries.length,
     nextAction: buildAdaptiveNextAction({ evidenceState, entries, chapters, drafts, due, currentReading, practiceState }),
     diagnostic: buildReaderDiagnostic({ evidenceState, chapters, metrics, skillSignals }),
     skillSignals,
@@ -4598,10 +4599,10 @@ function renderFutureWorkModule(vm) {
 
 function buildHomeModules(vm) {
   return [
-    homeModule("library-carousel", 5, true, confidenceForEvidence(vm.evidenceState), `${vm.libraryBooks.length} books`, renderLibraryCarouselModule(vm)),
+    homeModule("library-carousel", 5, vm.entryCount > 0, confidenceForEvidence(vm.evidenceState), `${vm.libraryBooks.length} books`, renderLibraryCarouselModule(vm)),
     homeModule("primary-next-action", 10, true, confidenceForEvidence(vm.evidenceState), vm.nextAction?.why, renderPrimaryNextActionModule(vm)),
     homeModule("reader-diagnostic", 20, true, vm.diagnostic?.confidence, vm.diagnostic?.basis, renderDiagnosticModule(vm)),
-    homeModule("memory-resurfacing", vm.evidenceState === "establishing" ? 50 : 30, vm.memoryCandidates.length > 0, confidenceForEvidence(vm.evidenceState), vm.memoryCandidates[0]?.reason, renderMemoryModule(vm)),
+    homeModule("memory-resurfacing", vm.evidenceState === "establishing" ? 50 : 30, vm.entryCount > 0 && vm.memoryCandidates.length > 0, confidenceForEvidence(vm.evidenceState), vm.memoryCandidates[0]?.reason, renderMemoryModule(vm)),
     homeModule("skill-development", 40, true, confidenceForEvidence(vm.evidenceState), vm.skillSignals[0]?.basis, renderSkillModule(vm)),
     homeModule("today-practice", 45, true, confidenceForEvidence(vm.evidenceState), vm.practiceState?.skill?.title, renderTodayPracticeModule(vm)),
     homeModule("progress-over-time", 60, true, confidenceForEvidence(vm.evidenceState), `${vm.progress.reviews} delayed reviews`, renderProgressModule(vm)),
