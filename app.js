@@ -4479,7 +4479,7 @@ function renderSkillModule(vm) {
     const status = days >= 3 ? "Durable" : skill.id === practice.skill.id ? "Recommended" : days > 0 ? "Developing" : "Available";
     const progress = Math.min(100, Math.round(Math.min(3, days) / 3 * 100));
     const stateName = skillDevelopmentState(days, skill.id === practice.skill.id);
-    const actionLabel = skill.id === practice.skill.id ? "Start practice" : `${status}${days ? ` · ${days}/3` : ""}`;
+    const actionLabel = skill.id === practice.skill.id ? "Start practice" : days ? `${status} · ${days}/3` : "";
     return { ...skill, index, days, status, progress, stateName, actionLabel };
   });
   return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
@@ -4494,7 +4494,7 @@ function renderSkillModule(vm) {
         <div class="skill-path-progress" aria-label="${escapeHtml(skill.title)} progress: ${skill.days} of 3 successful days">
           <i style="width: ${skill.progress}%"></i>
         </div>
-        <small class="${skill.id === practice.skill.id ? "skill-path-action" : ""}">${escapeHtml(skill.actionLabel)}</small>
+        ${skill.actionLabel ? `<small class="${skill.id === practice.skill.id ? "skill-path-action" : ""}">${escapeHtml(skill.actionLabel)}</small>` : ""}
       </button>`).join("")}
     </div>
   </section>`;
