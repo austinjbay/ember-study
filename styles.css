@@ -1049,17 +1049,22 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
 .skill-map-lines line { stroke: color-mix(in srgb, var(--line-dark), var(--green) 20%); stroke-width: 1.3; stroke-dasharray: 2.6 3.2; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .68; }
 .skill-map-lines line.is-active { stroke: var(--green); stroke-width: 1.7; opacity: 1; }
-.skill-map-region { position: absolute; z-index: 1; color: rgba(73,101,83,.5); font-size: .62rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; pointer-events: none; }
-.region-foundation { left: 7%; top: 13%; }
-.region-meaning { left: 36%; top: 40%; }
-.region-evaluate { right: 14%; top: 11%; }
-.region-transfer { right: 7%; bottom: 9%; }
-.skill-map-node { position: absolute; left: var(--x); top: var(--y); z-index: 2; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "icon number" "icon title" "icon status"; align-items: center; gap: 3px 10px; width: min(172px, 19vw); min-height: 92px; transform: translate(-50%, -50%); border: 1px solid var(--line-dark); border-radius: 999px 999px 999px 12px; background: color-mix(in srgb, var(--white), var(--paper) 20%); color: var(--ink); padding: 12px 14px; text-align: left; box-shadow: 0 10px 22px rgba(47,49,45,.07); transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .18s ease, box-shadow .18s ease; }
+.skill-map-region { position: absolute; z-index: 1; display: grid; gap: 3px; max-width: 176px; border: 1px solid rgba(73,101,83,.18); border-radius: 8px; background: rgba(255,253,247,.44); color: rgba(73,101,83,.72); padding: 9px 11px; pointer-events: none; }
+.skill-map-region strong { font-size: .62rem; font-weight: 850; letter-spacing: .14em; line-height: 1; text-transform: uppercase; }
+.skill-map-region span { color: rgba(47,49,45,.55); font-size: .64rem; line-height: 1.25; }
+.region-foundation { left: 5%; top: 7%; }
+.region-meaning { left: 34%; top: 38%; }
+.region-evaluate { right: 7%; top: 8%; }
+.region-transfer { right: 5%; bottom: 4%; }
+.skill-map-node { position: absolute; left: var(--x); top: var(--y); z-index: 2; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "icon number" "icon title" "icon level" "icon status"; align-items: center; gap: 3px 10px; width: min(178px, 19vw); min-height: 104px; transform: translate(-50%, -50%); border: 1px solid var(--line-dark); border-radius: 999px 999px 999px 12px; background: color-mix(in srgb, var(--white), var(--paper) 20%); color: var(--ink); padding: 12px 14px; text-align: left; box-shadow: 0 10px 22px rgba(47,49,45,.07); transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .18s ease, box-shadow .18s ease, opacity .18s ease; }
 .skill-map-node:hover { transform: translate(-50%, calc(-50% - 2px)); border-color: var(--green); box-shadow: 0 14px 26px rgba(47,49,45,.1); }
 .skill-map-node .skill-icon-wrap { grid-area: icon; }
 .skill-map-node > span:not(.skill-icon-wrap) { grid-area: number; color: var(--green); font-family: var(--serif); font-size: .94rem; font-style: italic; line-height: 1; }
 .skill-map-node strong { grid-area: title; font-family: var(--serif); font-size: .9rem; line-height: 1.08; }
+.skill-map-node em { grid-area: level; color: var(--muted); font-size: .58rem; font-style: normal; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .skill-map-node small { grid-area: status; color: var(--faint); font-size: .55rem; font-weight: 850; letter-spacing: .08em; line-height: 1.1; text-transform: uppercase; }
+.skill-map-canvas:has(.skill-map-node.is-selected) .skill-map-node:not(.is-related) { opacity: .56; }
+.skill-map-node.is-related { opacity: 1; }
 .skill-map-node.is-current { border-color: var(--green); box-shadow: 0 0 0 4px rgba(73,101,83,.08), 0 12px 24px rgba(47,49,45,.09); }
 .skill-map-node.is-selected { background: var(--white); box-shadow: 0 0 0 5px rgba(73,101,83,.1), 0 16px 30px rgba(47,49,45,.12); }
 .skill-map-node.is-durable { border-color: var(--green); background: linear-gradient(135deg, rgba(255,253,247,.96), rgba(232,224,198,.82)); }
@@ -1071,6 +1076,8 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-node[data-skill-state="durable"] .skill-icon-wrap { color: var(--skill-durable); --skill-highlight: var(--amber); }
 .skill-map-detail { align-self: stretch; display: grid; align-content: start; gap: 18px; padding: clamp(22px, 3vw, 30px); }
 .skill-map-detail p { margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.65; }
+.skill-map-source-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.skill-map-source-pills span { border: 1px solid var(--line); border-radius: 999px; background: rgba(255,253,247,.64); color: var(--green); padding: 6px 9px; font-size: .62rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .skill-map-detail dl { display: grid; gap: 0; margin: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .skill-map-detail div { padding: 14px 0; }
 .skill-map-detail div + div { border-top: 1px solid var(--line); }
@@ -2543,8 +2550,10 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .skill-map-practice-quick { align-self: flex-end; }
   .skill-map-canvas { display: grid; gap: 12px; min-height: 0; padding: 16px; }
   .skill-map-lines { display: none; }
+  .skill-map-region { position: static; max-width: none; }
   .skill-map-node { position: static; width: 100%; transform: none; }
   .skill-map-node:hover { transform: none; }
+  .skill-map-canvas:has(.skill-map-node.is-selected) .skill-map-node:not(.is-related) { opacity: 1; }
   .principles-list, .trust-grid { grid-template-columns: 1fr; }
   .example-flow { grid-template-columns: 1fr; }
   .example-flow article,
