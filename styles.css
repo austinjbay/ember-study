@@ -89,8 +89,8 @@ select[aria-invalid="true"] {
 .nav-item:hover { background: transparent; color: var(--ink); }
 .nav-item.is-active { background: rgba(255,255,255,.58); color: var(--ink); }
 .nav-item.is-active { font-weight: 700; }
-.notification-icon, .home-icon, .practice-icon { display: grid; place-items: center; }
-.notification-icon svg, .home-icon svg, .practice-icon svg { display: block; width: 17px; height: 17px; transition: color .18s ease; }
+.notification-icon, .home-icon, .practice-icon, .skill-map-icon { display: grid; place-items: center; }
+.notification-icon svg, .home-icon svg, .practice-icon svg, .skill-map-icon svg { display: block; width: 17px; height: 17px; transition: color .18s ease; }
 .nav-item em { min-width: 21px; border-radius: 10px; background: rgba(73,101,83,.12); color: var(--green); padding: 2px 6px; font-size: .68rem; font-style: normal; text-align: center; }
 .nav-item em.is-due { background: var(--amber-soft); color: var(--amber); }
 .nav-item em.has-scheduled { background: var(--green-soft); color: var(--green); }
