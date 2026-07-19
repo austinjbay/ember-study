@@ -4950,38 +4950,6 @@ function renderSkillMapPage() {
       <small>${escapeHtml(nodeState.label)}</small>
     </button>`;
   }).join("");
-  const activeRegion = skillMapRegions.find(region => region.id === skillMapRegionForSkill(selectedSkill.id)) || skillMapRegions[0];
-  const relationshipCopy = selectedParents.concat(selectedChildren).slice(0, 3)
-    .map(edge => `${skillMapTitleFor(edge.from)} → ${skillMapTitleFor(edge.to)}: ${edge.reason}`)
-    .join(" ");
-  const explanationCards = [
-    {
-      eyebrow: "Connected pathway",
-      title: selectedPathway.title,
-      body: selectedPathway.capability,
-      region: skillMapRegionForSkill(selectedSkill.id)
-    },
-    {
-      eyebrow: "Skill type",
-      title: activeRegion.label,
-      body: activeRegion.description,
-      region: activeRegion.id
-    },
-    {
-      eyebrow: "Why these connect",
-      title: selectedSkill.title,
-      body: relationshipCopy || "This skill is a starting point. Practice it first, then the next connected skills become easier to earn.",
-      region: skillMapRegionForSkill(selectedSkill.id)
-    }
-  ];
-  const activeCardIndex = Math.min(Number(state.selectedSkillMapRegion) || 0, explanationCards.length - 1);
-  const activeCard = explanationCards[activeCardIndex] || explanationCards[0];
-  const explanationStack = `<button class="skill-map-explanation-stack skill-region-${escapeHtml(activeCard.region)}" type="button" data-action="skill-map-explanation-next" aria-label="Show next skill map explanation">
-    <span>${escapeHtml(activeCard.eyebrow)}</span>
-    <strong>${escapeHtml(activeCard.title)}</strong>
-    <p>${escapeHtml(activeCard.body)}</p>
-    <small>${activeCardIndex + 1} of ${explanationCards.length} · tap to flip</small>
-  </button>`;
   const relationshipLegend = Object.entries(skillMapRelationshipTypes).map(([type, detail]) => `<span class="relationship-${escapeHtml(type)}"><i></i>${escapeHtml(detail.label)}</span>`).join("");
   root.innerHTML = `<div class="skill-map-layout">
     <section class="skill-map-canvas-card" aria-labelledby="skill-map-network-title">
@@ -4990,13 +4958,10 @@ function renderSkillMapPage() {
         <button class="secondary skill-map-practice-quick" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(currentSkill.id)}">Start current practice</button>
       </div>
       <p class="skill-map-earned-note">${earnedCount} of ${canonicalSkillTree.length} skills earned · earn each skill with three successful practice days.</p>
-      <div class="skill-map-maphead">
-        <div class="skill-map-relationship-legend" aria-label="Relationship types">${relationshipLegend}</div>
-        ${explanationStack}
-      </div>
       <div class="skill-map-canvas" aria-label="Reading skill network">
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
         ${nodes}
+        <div class="skill-map-relationship-legend" aria-label="Relationship types">${relationshipLegend}</div>
       </div>
       <div class="skill-map-inline-detail" aria-labelledby="skill-map-detail-title">
         <div>
@@ -6686,10 +6651,6 @@ document.addEventListener("click", async event => {
   }
   if (action === "skill-map-region") {
     state.selectedSkillMapRegion = event.target.closest("[data-skill-map-region]")?.dataset.skillMapRegion || "all";
-    renderSkillMapPage();
-  }
-  if (action === "skill-map-explanation-next") {
-    state.selectedSkillMapRegion = String(((Number(state.selectedSkillMapRegion) || 0) + 1) % 3);
     renderSkillMapPage();
   }
   if (action === "skill-map-practice") openSkillBadge(event.target.closest("[data-skill-map-id]")?.dataset.skillMapId);
