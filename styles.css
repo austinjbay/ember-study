@@ -646,11 +646,17 @@ body.logged-out .landing-footer { display: flex; }
 .skill-signal-list strong, .active-book-list strong { display: block; margin-top: 6px; font-family: var(--serif); font-size: 1rem; }
 .skill-signal-list p { margin-top: 7px; }
 .skill-module-copy { max-width: 740px; margin: 10px 0 2px; color: var(--muted); font-size: 1rem; line-height: 1.58; }
-.skill-path-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0 16px; }
-.skill-path-node { position: relative; display: grid; gap: 9px; align-content: start; min-width: 0; min-height: 250px; overflow: hidden; border: 1px solid var(--line-dark); border-radius: 8px; background: var(--skill-surface); color: inherit; padding: 16px 14px 16px; text-align: left; box-shadow: 0 7px 14px rgba(47,49,45,.05); cursor: pointer; transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s ease, box-shadow .2s ease; }
-.skill-path-node:hover { transform: translateY(-2px); border-color: var(--green); box-shadow: 0 12px 20px rgba(47,49,45,.09); }
+.skill-path-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 20px 0 16px; }
+.skill-path-node { --skill-card-tint: #f7f3e9; position: relative; display: grid; grid-template-rows: 78px auto auto 1fr auto; gap: 9px; align-content: start; min-width: 0; min-height: 275px; overflow: hidden; border: 1px solid var(--line-dark); border-radius: 8px; background: var(--white); color: inherit; padding: 0 16px 18px; text-align: left; box-shadow: 0 9px 25px rgba(32,34,31,.07); cursor: pointer; transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s ease, box-shadow .2s ease; }
+.skill-path-node::before { content: ""; position: absolute; inset: 0 0 auto; height: 78px; border-bottom: 1px solid color-mix(in srgb, var(--line), transparent 20%); background: linear-gradient(135deg, color-mix(in srgb, var(--skill-card-tint), white 18%), color-mix(in srgb, var(--skill-card-tint), transparent 52%)); }
+.skill-path-node:nth-child(2) { --skill-card-tint: #edf1e9; }
+.skill-path-node:nth-child(3) { --skill-card-tint: #f2e9dc; }
+.skill-path-node:nth-child(4) { --skill-card-tint: #f7f3e9; }
+.skill-path-node:nth-child(even) { transform: translateY(8px); }
+.skill-path-node:hover { transform: translateY(-2px); border-color: var(--green); box-shadow: 0 12px 24px rgba(47,49,45,.1); }
+.skill-path-node:nth-child(even):hover { transform: translateY(4px); }
 .skill-path-node:active { transform: translateY(1px) scale(.99); box-shadow: 0 3px 8px rgba(47,49,45,.08); }
-.skill-icon-wrap { position: relative; display: grid; place-items: center; width: 38px; height: 38px; color: var(--muted); filter: drop-shadow(0 4px 5px var(--skill-shadow)); transition: color .2s ease, filter .2s ease, transform .2s cubic-bezier(.2,.8,.2,1); }
+.skill-icon-wrap { position: relative; align-self: center; display: grid; place-items: center; width: 48px; height: 48px; margin-top: 15px; color: var(--muted); filter: drop-shadow(0 4px 5px var(--skill-shadow)); transition: color .2s ease, filter .2s ease, transform .2s cubic-bezier(.2,.8,.2,1); }
 .skill-icon { display: block; overflow: visible; }
 .skill-icon path,
 .skill-icon circle,
@@ -690,8 +696,8 @@ body.logged-out .landing-footer { display: flex; }
 .skill-path-node:hover .skill-icon-wrap { color: var(--green); filter: drop-shadow(0 7px 8px rgba(47,49,45,.14)); transform: translateY(-1px); }
 .skill-path-node:active .skill-icon-wrap { filter: drop-shadow(0 2px 3px rgba(47,49,45,.1)); transform: translateY(1px) scale(.98); }
 .skill-path-node > span:not(.skill-icon-wrap) { position: relative; color: var(--green); font-family: var(--serif); font-size: 1rem; font-style: italic; }
-.skill-path-node strong { position: relative; min-height: 2.25em; color: var(--ink); font-family: var(--serif); font-size: .98rem; line-height: 1.12; }
-.skill-path-desc { position: relative; color: var(--muted); font-size: .72rem; line-height: 1.45; }
+.skill-path-node strong { position: relative; min-height: 2.25em; color: var(--ink); font-family: var(--serif); font-size: 1.08rem; line-height: 1.12; }
+.skill-path-desc { position: relative; color: var(--muted); font-size: .76rem; line-height: 1.5; }
 .skill-path-node small { position: relative; color: var(--faint); font-size: .64rem; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
 .skill-path-node .skill-path-action {
   justify-self: end;
