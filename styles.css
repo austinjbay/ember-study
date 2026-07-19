@@ -245,11 +245,12 @@ main:focus { outline: 0; }
 .ember-guide-actions button { min-height: 30px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); padding: 0 10px; font-size: .68rem; font-weight: 800; }
 .ember-guide-actions button:hover { border-color: var(--green); color: var(--green); }
 .ember-guide-form { display: grid; grid-template-columns: 1fr; gap: 3px; align-items: center; min-height: 72px; border: 0; border-radius: 0; background: transparent; padding: 18px 18px 6px 24px; box-shadow: none; }
-.ember-companion-panel.has-response .ember-guide-form { border-top: 1px solid var(--line); }
+.ember-companion-panel.has-response .ember-guide-form { border-top: 0; }
 .ember-guide-form:focus-within { box-shadow: none; }
 .ember-guide-form input { min-width: 0; min-height: 38px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); padding: 0; font: inherit; font-size: .92rem; font-weight: 500; }
 .ember-guide-form input::placeholder { color: color-mix(in srgb, var(--muted), var(--paper) 38%); opacity: 1; }
-.ember-guide-form input:focus { outline: 0; }
+.ember-guide-form input:focus,
+.ember-guide-form input:focus-visible { outline: 0; }
 .ember-guide-form button { justify-self: end; display: inline-grid; place-items: center; width: auto; height: auto; min-height: 0; border: 0; border-radius: 0; background: transparent; color: var(--green); padding: 0 2px; font-size: .86rem; font-weight: 850; line-height: 1; }
 .ember-guide-form button:hover { color: var(--ink); }
 @keyframes emberPanelIn {
