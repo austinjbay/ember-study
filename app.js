@@ -4427,10 +4427,10 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
   if (key === "retrieve-explicit") {
     return `<svg ${common}>
-      <path class="skill-icon-strawberry-leaf" d="M7.7 7.4 10.6 8.8 12 5.9l1.4 2.9 2.9-1.4M9.1 9.3h5.8"></path>
-      <circle class="skill-icon-strawberry-seed" cx="9.4" cy="13" r=".55"></circle>
-      <circle class="skill-icon-strawberry-seed" cx="14.6" cy="13" r=".55"></circle>
-      <circle class="skill-icon-strawberry-seed" cx="12" cy="16.3" r=".55"></circle>
+      <path class="skill-icon-memory-page" d="M7.2 7.4c2.1-.5 3.7-.2 4.8.8 1.1-1 2.7-1.3 4.8-.8v9.7c-2.1-.4-3.7-.1-4.8.9-1.1-1-2.7-1.3-4.8-.9Z"></path>
+      <path class="skill-icon-memory-fold" d="M15.1 7.7v3h2"></path>
+      <path class="skill-icon-memory-line" d="M9.1 11.5h4.1M9.1 14h2.6"></path>
+      <circle class="skill-icon-memory-pin" cx="15.55" cy="10.05" r="1.05"></circle>
     </svg>`;
   }
   return `<svg ${common}>
