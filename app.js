@@ -4486,7 +4486,11 @@ function renderSkillIconSpecimen() {
 
 function renderSkillModule(vm) {
   const practice = vm.practiceState || currentPracticeSkillState();
-  const path = practiceSequence.map((skill, index) => {
+  const activeIndex = Math.max(0, practiceSequence.findIndex(skill => skill.id === practice.skill.id));
+  const startIndex = Math.min(Math.max(0, activeIndex - 1), Math.max(0, practiceSequence.length - 4));
+  const visibleSkills = practiceSequence.slice(startIndex, startIndex + 4);
+  const path = visibleSkills.map((skill) => {
+    const index = practiceSequence.findIndex(item => item.id === skill.id);
     const days = successfulPracticeDays(skill);
     const status = days >= 3 ? "Durable" : skill.id === practice.skill.id ? "Recommended" : days > 0 ? "Developing" : "Available";
     const progress = Math.min(100, Math.round(Math.min(3, days) / 3 * 100));
