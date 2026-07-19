@@ -3882,12 +3882,12 @@ function commonGapFromChapters(chapters = []) {
 }
 
 function skillTitleForGap(gap = "") {
-  if (gap === "Missed central claim") return "Find the central claim";
-  if (gap === "Missed supporting evidence") return "Connect claims to evidence";
-  if (gap === "Weak synthesis") return "Connect ideas";
-  if (gap === "Weak application") return "Apply ideas with judgment";
-  if (gap === "Insufficient response") return "Build complete explanations";
-  return "Find the central claim";
+  if (gap === "Missed central claim") return "Name the main point";
+  if (gap === "Missed supporting evidence") return "Pick the proof";
+  if (gap === "Weak synthesis") return "Show how ideas connect";
+  if (gap === "Weak application") return "Use the idea wisely";
+  if (gap === "Insufficient response") return "Explain it clearly";
+  return "Name the main point";
 }
 
 function practiceReasonForGap(gap = "") {
@@ -3999,7 +3999,7 @@ function buildSkillSignals(chapters = [], evidenceState = "establishing") {
     });
   }
   if (!signals.length) {
-    const firstSkill = practiceSequence[0] || { title: "Find the central claim", description: "Separate the topic from the author’s argument." };
+    const firstSkill = practiceSequence[0] || { title: "Name the main point", description: "Say what the author is really trying to argue." };
     signals.push({
       title: `${firstSkill.title} is the best place to start.`,
       copy: firstSkill.description,
@@ -4102,7 +4102,7 @@ function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
       scheduled: scheduled.length,
       drafts: drafts.length,
       hasReading: chapters.length > 0,
-      skillTitle: practiceState?.skill?.title || skillSignals[0]?.title || "Find the central claim",
+      skillTitle: practiceState?.skill?.title || skillSignals[0]?.title || "Name the main point",
       practiceDone: Boolean(practiceState?.completedToday)
     },
     unsupportedDiagnostics: unsupportedHomeDiagnostics
@@ -4165,12 +4165,12 @@ function renderHomeInteractionPrototype(vm) {
   const supportingChecks = vm.metrics.completedChecks || 4;
   const delayedReviews = vm.metrics.delayedReviews || 1;
   const skillNodes = [
-    { title: "Central claim", state: "Developing", evidence: "4 checks", active: true },
-    { title: "Connect ideas", state: "Emerging", evidence: "2 gaps", active: true },
-    { title: "Evaluate evidence", state: "Unmeasured", evidence: "Future signal", active: false },
-    { title: "Clear explanations", state: "Developing", evidence: "3 attempts", active: true },
-    { title: "Confidence", state: "Unmeasured", evidence: "Future signal", active: false },
-    { title: "Apply ideas", state: "Emerging", evidence: "1 transfer", active: true }
+    { title: "Name the main point", state: "Developing", evidence: "4 checks", active: true },
+    { title: "Show how ideas connect", state: "Emerging", evidence: "2 gaps", active: true },
+    { title: "Pick the proof", state: "Unmeasured", evidence: "Future signal", active: false },
+    { title: "Explain it clearly", state: "Developing", evidence: "3 attempts", active: true },
+    { title: "Check what you know", state: "Unmeasured", evidence: "Future signal", active: false },
+    { title: "Use the idea wisely", state: "Emerging", evidence: "1 transfer", active: true }
   ];
   return `<section class="home-interaction-prototype" aria-labelledby="home-prototype-title">
     <header class="prototype-head">
@@ -4189,7 +4189,7 @@ function renderHomeInteractionPrototype(vm) {
           <h3 id="prototype-next-title">Connect the missing relationship.</h3>
           <p>${escapeHtml(vm.nextAction.copy)}</p>
           <dl>
-            <div><dt>Supports</dt><dd>Connect ideas</dd></div>
+            <div><dt>Supports</dt><dd>Show how ideas connect</dd></div>
             <div><dt>Evidence</dt><dd>${supportingChecks} checks</dd></div>
           </dl>
         </div>
@@ -4209,7 +4209,7 @@ function renderHomeInteractionPrototype(vm) {
 
       <div class="prototype-consequence" role="status" aria-live="polite" hidden>
         <strong>That connection held.</strong>
-        <span>Connect ideas moved forward. One earlier weak spot is now recovered.</span>
+        <span>Show how ideas connect moved forward. One earlier weak spot is now recovered.</span>
       </div>
 
       <section class="prototype-memory-card" aria-labelledby="prototype-memory-title">
@@ -4235,7 +4235,7 @@ function renderHomeInteractionPrototype(vm) {
           <span>A pattern is forming</span>
         </div>
         <div class="skill-map-grid">
-          ${skillNodes.map((skill, index) => `<button class="skill-node${skill.active ? " is-active" : ""}" type="button" data-prototype-skill="${skill.title === "Connect ideas" ? "connect" : ""}" aria-describedby="skill-node-${index}">
+          ${skillNodes.map((skill, index) => `<button class="skill-node${skill.active ? " is-active" : ""}" type="button" data-prototype-skill="${skill.title === "Show how ideas connect" ? "connect" : ""}" aria-describedby="skill-node-${index}">
             <strong>${escapeHtml(skill.title)}</strong>
             <span>${escapeHtml(skill.state)}</span>
             <small id="skill-node-${index}">${escapeHtml(skill.evidence)}</small>
@@ -4313,7 +4313,7 @@ function completePrototypeMission() {
     button.disabled = true;
     button.innerHTML = "Mission complete <span>✓</span>";
   }
-  toast("Mission complete. Connect ideas moved forward.");
+  toast("Mission complete. Show how ideas connect moved forward.");
 }
 
 function choosePrototypePath(choice = "") {
@@ -4330,7 +4330,7 @@ function choosePrototypePath(choice = "") {
     skill: {
       title: "Connect the missing relationship.",
       placeholder: "The supporting idea matters because...",
-      support: "Connect ideas"
+      support: "Show how ideas connect"
     },
     book: {
       title: "Inspect what this book is teaching you.",
@@ -4438,12 +4438,12 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
 }
 
 const marketingSkillIcons = [
-  { id: "central-claim", title: "Find the central claim", state: "durable", label: "01 · Earned" },
-  { id: "connect-ideas", title: "Connect ideas", state: "strengthening", label: "02 · In progress" },
-  { id: "match-evidence", title: "Evaluate evidence", state: "developing", label: "03 · Upcoming" },
-  { id: "build-explanation", title: "Build clear explanations", state: "emerging", label: "04 · Upcoming" },
-  { id: "calibrate-confidence", title: "Calibrate confidence", state: "unexplored", label: "05 · Upcoming" },
-  { id: "apply-with-judgment", title: "Apply with judgment", state: "unexplored", label: "06 · Upcoming" }
+  { id: "central-claim", title: "Name the main point", state: "durable", label: "01 · Earned" },
+  { id: "connect-ideas", title: "Show how ideas connect", state: "strengthening", label: "02 · In progress" },
+  { id: "match-evidence", title: "Pick the proof", state: "developing", label: "03 · Upcoming" },
+  { id: "build-explanation", title: "Explain it clearly", state: "emerging", label: "04 · Upcoming" },
+  { id: "calibrate-confidence", title: "Check what you really know", state: "unexplored", label: "05 · Upcoming" },
+  { id: "apply-with-judgment", title: "Use the idea wisely", state: "unexplored", label: "06 · Upcoming" }
 ];
 
 function skillIdForMarketingTitle(title = "") {
@@ -4551,35 +4551,35 @@ function renderSkillModule(vm) {
 const canonicalSkillTree = [
   {
     id: "retrieve-explicit",
-    title: "Retrieve explicit information",
-    description: "Recover important stated details before interpreting them.",
+    title: "Remember key details",
+    description: "Find the important things the author actually said.",
     level: "Retrieve",
     source: "PIRLS retrieve · CCRA.R.1",
-    exercise: "Find the sentence or detail the author actually states.",
+    exercise: "Name one important detail the author directly states.",
     supported: true
   },
   {
     id: "central-claim",
-    title: "Find the central claim",
-    description: "Separate the topic from the author’s argument.",
+    title: "Name the main point",
+    description: "Say what the author is really trying to argue.",
     level: "Establish meaning",
     source: "CCRA.R.2 · PIRLS interpret",
-    exercise: "State the author’s central claim in one sentence.",
+    exercise: "State the author’s main point in one sentence.",
     supported: true
   },
   {
     id: "supporting-ideas",
-    title: "Identify supporting ideas",
-    description: "Recover the reasons, examples, and mechanisms that make the claim work.",
+    title: "Find the support",
+    description: "Point to the reasons or examples that make the main point work.",
     level: "Establish meaning",
     source: "CCRA.R.2",
-    exercise: "Name the strongest support for the claim.",
+    exercise: "Name the strongest reason or example behind the main point.",
     supported: true
   },
   {
     id: "source-fidelity",
-    title: "Preserve source fidelity",
-    description: "Keep your answer faithful to the text and avoid unsupported additions.",
+    title: "Stay close to the text",
+    description: "Keep your answer grounded in the reading instead of adding guesses.",
     level: "Establish meaning",
     source: "CCRA.R.1",
     exercise: "Separate what the text says from what you inferred.",
@@ -4587,8 +4587,8 @@ const canonicalSkillTree = [
   },
   {
     id: "connect-ideas",
-    title: "Connect two ideas",
-    description: "Explain how one idea leads to, depends on, or qualifies another.",
+    title: "Show how ideas connect",
+    description: "Explain how one idea leads to, depends on, or changes another.",
     level: "Integrate",
     source: "CCRA.R.3 · PIRLS integrate",
     exercise: "Explain the relationship between two ideas.",
@@ -4596,53 +4596,53 @@ const canonicalSkillTree = [
   },
   {
     id: "structure",
-    title: "Notice structure",
-    description: "Use sequence, contrast, cause and effect, and section structure to understand the argument.",
+    title: "Notice the structure",
+    description: "Use the chapter’s order, contrasts, and cause-and-effect moves to follow the argument.",
     level: "Craft",
     source: "CCRA.R.5",
-    exercise: "Name the structure and explain how it shapes the meaning.",
+    exercise: "Name how the chapter is organized and why that matters.",
     supported: true
   },
   {
     id: "point-of-view",
-    title: "Read purpose and point of view",
-    description: "Explain how the author’s purpose shapes what gets emphasized.",
+    title: "Notice the author’s angle",
+    description: "See what the author wants you to pay attention to and why.",
     level: "Craft",
     source: "CCRA.R.6",
-    exercise: "Name the author’s purpose and what it changes.",
+    exercise: "Name what the author is trying to do and what that changes.",
     supported: true
   },
   {
     id: "match-evidence",
-    title: "Match claims with evidence",
-    description: "Choose the reason or example that actually supports a claim.",
+    title: "Pick the proof",
+    description: "Choose the example or reason that best supports a claim.",
     level: "Evaluate",
     source: "CCRA.R.8",
-    exercise: "Choose the evidence that does the most work for the claim.",
+    exercise: "Choose the evidence that does the most work.",
     supported: true
   },
   {
     id: "evaluate-reasoning",
-    title: "Evaluate reasoning",
-    description: "Judge whether a claim is supported by relevant and sufficient reasons.",
+    title: "Check the argument",
+    description: "Decide whether the reasons are strong enough to support the claim.",
     level: "Evaluate",
     source: "CCRA.R.8 · PIRLS evaluate",
-    exercise: "Test whether the evidence is relevant and sufficient.",
+    exercise: "Test whether the evidence is relevant and strong enough.",
     supported: true
   },
   {
     id: "build-explanation",
-    title: "Build a complete explanation",
-    description: "Move from claim to reason to concrete example.",
+    title: "Explain it clearly",
+    description: "Connect the main point, the reason, and a concrete example.",
     level: "Explain",
     source: "Ember rubric synthesis",
-    exercise: "Explain the claim, the reason behind it, and one concrete example.",
+    exercise: "Explain the point, the reason behind it, and one concrete example.",
     supported: true
   },
   {
     id: "infer-implications",
-    title: "Infer implications",
-    description: "Draw a conclusion that follows from the text without inventing unsupported claims.",
+    title: "Say what follows",
+    description: "Draw a conclusion that fits the text, without inventing more than it supports.",
     level: "Infer",
     source: "CCRA.R.1 · PIRLS infer",
     exercise: "State what follows from the argument, and why.",
@@ -4650,17 +4650,17 @@ const canonicalSkillTree = [
   },
   {
     id: "compare-texts",
-    title: "Compare across texts",
-    description: "Connect two sources by theme, argument, or approach.",
+    title: "Connect readings",
+    description: "Relate this reading to another source, idea, or author.",
     level: "Synthesize",
     source: "CCRA.R.9",
-    exercise: "Compare how two authors approach the same idea.",
+    exercise: "Compare how two sources approach the same idea.",
     supported: true
   },
   {
     id: "apply-with-judgment",
-    title: "Apply with judgment",
-    description: "Use an idea in a realistic situation while keeping its limits visible.",
+    title: "Use the idea wisely",
+    description: "Apply the idea to real life while noticing where it may not fit.",
     level: "Transfer",
     source: "Ember transfer rubric",
     exercise: "Use the idea in practice and name where it might fail.",
@@ -4668,8 +4668,8 @@ const canonicalSkillTree = [
   },
   {
     id: "evaluate-boundaries",
-    title: "Evaluate boundaries",
-    description: "Identify limits, assumptions, exceptions, and tradeoffs.",
+    title: "Find the limits",
+    description: "Notice when an idea stops being useful, true, or fair.",
     level: "Transfer",
     source: "PIRLS evaluate · Ember boundary challenge",
     exercise: "Name when the argument stops being useful or true.",
@@ -4677,8 +4677,8 @@ const canonicalSkillTree = [
   },
   {
     id: "calibrate-confidence",
-    title: "Calibrate confidence",
-    description: "Compare how well you thought you understood with what you could retrieve.",
+    title: "Check what you really know",
+    description: "Compare how confident you felt with what you could actually explain.",
     level: "Metacognition",
     source: "Ember confidence calibration",
     exercise: "Compare your confidence estimate with the evidence in your answer.",
@@ -5134,7 +5134,7 @@ function renderAdaptiveHomeStateHeader(vm) {
   const draftLabel = today.drafts
     ? `${today.drafts} draft${today.drafts === 1 ? "" : "s"} waiting`
     : "No drafts waiting";
-  const practiceLabel = today.practiceDone ? "Practice done" : `Skill: ${today.skillTitle || "Find the central claim"}`;
+  const practiceLabel = today.practiceDone ? "Practice done" : `Skill: ${today.skillTitle || "Name the main point"}`;
   return `<header class="adaptive-home-state" aria-label="Today in Ember">
     <h1>Today in Ember</h1>
     <div class="adaptive-home-state-list" aria-label="Current reading state">
@@ -5960,21 +5960,21 @@ function cancelManagedReview(id) {
 }
 
 const practiceSequence = [
-  { id: "retrieve-explicit", title: "Retrieve explicit information", description: "Recover important stated details before interpreting them." },
-  { id: "central-claim", title: "Find the central claim", description: "Separate the topic from the author’s argument." },
-  { id: "supporting-ideas", title: "Identify supporting ideas", description: "Recover the reasons, examples, and mechanisms that make the claim work." },
-  { id: "source-fidelity", title: "Preserve source fidelity", description: "Keep your answer faithful to the text and avoid unsupported additions." },
-  { id: "connect-ideas", title: "Connect two ideas", description: "Explain how one idea leads to or depends on another." },
-  { id: "structure", title: "Notice structure", description: "Use sequence, contrast, cause and effect, and section structure to understand the argument." },
-  { id: "point-of-view", title: "Read purpose and point of view", description: "Explain how the author’s purpose shapes what gets emphasized." },
-  { id: "match-evidence", title: "Match claims with evidence", description: "Choose the reason or example that actually supports a claim." },
-  { id: "evaluate-reasoning", title: "Evaluate reasoning", description: "Judge whether a claim is supported by relevant and sufficient reasons." },
-  { id: "build-explanation", title: "Build a complete explanation", description: "Move from claim to reason to concrete example." },
-  { id: "infer-implications", title: "Infer implications", description: "Draw a conclusion that follows from the text without inventing unsupported claims." },
-  { id: "compare-texts", title: "Compare across texts", description: "Connect two sources by theme, argument, or approach." },
-  { id: "apply-with-judgment", title: "Apply with judgment", description: "Use an idea in a realistic situation while keeping its limits visible." },
-  { id: "evaluate-boundaries", title: "Evaluate boundaries", description: "Identify limits, assumptions, exceptions, and tradeoffs." },
-  { id: "calibrate-confidence", title: "Calibrate confidence", description: "Compare how well you thought you understood with what you could retrieve." }
+  { id: "retrieve-explicit", title: "Remember key details", description: "Find the important things the author actually said." },
+  { id: "central-claim", title: "Name the main point", description: "Say what the author is really trying to argue." },
+  { id: "supporting-ideas", title: "Find the support", description: "Point to the reasons or examples that make the main point work." },
+  { id: "source-fidelity", title: "Stay close to the text", description: "Keep your answer grounded in the reading instead of adding guesses." },
+  { id: "connect-ideas", title: "Show how ideas connect", description: "Explain how one idea leads to, depends on, or changes another." },
+  { id: "structure", title: "Notice the structure", description: "Use the chapter’s order, contrasts, and cause-and-effect moves to follow the argument." },
+  { id: "point-of-view", title: "Notice the author’s angle", description: "See what the author wants you to pay attention to and why." },
+  { id: "match-evidence", title: "Pick the proof", description: "Choose the example or reason that best supports a claim." },
+  { id: "evaluate-reasoning", title: "Check the argument", description: "Decide whether the reasons are strong enough to support the claim." },
+  { id: "build-explanation", title: "Explain it clearly", description: "Connect the main point, the reason, and a concrete example." },
+  { id: "infer-implications", title: "Say what follows", description: "Draw a conclusion that fits the text, without inventing more than it supports." },
+  { id: "compare-texts", title: "Connect readings", description: "Relate this reading to another source, idea, or author." },
+  { id: "apply-with-judgment", title: "Use the idea wisely", description: "Apply the idea to real life while noticing where it may not fit." },
+  { id: "evaluate-boundaries", title: "Find the limits", description: "Notice when an idea stops being useful, true, or fair." },
+  { id: "calibrate-confidence", title: "Check what you really know", description: "Compare how confident you felt with what you could actually explain." }
 ];
 
 function loadPracticeRecords() {
@@ -6099,7 +6099,7 @@ const practiceQuestionBanks = {
     lessonCopy: "A complete explanation states the idea, explains why it holds, and grounds it in something concrete.",
     exampleOne: "<strong>Claim:</strong> Shared quiet hours improve team output.",
     exampleTwo: "<strong>Reason + example:</strong> They reduce interruption; for example, teams can reserve mornings for focused production.",
-    question: "Build a complete explanation from this passage.",
+    question: "Explain this passage clearly.",
     passage: "People are more likely to maintain a new habit when the desired action is easy to begin. Preparing materials in advance removes a moment of friction. Someone who places a book on their pillow, for example, is more likely to read before bed.",
     placeholder: "State the claim, explain the reason, and include the example.",
     signals: [["habit", "action"], ["easy", "friction", "prepare"], ["book", "pillow", "read"]],
