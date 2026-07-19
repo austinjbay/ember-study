@@ -3209,6 +3209,32 @@ select:focus-visible,
   transform: none;
 }
 
+.adaptive-home .next-action-card .primary,
+.home-top-module[data-module-id="primary-next-action"] .next-action-card .primary {
+  border-color: rgba(255,255,255,.92);
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: 0 10px 24px rgba(0,0,0,.14);
+}
+
+.adaptive-home .next-action-card .primary:hover,
+.adaptive-home .next-action-card .primary:focus-visible,
+.home-top-module[data-module-id="primary-next-action"] .next-action-card .primary:hover,
+.home-top-module[data-module-id="primary-next-action"] .next-action-card .primary:focus-visible {
+  border-color: var(--white);
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: 0 14px 28px rgba(0,0,0,.18);
+  transform: translateY(-1px);
+}
+
+.adaptive-home .next-action-card .primary:active,
+.home-top-module[data-module-id="primary-next-action"] .next-action-card .primary:active {
+  background: color-mix(in srgb, var(--white), var(--paper) 8%);
+  box-shadow: 0 6px 14px rgba(0,0,0,.14);
+  transform: translateY(1px);
+}
+
 .secondary,
 .google-auth-button,
 .reschedule-options button,
