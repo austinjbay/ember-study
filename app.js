@@ -3991,14 +3991,11 @@ function progressSummary(chapters = []) {
   const reviews = completedReviewCount(chapters);
   const recovered = chapters.filter(chapter => chapter.repairResolved || chapter.delayedAttempts?.some(attempt => attempt.gapBand === "Strong" || attempt.band === "Strong")).length;
   const practiced = loadPracticeRecords().filter(record => record.completedAt || record.correct).length;
-  const headline = chapters.length
-    ? `${chapters.length} reading${chapters.length === 1 ? "" : "s"} reviewed`
-    : "No reviews logged yet";
-  const copy = chapters.length
-    ? reviews
-      ? `${reviews} delayed review${reviews === 1 ? "" : "s"} completed so far.`
-      : "Your first delayed reviews will appear here after Ember brings readings back."
-    : "Start a review to begin tracking what you remember, practice, and recover.";
+  const totalActions = chapters.length + reviews + recovered + practiced;
+  const headline = `${chapters.length} reading${chapters.length === 1 ? "" : "s"} reviewed`;
+  const copy = totalActions
+    ? `${totalActions} learning action${totalActions === 1 ? "" : "s"} logged across reviews, practice, and recovered weak spots.`
+    : "Ember will track reviewed readings, delayed reviews, practice, and recovered weak spots here.";
   return {
     chapters: chapters.length,
     reviews,
@@ -4081,7 +4078,7 @@ function fixtureHomeViewModel(evidenceState) {
       diagnostic: { confidence: "preview", title: "Ember is ready to organize your first book.", copy: "Create a book first, then add chapters as you read so Ember can build reviews around that source.", basis: "Example insight only." },
       skillSignals: [{ title: "No personal reading signal yet.", copy: "Create a book and complete one chapter check to begin the diagnostic profile.", basis: "Fixture preview.", confidence: "preview" }],
       memoryCandidates: [],
-      progress: { chapters: 0, reviews: 0, recovered: 0, practiced: 0, headline: "No reviews logged yet", copy: "Start a review to begin tracking what you remember, practice, and recover." },
+      progress: { chapters: 0, reviews: 0, recovered: 0, practiced: 0, headline: "0 readings reviewed", copy: "Ember will track reviewed readings, delayed reviews, practice, and recovered weak spots here." },
       libraryBooks: [],
       activeBooks: []
     },
@@ -4091,7 +4088,7 @@ function fixtureHomeViewModel(evidenceState) {
       diagnostic: { confidence: "early", title: "Early patterns are beginning to show.", copy: "You are recovering central claims, while support-to-argument links are still developing.", basis: "Early signal across 4 checks and 1 delayed review." },
       skillSignals: [{ title: "Central claims are coming back.", copy: "You recovered the main claim in most early checks.", basis: "4 completed checks.", confidence: "early" }, { title: "Connecting ideas is the growth area.", copy: "The same relationship gap appeared twice.", basis: "2 related gaps.", confidence: "early" }],
       memoryCandidates: [{ chapterId: "", title: "Deep Work Is Valuable", bookTitle: "Deep Work", prompt: "Before opening it: why did this chapter argue depth matters?", preview: "Depth creates rare value because it lets you produce at the edge of your ability while avoiding the shallow work that fragments attention.", reason: "Example resurfacing from a recent chapter." }],
-      progress: { chapters: 4, reviews: 1, recovered: 1, practiced: 2, headline: "4 readings reviewed", copy: "1 delayed review completed so far." },
+      progress: { chapters: 4, reviews: 1, recovered: 1, practiced: 2, headline: "4 readings reviewed", copy: "8 learning actions logged across reviews, practice, and recovered weak spots." },
       libraryBooks: [{ key: "deep-work", title: "Deep Work", author: "Cal Newport", completed: 4, total: 12, drafts: 0, latestChapter: "Deep Work Is Valuable" }],
       activeBooks: [{ title: "Deep Work", author: "Cal Newport", completed: 4, total: 12 }]
     },
@@ -4101,7 +4098,7 @@ function fixtureHomeViewModel(evidenceState) {
       diagnostic: { confidence: "supported", title: "Your reading profile is supported by repeated evidence.", copy: "You identify central claims reliably, even after delay. The best next focus is reconnecting examples to the author’s argument.", basis: "Across 16 checks, 8 reviews, and 4 skill areas." },
       skillSignals: [{ title: "Central claim recall is reliable.", copy: "This skill held up across recent delayed reviews.", basis: "8 delayed reviews.", confidence: "supported" }, { title: "Evidence connection is the focus.", copy: "Examples come back, but their role in the argument is less consistent.", basis: "6 related checks.", confidence: "supported" }],
       memoryCandidates: [{ chapterId: "", title: "Legacy", bookTitle: "The Road to Character", prompt: "Before opening it: what did this chapter suggest about résumé virtues and eulogy virtues?", preview: "", reason: "Example resurfacing from a previously difficult idea." }],
-      progress: { chapters: 16, reviews: 8, recovered: 5, practiced: 7, headline: "16 readings reviewed", copy: "8 delayed reviews completed so far." },
+      progress: { chapters: 16, reviews: 8, recovered: 5, practiced: 7, headline: "16 readings reviewed", copy: "36 learning actions logged across reviews, practice, and recovered weak spots." },
       libraryBooks: [{ key: "road-character", title: "The Road to Character", author: "David Brooks", completed: 12, total: 12, drafts: 0, latestChapter: "Quiet Strength" }, { key: "know-person", title: "How to Know a Person", author: "David Brooks", completed: 4, total: 10, drafts: 1, latestChapter: "Good Talks" }],
       activeBooks: [{ title: "The Road to Character", author: "David Brooks", completed: 12, total: 12 }, { title: "How to Know a Person", author: "David Brooks", completed: 4, total: 10 }]
     }
