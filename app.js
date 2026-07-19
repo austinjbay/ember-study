@@ -4520,7 +4520,8 @@ const canonicalSkillTree = [
     description: "Recover important stated details before interpreting them.",
     level: "Retrieve",
     source: "PIRLS retrieve · CCRA.R.1",
-    exercise: "Find the sentence or detail the author actually states."
+    exercise: "Find the sentence or detail the author actually states.",
+    supported: true
   },
   {
     id: "central-claim",
@@ -4537,7 +4538,8 @@ const canonicalSkillTree = [
     description: "Recover the reasons, examples, and mechanisms that make the claim work.",
     level: "Establish meaning",
     source: "CCRA.R.2",
-    exercise: "Name the strongest support for the claim."
+    exercise: "Name the strongest support for the claim.",
+    supported: true
   },
   {
     id: "source-fidelity",
@@ -4545,7 +4547,8 @@ const canonicalSkillTree = [
     description: "Keep your answer faithful to the text and avoid unsupported additions.",
     level: "Establish meaning",
     source: "CCRA.R.1",
-    exercise: "Separate what the text says from what you inferred."
+    exercise: "Separate what the text says from what you inferred.",
+    supported: true
   },
   {
     id: "connect-ideas",
@@ -4562,7 +4565,8 @@ const canonicalSkillTree = [
     description: "Use sequence, contrast, cause and effect, and section structure to understand the argument.",
     level: "Craft",
     source: "CCRA.R.5",
-    exercise: "Name the structure and explain how it shapes the meaning."
+    exercise: "Name the structure and explain how it shapes the meaning.",
+    supported: true
   },
   {
     id: "point-of-view",
@@ -4570,7 +4574,8 @@ const canonicalSkillTree = [
     description: "Explain how the author’s purpose shapes what gets emphasized.",
     level: "Craft",
     source: "CCRA.R.6",
-    exercise: "Name the author’s purpose and what it changes."
+    exercise: "Name the author’s purpose and what it changes.",
+    supported: true
   },
   {
     id: "match-evidence",
@@ -4587,7 +4592,8 @@ const canonicalSkillTree = [
     description: "Judge whether a claim is supported by relevant and sufficient reasons.",
     level: "Evaluate",
     source: "CCRA.R.8 · PIRLS evaluate",
-    exercise: "Test whether the evidence is relevant and sufficient."
+    exercise: "Test whether the evidence is relevant and sufficient.",
+    supported: true
   },
   {
     id: "build-explanation",
@@ -4604,7 +4610,8 @@ const canonicalSkillTree = [
     description: "Draw a conclusion that follows from the text without inventing unsupported claims.",
     level: "Infer",
     source: "CCRA.R.1 · PIRLS infer",
-    exercise: "State what follows from the argument, and why."
+    exercise: "State what follows from the argument, and why.",
+    supported: true
   },
   {
     id: "compare-texts",
@@ -4612,7 +4619,8 @@ const canonicalSkillTree = [
     description: "Connect two sources by theme, argument, or approach.",
     level: "Synthesize",
     source: "CCRA.R.9",
-    exercise: "Compare how two authors approach the same idea."
+    exercise: "Compare how two authors approach the same idea.",
+    supported: true
   },
   {
     id: "apply-with-judgment",
@@ -4620,7 +4628,8 @@ const canonicalSkillTree = [
     description: "Use an idea in a realistic situation while keeping its limits visible.",
     level: "Transfer",
     source: "Ember transfer rubric",
-    exercise: "Use the idea in practice and name where it might fail."
+    exercise: "Use the idea in practice and name where it might fail.",
+    supported: true
   },
   {
     id: "evaluate-boundaries",
@@ -4628,7 +4637,8 @@ const canonicalSkillTree = [
     description: "Identify limits, assumptions, exceptions, and tradeoffs.",
     level: "Transfer",
     source: "PIRLS evaluate · Ember boundary challenge",
-    exercise: "Name when the argument stops being useful or true."
+    exercise: "Name when the argument stops being useful or true.",
+    supported: true
   },
   {
     id: "calibrate-confidence",
@@ -4636,7 +4646,8 @@ const canonicalSkillTree = [
     description: "Compare how well you thought you understood with what you could retrieve.",
     level: "Metacognition",
     source: "Ember confidence calibration",
-    exercise: "Compare your confidence estimate with the evidence in your answer."
+    exercise: "Compare your confidence estimate with the evidence in your answer.",
+    supported: true
   }
 ];
 
@@ -4661,21 +4672,21 @@ const skillMapEdges = [
 ];
 
 const skillMapPositions = {
-  "retrieve-explicit": { x: 9, y: 46 },
-  "central-claim": { x: 24, y: 25 },
-  "supporting-ideas": { x: 24, y: 69 },
-  "source-fidelity": { x: 39, y: 12 },
-  "connect-ideas": { x: 42, y: 47 },
-  "structure": { x: 57, y: 24 },
-  "point-of-view": { x: 73, y: 16 },
-  "match-evidence": { x: 58, y: 66 },
-  "evaluate-reasoning": { x: 73, y: 60 },
-  "build-explanation": { x: 73, y: 82 },
-  "infer-implications": { x: 56, y: 8 },
-  "compare-texts": { x: 89, y: 32 },
-  "apply-with-judgment": { x: 89, y: 56 },
-  "evaluate-boundaries": { x: 89, y: 77 },
-  "calibrate-confidence": { x: 72, y: 94 }
+  "retrieve-explicit": { x: 10, y: 52 },
+  "central-claim": { x: 23, y: 34 },
+  "supporting-ideas": { x: 23, y: 70 },
+  "source-fidelity": { x: 38, y: 18 },
+  "connect-ideas": { x: 40, y: 52 },
+  "structure": { x: 55, y: 32 },
+  "point-of-view": { x: 70, y: 22 },
+  "match-evidence": { x: 55, y: 70 },
+  "evaluate-reasoning": { x: 70, y: 64 },
+  "build-explanation": { x: 70, y: 84 },
+  "infer-implications": { x: 55, y: 10 },
+  "compare-texts": { x: 86, y: 36 },
+  "apply-with-judgment": { x: 86, y: 58 },
+  "evaluate-boundaries": { x: 86, y: 79 },
+  "calibrate-confidence": { x: 70, y: 96 }
 };
 
 function skillMapStateFor(skill, currentSkill) {
@@ -4685,7 +4696,7 @@ function skillMapStateFor(skill, currentSkill) {
   const stateName = practiceReady ? skillDevelopmentState(days, isCurrent) : "unexplored";
   const label = !practiceReady
     ? "Mapped future skill"
-    : isCurrent ? "Current focus" : days >= 3 ? "Durable" : days > 0 ? `${days}/3 successful days` : "Practice-ready";
+    : isCurrent ? "Current focus" : days >= 3 ? "Earned" : days > 0 ? `${days}/3 successful days` : "Available";
   return { days, isCurrent, practiceReady, stateName, label };
 }
 
@@ -4700,6 +4711,7 @@ function renderSkillMapPage() {
     || canonicalSkillTree[0];
   state.selectedSkillMapSkill = selectedSkill.id;
   const selectedState = skillMapStateFor(selectedSkill, currentSkill);
+  const earnedCount = canonicalSkillTree.filter(skill => skillMapStateFor(skill, currentSkill).days >= 3).length;
   const edges = skillMapEdges.map(([from, to]) => {
     const start = skillMapPositions[from];
     const end = skillMapPositions[to];
@@ -4715,19 +4727,25 @@ function renderSkillMapPage() {
       <span class="skill-icon-wrap">${renderSkillIcon(skill.id, nodeState.stateName, 34)}</span>
       <span>${String(index + 1).padStart(2, "0")}</span>
       <strong>${escapeHtml(skill.title)}</strong>
+      <small>${escapeHtml(nodeState.label)}</small>
     </button>`;
   }).join("");
   root.innerHTML = `<div class="skill-map-layout">
     <section class="skill-map-canvas-card" aria-labelledby="skill-map-network-title">
       <div class="skill-map-card-head">
         <div>
-          <span class="eyebrow">Network</span>
-          <h2 id="skill-map-network-title">How the reading skills connect.</h2>
+          <span class="eyebrow">Skill Tree</span>
+          <h2 id="skill-map-network-title">Earn your way from recall to transfer.</h2>
+          <p>${earnedCount} of ${canonicalSkillTree.length} skills earned · earn each skill with three successful practice days.</p>
         </div>
         <button class="secondary skill-map-practice-quick" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(currentSkill.id)}">Start current practice</button>
       </div>
       <div class="skill-map-canvas" aria-label="Reading skill network">
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
+        <span class="skill-map-region region-foundation">Recall</span>
+        <span class="skill-map-region region-meaning">Meaning</span>
+        <span class="skill-map-region region-evaluate">Judgment</span>
+        <span class="skill-map-region region-transfer">Transfer</span>
         ${nodes}
       </div>
     </section>
@@ -5727,10 +5745,21 @@ function cancelManagedReview(id) {
 }
 
 const practiceSequence = [
+  { id: "retrieve-explicit", title: "Retrieve explicit information", description: "Recover important stated details before interpreting them." },
   { id: "central-claim", title: "Find the central claim", description: "Separate the topic from the author’s argument." },
+  { id: "supporting-ideas", title: "Identify supporting ideas", description: "Recover the reasons, examples, and mechanisms that make the claim work." },
+  { id: "source-fidelity", title: "Preserve source fidelity", description: "Keep your answer faithful to the text and avoid unsupported additions." },
   { id: "connect-ideas", title: "Connect two ideas", description: "Explain how one idea leads to or depends on another." },
+  { id: "structure", title: "Notice structure", description: "Use sequence, contrast, cause and effect, and section structure to understand the argument." },
+  { id: "point-of-view", title: "Read purpose and point of view", description: "Explain how the author’s purpose shapes what gets emphasized." },
   { id: "match-evidence", title: "Match claims with evidence", description: "Choose the reason or example that actually supports a claim." },
-  { id: "build-explanation", title: "Build a complete explanation", description: "Move from claim to reason to concrete example." }
+  { id: "evaluate-reasoning", title: "Evaluate reasoning", description: "Judge whether a claim is supported by relevant and sufficient reasons." },
+  { id: "build-explanation", title: "Build a complete explanation", description: "Move from claim to reason to concrete example." },
+  { id: "infer-implications", title: "Infer implications", description: "Draw a conclusion that follows from the text without inventing unsupported claims." },
+  { id: "compare-texts", title: "Compare across texts", description: "Connect two sources by theme, argument, or approach." },
+  { id: "apply-with-judgment", title: "Apply with judgment", description: "Use an idea in a realistic situation while keeping its limits visible." },
+  { id: "evaluate-boundaries", title: "Evaluate boundaries", description: "Identify limits, assumptions, exceptions, and tradeoffs." },
+  { id: "calibrate-confidence", title: "Calibrate confidence", description: "Compare how well you thought you understood with what you could retrieve." }
 ];
 
 function loadPracticeRecords() {
@@ -5738,6 +5767,17 @@ function loadPracticeRecords() {
 }
 
 const practiceQuestionBanks = {
+  "retrieve-explicit": [{
+    lessonTitle: "Start with what the text actually says",
+    lessonCopy: "Before interpreting a passage, recover the stated detail that does the most work.",
+    exampleOne: "<strong>Detail:</strong> The policy starts next month.",
+    exampleTwo: "<strong>Use:</strong> That stated date anchors any inference about timing.",
+    question: "Which stated detail matters most?",
+    passage: "The library extended its evening hours after students reported that daytime schedules conflicted with labs and jobs. Attendance rose most sharply between 7 p.m. and 9 p.m., especially during exam weeks.",
+    placeholder: "Name the stated detail and explain why it matters.",
+    signals: [["evening", "hours", "7", "9"], ["students", "schedules", "labs", "jobs"], ["attendance", "rose", "exam"]],
+    success: "You recovered the stated detail about evening use and connected it to why the schedule change mattered."
+  }],
   "central-claim": [
     {
       lessonTitle: "Topic is not the same as claim",
@@ -5773,6 +5813,50 @@ const practiceQuestionBanks = {
     signals: [["switching", "tasks"], ["residue", "attention", "mind"], ["focus", "concentration", "quality", "work"]],
     success: "You explained the causal chain from task switching to attention residue to lower-quality focused work."
   }],
+  "supporting-ideas": [{
+    lessonTitle: "Claims need support",
+    lessonCopy: "Supporting ideas are the reasons, examples, or mechanisms that make the central claim credible.",
+    exampleOne: "<strong>Claim:</strong> Walking meetings can improve attention.",
+    exampleTwo: "<strong>Support:</strong> Movement increases alertness and removes screen distractions.",
+    question: "What idea best supports the author’s claim?",
+    passage: "The author argues that community gardens strengthen neighborhoods. Residents who work in the gardens meet one another repeatedly, share tools, and develop small routines of cooperation that often extend beyond the garden itself.",
+    placeholder: "Name the strongest supporting idea and explain how it helps the claim.",
+    signals: [["residents", "neighbors", "community"], ["meet", "share", "cooperation"], ["garden", "beyond", "neighborhood"]],
+    success: "You identified repeated cooperation as the support that explains why gardens can strengthen neighborhoods."
+  }],
+  "source-fidelity": [{
+    lessonTitle: "Keep inference tethered",
+    lessonCopy: "Strong readers distinguish what the text states from what they reasonably conclude.",
+    exampleOne: "<strong>Text says:</strong> Sales fell after the price increase.",
+    exampleTwo: "<strong>Inference:</strong> The higher price may have reduced demand.",
+    question: "What is stated, and what is inferred?",
+    passage: "After the museum began charging admission, weekday visits dropped by nearly a third. The director said the fee would fund longer opening hours and new school programs.",
+    placeholder: "Separate one stated fact from one reasonable inference.",
+    signals: [["visits", "dropped", "third"], ["fee", "admission", "charging"], ["infer", "may", "could", "likely", "because"]],
+    success: "You kept the stated attendance drop separate from a cautious inference about the admission fee."
+  }],
+  "structure": [{
+    lessonTitle: "Structure shapes meaning",
+    lessonCopy: "Authors use structure to guide what readers notice: cause and effect, contrast, sequence, problem and solution, or comparison.",
+    exampleOne: "<strong>Structure:</strong> Problem → solution",
+    exampleTwo: "<strong>Effect:</strong> The solution feels necessary because the problem is established first.",
+    question: "What structure organizes this passage?",
+    passage: "First, the team tracked where customers abandoned the form. Then they removed unnecessary fields and grouped related questions. After the redesign, more customers completed the checkout process.",
+    placeholder: "Name the structure and explain how it shapes the argument.",
+    signals: [["first", "then", "after"], ["sequence", "process", "steps"], ["redesign", "completed", "checkout"]],
+    success: "You noticed the sequence structure and explained how the steps build toward the result."
+  }],
+  "point-of-view": [{
+    lessonTitle: "Purpose changes emphasis",
+    lessonCopy: "A writer’s purpose affects which details are selected, praised, criticized, or left out.",
+    exampleOne: "<strong>Purpose:</strong> Persuade readers to protect wetlands.",
+    exampleTwo: "<strong>Emphasis:</strong> Flood protection and habitat benefits receive attention.",
+    question: "What purpose shapes this passage?",
+    passage: "The author describes remote work by emphasizing lower commute stress, quieter work blocks, and access for employees who live far from city centers. The paragraph gives little attention to coordination problems or training challenges.",
+    placeholder: "Name the author’s likely purpose and one detail that reveals it.",
+    signals: [["remote", "work"], ["commute", "quiet", "access"], ["purpose", "emphasize", "persuade", "favor"]],
+    success: "You connected the positive emphasis on access and focus to the author’s favorable purpose."
+  }],
   "match-evidence": [{
     lessonTitle: "Evidence must do a job",
     lessonCopy: "Strong evidence directly supports the claim; it is not merely another fact about the same topic.",
@@ -5784,6 +5868,17 @@ const practiceQuestionBanks = {
     signals: [["walk", "outside", "outdoor"], ["errors", "fewer"], ["attention", "task", "focus"]],
     success: "You selected the workplace trial and explained how fewer errors support the claim about sustained attention."
   }],
+  "evaluate-reasoning": [{
+    lessonTitle: "Relevant is not the same as sufficient",
+    lessonCopy: "A reason can be related to the claim but still too weak, narrow, or incomplete to prove it.",
+    exampleOne: "<strong>Claim:</strong> The policy improved attendance.",
+    exampleTwo: "<strong>Test:</strong> Is there enough evidence that attendance changed because of the policy?",
+    question: "Is the reasoning strong enough?",
+    passage: "The author argues that the new study app caused higher test scores. The only evidence offered is that one student used the app for a week and received a better score than last time.",
+    placeholder: "Judge whether the evidence is relevant and sufficient.",
+    signals: [["one", "student", "week"], ["scores", "app", "study"], ["insufficient", "weak", "not enough", "limited"]],
+    success: "You saw that the example is relevant but too narrow to prove the broader causal claim."
+  }],
   "build-explanation": [{
     lessonTitle: "Build from claim to reason to example",
     lessonCopy: "A complete explanation states the idea, explains why it holds, and grounds it in something concrete.",
@@ -5794,6 +5889,61 @@ const practiceQuestionBanks = {
     placeholder: "State the claim, explain the reason, and include the example.",
     signals: [["habit", "action"], ["easy", "friction", "prepare"], ["book", "pillow", "read"]],
     success: "You included the claim, the friction-reducing mechanism, and the concrete reading example."
+  }],
+  "infer-implications": [{
+    lessonTitle: "Infer what follows",
+    lessonCopy: "An implication is not directly stated, but it should follow from the author’s reasoning.",
+    exampleOne: "<strong>Text:</strong> Interruptions reduce deep work.",
+    exampleTwo: "<strong>Implication:</strong> Teams should protect blocks of uninterrupted time.",
+    question: "What conclusion is strongly implied?",
+    passage: "The chapter argues that people overestimate how much they understand after rereading because familiar words feel fluent. Testing yourself feels harder, but it reveals what you can actually retrieve without support.",
+    placeholder: "State one implied conclusion and explain what in the passage supports it.",
+    signals: [["test", "testing", "retrieve"], ["rereading", "familiar", "fluent"], ["implies", "should", "therefore", "because"]],
+    success: "You inferred that self-testing is more trustworthy than rereading for judging understanding."
+  }],
+  "compare-texts": [{
+    lessonTitle: "Compare the move, not just the topic",
+    lessonCopy: "Useful comparison notices how two authors treat a shared idea differently.",
+    exampleOne: "<strong>Shared topic:</strong> Technology in classrooms",
+    exampleTwo: "<strong>Difference:</strong> One focuses on access; the other focuses on distraction.",
+    question: "How do these two short texts differ?",
+    passage: "Text A argues that digital notes help students search and reorganize information quickly. Text B argues that handwritten notes slow students down enough to make them select and process ideas more carefully.",
+    placeholder: "Compare the two authors’ approaches to the same topic.",
+    signals: [["digital", "handwritten", "notes"], ["search", "reorganize", "quick"], ["slow", "select", "process", "careful"]],
+    success: "You compared the authors’ different approaches to note-taking rather than merely naming the shared topic."
+  }],
+  "apply-with-judgment": [{
+    lessonTitle: "Transfer needs limits",
+    lessonCopy: "Applying an idea well means naming where it helps and where the situation may be different.",
+    exampleOne: "<strong>Idea:</strong> Make habits easy to start.",
+    exampleTwo: "<strong>Judgment:</strong> Useful for routines, weaker for decisions that require deep motivation.",
+    question: "How would you use this idea in practice?",
+    passage: "The author argues that people follow through more often when the desired action is visible and easy to begin. Small setup choices can make the first step feel almost automatic.",
+    placeholder: "Apply the idea to a real situation and name one limit.",
+    signals: [["visible", "easy", "start", "begin"], ["use", "apply", "practice"], ["limit", "unless", "but", "however"]],
+    success: "You applied the idea to a practical situation while keeping a limit in view."
+  }],
+  "evaluate-boundaries": [{
+    lessonTitle: "Good arguments have edges",
+    lessonCopy: "A boundary is where an idea stops being useful, needs qualification, or depends on a hidden assumption.",
+    exampleOne: "<strong>Argument:</strong> Constraints improve creativity.",
+    exampleTwo: "<strong>Boundary:</strong> Too many constraints can prevent useful exploration.",
+    question: "Where might this argument stop being useful?",
+    passage: "The author argues that deadlines improve creative work because they force decisions and prevent endless revision. But the passage assumes that the deadline still leaves enough time to explore more than one possible direction.",
+    placeholder: "Name the boundary, exception, or assumption.",
+    signals: [["deadline", "deadlines"], ["time", "explore", "direction"], ["limit", "boundary", "assumption", "unless", "too"]],
+    success: "You identified the argument’s boundary: deadlines help only when they still leave enough room to explore."
+  }],
+  "calibrate-confidence": [{
+    lessonTitle: "Compare confidence with evidence",
+    lessonCopy: "Calibration means noticing whether your confidence matches what your answer actually showed.",
+    exampleOne: "<strong>Confidence:</strong> Very high",
+    exampleTwo: "<strong>Evidence:</strong> Missing the reason behind the claim means the confidence was too high.",
+    question: "How well did the answer match the confidence?",
+    passage: "A student felt very confident after reading a chapter about sleep and learning. In the answer, the student remembered that sleep matters but forgot the mechanism: sleep helps stabilize newly learned information.",
+    placeholder: "Judge the confidence and name the missing evidence.",
+    signals: [["confident", "confidence"], ["sleep", "learning"], ["mechanism", "stabilize", "missing"]],
+    success: "You compared the confidence with the missing mechanism and made the calibration explicit."
   }]
 };
 
@@ -5852,6 +6002,12 @@ function currentPracticeQuestion(skillId) {
 }
 
 const practiceCoaching = {
+  "retrieve-explicit": {
+    parts: ["the stated detail", "where it appears", "why it matters"],
+    move: "Next time, quote or paraphrase the exact detail first, then explain the role it plays.",
+    diagnostic: "Retrieval practice starts with the stated detail. Do not jump to interpretation before anchoring the answer.",
+    template: "The text states ___. This matters because ___."
+  },
   "central-claim": {
     parts: ["the topic", "the author’s recommendation", "the reason it matters"],
     move: "Next time, write one sentence with this shape: “The author argues that [who] should [do what] because [why].”",
@@ -5864,17 +6020,77 @@ const practiceCoaching = {
     diagnostic: "A connection answer should show how one idea changes, causes, supports, or limits the other.",
     template: "___ leads to ___ because ___."
   },
+  "supporting-ideas": {
+    parts: ["the central claim", "the supporting idea", "how the support helps"],
+    move: "Next time, name the support and add the phrase “this supports the claim because…”.",
+    diagnostic: "A supporting idea should make the central claim more believable, specific, or complete.",
+    template: "The support is ___. It strengthens the claim because ___."
+  },
+  "source-fidelity": {
+    parts: ["what the text states", "what you inferred", "a cautious connector"],
+    move: "Next time, split the answer into two parts: “The text says…” and “This suggests…”.",
+    diagnostic: "Source fidelity means keeping stated evidence separate from your interpretation.",
+    template: "The text says ___. This suggests ___ because ___."
+  },
+  "structure": {
+    parts: ["the structure", "the order or pattern", "how it shapes meaning"],
+    move: "Next time, use a structure label like sequence, contrast, cause and effect, or problem and solution.",
+    diagnostic: "A structure answer should explain how the organization changes what the reader understands.",
+    template: "The passage is organized as ___. That matters because ___."
+  },
+  "point-of-view": {
+    parts: ["the author’s purpose", "the emphasized detail", "what is minimized or left out"],
+    move: "Next time, connect one selected detail to the author’s likely purpose.",
+    diagnostic: "Purpose and point of view show up in what the author emphasizes, criticizes, or leaves unexplored.",
+    template: "The author seems to want ___. We can see this because ___."
+  },
   "match-evidence": {
     parts: ["the claim", "the specific evidence", "how the evidence proves the claim"],
     move: "Next time, do not stop at naming evidence. Add one phrase that explains the job it does for the claim.",
     diagnostic: "Evidence is useful only when you explain why it supports the claim rather than merely sharing the same topic.",
     template: "The best evidence is ___ because it shows ___."
   },
+  "evaluate-reasoning": {
+    parts: ["the claim", "the evidence", "a judgment about sufficiency"],
+    move: "Next time, say whether the evidence is relevant, sufficient, or both.",
+    diagnostic: "Reasoning is strong only when evidence is both connected to the claim and enough to support its size.",
+    template: "The evidence is ___, but it is/is not sufficient because ___."
+  },
   "build-explanation": {
     parts: ["the claim", "the reason or mechanism", "a concrete example"],
     move: "Next time, use a three-part answer: claim first, reason second, example last.",
     diagnostic: "A complete explanation should move from the idea to why it works, then ground it in a concrete case.",
     template: "The claim is ___. This works because ___. For example, ___."
+  },
+  "infer-implications": {
+    parts: ["the implied conclusion", "the stated clue", "the reasoning bridge"],
+    move: "Next time, write “This implies…” and point back to the sentence that makes it likely.",
+    diagnostic: "An implication should follow from the text, even if the author never states it directly.",
+    template: "This implies ___ because the text says ___."
+  },
+  "compare-texts": {
+    parts: ["the shared topic", "the first author’s approach", "the second author’s approach"],
+    move: "Next time, compare the authors’ moves, not only their subject.",
+    diagnostic: "A strong comparison explains how two texts treat the same idea differently.",
+    template: "Both texts address ___. Text A emphasizes ___, while Text B emphasizes ___."
+  },
+  "apply-with-judgment": {
+    parts: ["the idea", "the practical use", "one limit or condition"],
+    move: "Next time, include a real use case and one place where the idea may not apply.",
+    diagnostic: "Transfer is strongest when the application is concrete and the limits are visible.",
+    template: "I would use this by ___. It may not apply when ___."
+  },
+  "evaluate-boundaries": {
+    parts: ["the argument", "the boundary or exception", "the condition that changes it"],
+    move: "Next time, name the assumption the argument depends on.",
+    diagnostic: "A boundary answer should identify where the idea needs a qualifier, exception, or condition.",
+    template: "This argument works when ___. It breaks down if ___."
+  },
+  "calibrate-confidence": {
+    parts: ["the confidence level", "the evidence in the answer", "the adjustment"],
+    move: "Next time, compare how confident you felt with what your answer actually included.",
+    diagnostic: "Calibration means adjusting your confidence based on demonstrated recall, not the feeling of familiarity.",
+    template: "My confidence was ___. The answer showed ___, so I should adjust by ___."
   }
 };
 
