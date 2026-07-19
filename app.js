@@ -4622,7 +4622,6 @@ function buildHomeModules(vm) {
     homeModule("reader-diagnostic", 20, hasReaderEvidence, vm.diagnostic?.confidence, vm.diagnostic?.basis, renderDiagnosticModule(vm)),
     homeModule("memory-resurfacing", vm.evidenceState === "establishing" ? 50 : 30, vm.entryCount > 0 && vm.memoryCandidates.length > 0, confidenceForEvidence(vm.evidenceState), vm.memoryCandidates[0]?.reason, renderMemoryModule(vm)),
     homeModule("skill-development", 40, true, confidenceForEvidence(vm.evidenceState), vm.skillSignals[0]?.basis, renderSkillModule(vm)),
-    homeModule("today-practice", 45, true, confidenceForEvidence(vm.evidenceState), vm.practiceState?.skill?.title, renderTodayPracticeModule(vm)),
     homeModule("progress-over-time", 60, true, confidenceForEvidence(vm.evidenceState), `${vm.progress.reviews} delayed reviews`, renderProgressModule(vm)),
     homeModule("personalization-setup", 35, vm.evidenceState === "establishing", "preview", "Optional setup while evidence is sparse.", renderPersonalizationModule(vm)),
     homeModule("future-work", 80, vm.evidenceState === "established", "preview", "Unsupported diagnostics are marked as future work.", renderFutureWorkModule(vm))
@@ -4675,7 +4674,7 @@ function renderAdaptiveLoggedInHome(vm) {
   const hasLibraryActivity = moduleById.has("library-activity");
   const hasReaderDiagnostic = moduleById.has("reader-diagnostic");
   const supportModules = modules
-    .filter(module => !["primary-next-action", "skill-development", "progress-over-time", "library-carousel", "memory-resurfacing", "today-practice", "reader-diagnostic"].includes(module.id))
+    .filter(module => !["primary-next-action", "skill-development", "progress-over-time", "library-carousel", "memory-resurfacing", "reader-diagnostic"].includes(module.id))
     .map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`)
     .join("");
   $("#returning-home").innerHTML = `
@@ -4691,9 +4690,6 @@ function renderAdaptiveLoggedInHome(vm) {
         ${hasMemoryResurfacing ? `<section class="reading-world-zone memory-zone" aria-label="Memory recovery">
           ${zone("memory-resurfacing")}
         </section>` : ""}
-        <section class="reading-world-zone practice-zone" aria-label="Today’s practice">
-          ${zone("today-practice")}
-        </section>
         ${hasLibraryActivity ? `<section class="reading-world-zone library-zone" aria-label="Library activity">
           ${zone("library-activity")}
         </section>` : ""}
