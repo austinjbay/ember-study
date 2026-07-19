@@ -155,6 +155,7 @@ const state = {
   authMode: "login",
   homeFixture: "",
   selectedSkillMapSkill: "",
+  selectedSkillMapRegion: "all",
   emberChatMessages: [],
   pendingEmberAssistantIndex: null
 };
@@ -4695,26 +4696,41 @@ const skillMapPositions = {
 
 const skillMapRegions = [
   {
+    id: "recall",
     label: "Recall",
     className: "region-foundation",
     description: "Recover what the text actually says."
   },
   {
+    id: "meaning",
     label: "Meaning",
     className: "region-meaning",
     description: "Turn details into the author’s argument."
   },
   {
+    id: "judgment",
     label: "Judgment",
     className: "region-evaluate",
     description: "Test evidence, reasoning, and point of view."
   },
   {
+    id: "transfer",
     label: "Transfer",
     className: "region-transfer",
     description: "Use the idea, compare it, and find its limits."
   }
 ];
+
+const skillMapRegionSkillIds = {
+  recall: ["retrieve-explicit", "central-claim", "source-fidelity"],
+  meaning: ["supporting-ideas", "connect-ideas", "structure", "infer-implications"],
+  judgment: ["point-of-view", "match-evidence", "evaluate-reasoning", "compare-texts"],
+  transfer: ["build-explanation", "apply-with-judgment", "evaluate-boundaries", "calibrate-confidence"]
+};
+
+function skillMapRegionForSkill(skillId) {
+  return Object.entries(skillMapRegionSkillIds).find(([, ids]) => ids.includes(skillId))?.[0] || "meaning";
+}
 
 function skillMapParents(skillId) {
   return skillMapEdges.filter(([, to]) => to === skillId).map(([from]) => from);
@@ -4766,18 +4782,23 @@ function renderSkillMapPage() {
   const selectedParents = skillMapParents(selectedSkill.id);
   const selectedChildren = skillMapChildren(selectedSkill.id);
   const relatedIds = new Set([selectedSkill.id, ...selectedParents, ...selectedChildren]);
+  const selectedRegion = state.selectedSkillMapRegion || "all";
+  const selectedRegionIds = selectedRegion === "all" ? [] : skillMapRegionSkillIds[selectedRegion] || [];
   const edges = skillMapEdges.map(([from, to]) => {
     const start = skillMapPositions[from];
     const end = skillMapPositions[to];
     if (!start || !end) return "";
     const active = from === selectedSkill.id || to === selectedSkill.id;
-    return `<line class="${active ? "is-active" : ""}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}" />`;
+    const regionEdge = selectedRegionIds.includes(from) && selectedRegionIds.includes(to);
+    return `<line class="${active ? "is-active" : ""}${regionEdge ? " is-region-edge" : ""}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}" />`;
   }).join("");
   const nodes = canonicalSkillTree.map((skill, index) => {
     const position = skillMapPositions[skill.id] || { x: 50, y: 50 };
     const nodeState = skillMapStateFor(skill, currentSkill);
     const selected = skill.id === selectedSkill.id;
-    return `<button class="skill-map-node${nodeState.practiceReady ? " is-practice-ready" : " is-mapped"}${nodeState.isCurrent ? " is-current" : ""}${nodeState.days >= 3 ? " is-durable" : ""}${selected ? " is-selected" : ""}${relatedIds.has(skill.id) ? " is-related" : ""}" type="button" style="--x:${position.x}%; --y:${position.y}%;" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skill.id)}" data-skill-state="${escapeHtml(nodeState.stateName)}" aria-pressed="${selected}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(nodeState.label)}. Maps to ${escapeHtml(skill.source)}.">
+    const regionId = skillMapRegionForSkill(skill.id);
+    const regionMatch = selectedRegion === "all" || selectedRegion === regionId;
+    return `<button class="skill-map-node skill-region-${escapeHtml(regionId)}${nodeState.practiceReady ? " is-practice-ready" : " is-mapped"}${nodeState.isCurrent ? " is-current" : ""}${nodeState.days >= 3 ? " is-durable" : ""}${selected ? " is-selected" : ""}${relatedIds.has(skill.id) ? " is-related" : ""}${regionMatch ? " is-region-match" : " is-region-dimmed"}" type="button" style="--x:${position.x}%; --y:${position.y}%;" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skill.id)}" data-skill-state="${escapeHtml(nodeState.stateName)}" aria-pressed="${selected}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(nodeState.label)}. Category: ${escapeHtml(regionId)}. Maps to ${escapeHtml(skill.source)}.">
       <span class="skill-icon-wrap">${renderSkillIcon(skill.id, nodeState.stateName, 34)}</span>
       <span>${String(index + 1).padStart(2, "0")}</span>
       <strong>${escapeHtml(skill.title)}</strong>
@@ -4785,7 +4806,10 @@ function renderSkillMapPage() {
       <small>${escapeHtml(nodeState.label)}</small>
     </button>`;
   }).join("");
-  const regions = skillMapRegions.map(region => `<article class="skill-map-region ${escapeHtml(region.className)}">
+  const regionTabs = [`<button class="skill-map-region-tab${selectedRegion === "all" ? " is-active" : ""}" type="button" data-action="skill-map-region" data-skill-map-region="all">All skills</button>`]
+    .concat(skillMapRegions.map(region => `<button class="skill-map-region-tab skill-region-${escapeHtml(region.id)}${selectedRegion === region.id ? " is-active" : ""}" type="button" data-action="skill-map-region" data-skill-map-region="${escapeHtml(region.id)}">${escapeHtml(region.label)}</button>`))
+    .join("");
+  const regions = skillMapRegions.map(region => `<article class="skill-map-region ${escapeHtml(region.className)} skill-region-${escapeHtml(region.id)}">
     <strong>${escapeHtml(region.label)}</strong>
     <span>${escapeHtml(region.description)}</span>
   </article>`).join("");
@@ -4795,34 +4819,35 @@ function renderSkillMapPage() {
         <div>
           <span class="eyebrow">Skill Tree</span>
           <h2 id="skill-map-network-title">Earn your way from recall to transfer.</h2>
-          <p>${earnedCount} of ${canonicalSkillTree.length} skills earned · earn each skill with three successful practice days.</p>
+          <p>Explore the branches of reading comprehension. Choose a category or skill to see what it builds from, what it unlocks, and the standard or process it maps up to.</p>
         </div>
         <button class="secondary skill-map-practice-quick" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(currentSkill.id)}">Start current practice</button>
       </div>
+      <p class="skill-map-earned-note">${earnedCount} of ${canonicalSkillTree.length} skills earned · earn each skill with three successful practice days.</p>
+      <div class="skill-map-region-tabs" aria-label="Skill categories">${regionTabs}</div>
       <div class="skill-map-canvas" aria-label="Reading skill network">
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
         ${regions}
         ${nodes}
       </div>
-    </section>
-    <aside class="skill-map-detail" aria-labelledby="skill-map-detail-title">
-      <span class="eyebrow">${escapeHtml(selectedSkill.level || "Reading skill")}</span>
-      <h2 id="skill-map-detail-title">${escapeHtml(selectedSkill.title)}</h2>
-      <p>${escapeHtml(selectedSkill.description)}</p>
-      <div class="skill-map-source-pills" aria-label="Standards and frameworks this skill maps to">
-        ${skillMapSourcePills(selectedSkill.source || "Ember skill model")}
+      <div class="skill-map-inline-detail" aria-labelledby="skill-map-detail-title">
+        <div>
+          <span class="eyebrow">${escapeHtml(selectedSkill.level || "Reading skill")}</span>
+          <h2 id="skill-map-detail-title">${escapeHtml(selectedSkill.title)}</h2>
+          <p>${escapeHtml(selectedSkill.description)}</p>
+          <div class="skill-map-source-pills" aria-label="Standards and frameworks this skill maps to">
+            ${skillMapSourcePills(selectedSkill.source || "Ember skill model")}
+          </div>
+        </div>
+        <dl>
+          <div><dt>Category</dt><dd>${escapeHtml(skillMapRegions.find(region => region.id === skillMapRegionForSkill(selectedSkill.id))?.label || "Reading skill")}</dd></div>
+          <div><dt>Builds from</dt><dd>${escapeHtml(skillMapTitleList(selectedParents, "Starting point"))}</dd></div>
+          <div><dt>Unlocks</dt><dd>${escapeHtml(skillMapTitleList(selectedChildren, "End of this branch"))}</dd></div>
+          <div><dt>Maps up to</dt><dd>${escapeHtml(selectedSkill.source || "Ember skill model")}</dd></div>
+        </dl>
+        <button class="${selectedState.isCurrent ? "primary" : "secondary"}" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}">${selectedState.isCurrent ? "Start practice" : "Practice this skill"}</button>
       </div>
-      <dl>
-        <div><dt>State</dt><dd>${escapeHtml(selectedState.label)}</dd></div>
-        <div><dt>Builds from</dt><dd>${escapeHtml(skillMapTitleList(selectedParents, "Starting point"))}</dd></div>
-        <div><dt>Unlocks</dt><dd>${escapeHtml(skillMapTitleList(selectedChildren, "End of this branch"))}</dd></div>
-        <div><dt>Maps up to</dt><dd>${escapeHtml(selectedSkill.source || "Ember skill model")}</dd></div>
-        <div><dt>Exercise</dt><dd>${escapeHtml(selectedSkill.exercise || selectedSkill.description)}</dd></div>
-      </dl>
-      ${selectedState.practiceReady
-        ? `<button class="${selectedState.isCurrent ? "primary" : "secondary"}" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}">${selectedState.isCurrent ? "Start practice" : "Practice this skill"}</button>`
-        : `<button class="secondary" type="button" disabled>Practice coming later</button>`}
-    </aside>
+    </section>
   </div>`;
 }
 
@@ -6486,6 +6511,10 @@ document.addEventListener("click", async event => {
   if (action === "open-skill-badge") openSkillBadge(event.target.closest("[data-practice-skill]")?.dataset.practiceSkill);
   if (action === "skill-map-select") {
     state.selectedSkillMapSkill = event.target.closest("[data-skill-map-id]")?.dataset.skillMapId || "";
+    renderSkillMapPage();
+  }
+  if (action === "skill-map-region") {
+    state.selectedSkillMapRegion = event.target.closest("[data-skill-map-region]")?.dataset.skillMapRegion || "all";
     renderSkillMapPage();
   }
   if (action === "skill-map-practice") openSkillBadge(event.target.closest("[data-skill-map-id]")?.dataset.skillMapId);
