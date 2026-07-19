@@ -11,6 +11,7 @@ const DISMISSED_AUTO_DRAFTS_KEY = "margin-dismissed-auto-drafts-v1";
 const LOGIN_PROMPT_KEY = "ember-login-prompt-index";
 const SESSION_PROMPT_KEY = "ember-session-login-prompt";
 const EMBER_CHAT_MINIMIZED_KEY = "ember-chat-minimized-v1";
+const SIDEBAR_OPENED_KEY = "ember-sidebar-opened-by-user-v1";
 const DEFAULT_COLOR_THEME = "moss-paper";
 const DEFAULT_COLOR_MODE = "light";
 
@@ -387,7 +388,7 @@ function renderAuthState() {
   const loggedIn = isLoggedIn();
   applyColorTheme();
   document.body.classList.toggle("logged-out", !loggedIn);
-  setSidebarCollapsed(!loggedIn);
+  setSidebarCollapsed(!loggedIn || localStorage.getItem(SIDEBAR_OPENED_KEY) !== "true");
   updateProfileUI();
   if (loggedIn) {
     $("#onboarding-title").innerHTML = `<span data-local-greeting>${localGreeting()}</span><br><em data-login-prompt>${activeLoggedInPrompt()}</em>`;
@@ -6288,7 +6289,10 @@ $("#existing-book").addEventListener("change", () => {
 $("#check-form").addEventListener("submit", event => event.preventDefault());
 $("#toggle-sidebar").addEventListener("click", () => {
   if (!isLoggedIn()) return;
-  setSidebarCollapsed(!document.body.classList.contains("sidebar-collapsed"));
+  const nextCollapsed = !document.body.classList.contains("sidebar-collapsed");
+  if (nextCollapsed) localStorage.removeItem(SIDEBAR_OPENED_KEY);
+  else localStorage.setItem(SIDEBAR_OPENED_KEY, "true");
+  setSidebarCollapsed(nextCollapsed);
 });
 $("#mobile-menu").addEventListener("click", () => document.body.classList.toggle("mobile-nav-open"));
 $("#source-dialog").addEventListener("click", event => {
