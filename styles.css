@@ -346,7 +346,7 @@ main:focus { outline: 0; }
 .next-action-copy .eyebrow { color: #a9c8b4; }
 .next-action-copy h2 { max-width: 760px; margin: 14px 0 14px; font-family: var(--serif); font-size: clamp(2.15rem, 5vw, 4.45rem); font-weight: 500; line-height: .98; }
 .next-action-subrow { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 620px) auto; align-items: center; gap: clamp(20px, 4vw, 56px); }
-.next-action-copy p { max-width: 620px; margin: 0; color: rgba(255,255,255,.68); font-size: .86rem; line-height: 1.65; }
+.next-action-copy p { max-width: 660px; margin: 0; color: rgba(255,255,255,.68); font-size: .98rem; line-height: 1.62; }
 .next-action-card .primary { position: relative; z-index: 1; align-self: center; border-color: white; background: white; color: var(--ink); white-space: nowrap; box-shadow: 0 12px 30px rgba(0,0,0,.14); }
 .next-action-card .primary:hover { transform: translateY(-1px); }
 @keyframes primaryActionSheen {
