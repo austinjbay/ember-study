@@ -1027,7 +1027,7 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-callout { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px 20px; }
 .skill-map-callout p { margin: 6px 0 0; }
 .skill-map-callout .text-button { justify-self: end; }
-.skill-map-view { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 72px 0 90px; }
+.skill-map-view { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 34px 0 90px; }
 .skill-map-hero { max-width: 920px; }
 .skill-map-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(16px, 3vw, 28px); align-items: stretch; margin-top: 24px; }
 .skill-map-canvas-card { display: grid; min-width: 0; border: 1px solid var(--line-dark); border-radius: 8px; background: color-mix(in srgb, var(--white), var(--paper) 34%); box-shadow: 10px 10px 0 rgba(47,49,45,.06); color: var(--ink); padding: clamp(14px, 2vw, 20px); }
@@ -2607,7 +2607,7 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .skill-specimen-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .skill-map-callout { grid-template-columns: 1fr; }
   .skill-map-callout .text-button { justify-self: start; }
-  .skill-map-view { width: min(100% - 36px, 1180px); padding-top: 42px; }
+  .skill-map-view { width: min(100% - 36px, 1180px); padding-top: 24px; }
   .skill-map-layout { grid-template-columns: 1fr; }
   .skill-map-canvas-card { grid-template-rows: auto auto; }
   .skill-map-card-head { align-items: stretch; flex-direction: column; }
