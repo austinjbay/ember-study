@@ -4508,10 +4508,10 @@ function renderProgressModule(vm) {
     <h2 id="progress-title">${escapeHtml(vm.progress.headline)}</h2>
     <p>${escapeHtml(vm.progress.copy)}</p>
     <div class="learning-snapshot adaptive-snapshot" aria-label="Learning evidence">
-      <article><span>Chapters checked</span><strong>${vm.progress.chapters}</strong><small>Source-grounded checks</small></article>
-      <article><span>Reviews completed</span><strong>${vm.progress.reviews}</strong><small>Delayed retrievals</small></article>
-      <article><span>Weak spots recovered</span><strong>${vm.progress.recovered}</strong><small>Later strengthened</small></article>
-      <article><span>Practice logged</span><strong>${vm.progress.practiced}</strong><small>Skill exercises</small></article>
+      <article><strong>${vm.progress.chapters}</strong><span>Chapters checked</span></article>
+      <article><strong>${vm.progress.reviews}</strong><span>Reviews completed</span></article>
+      <article><strong>${vm.progress.recovered}</strong><span>Weak spots recovered</span></article>
+      <article><strong>${vm.progress.practiced}</strong><span>Practice logged</span></article>
     </div>
   </section>`;
 }

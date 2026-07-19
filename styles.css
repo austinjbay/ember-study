@@ -615,6 +615,8 @@ body.logged-out .landing-footer { display: flex; }
   margin-bottom: 0;
   padding: 0;
 }
+.progress-module .learning-snapshot strong { margin: 0 0 8px; }
+.progress-module .learning-snapshot article > span { line-height: 1.25; }
 .adaptive-home .skill-signal-list article,
 .adaptive-home .active-book-list article,
 .adaptive-home .memory-reveal details {
