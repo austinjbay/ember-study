@@ -4427,10 +4427,11 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
   if (key === "retrieve-explicit") {
     return `<svg ${common}>
-      <path class="skill-icon-memory-page" d="M7.2 7.4c2.1-.5 3.7-.2 4.8.8 1.1-1 2.7-1.3 4.8-.8v9.7c-2.1-.4-3.7-.1-4.8.9-1.1-1-2.7-1.3-4.8-.9Z"></path>
-      <path class="skill-icon-memory-fold" d="M15.1 7.7v3h2"></path>
-      <path class="skill-icon-memory-line" d="M9.1 11.5h4.1M9.1 14h2.6"></path>
-      <circle class="skill-icon-memory-pin" cx="15.55" cy="10.05" r="1.05"></circle>
+      <path class="skill-icon-recall-page" d="M7.3 6.9h7.9l1.5 1.6v8.8H7.3Z"></path>
+      <path class="skill-icon-recall-corner" d="M15.2 6.9v2h1.5"></path>
+      <path class="skill-icon-recall-quote" d="M9.2 10.3c.7-.7 1.4-.8 2-.3-.5.3-.8.8-.8 1.4v.4H9.2Z"></path>
+      <path class="skill-icon-recall-lines" d="M9.2 13.1h5.6M9.2 15.3h4.1"></path>
+      <circle class="skill-icon-recall-pin" cx="15.3" cy="10.7" r="1.05"></circle>
     </svg>`;
   }
   return `<svg ${common}>
