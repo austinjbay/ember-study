@@ -667,10 +667,14 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon .skill-icon-link { fill: none; stroke: color-mix(in srgb, var(--skill-highlight), var(--ink) 22%); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; opacity: .82; vector-effect: non-scaling-stroke; }
 .skill-icon .skill-icon-body { fill: color-mix(in srgb, var(--ink), var(--white) 6%); stroke: color-mix(in srgb, var(--ink), var(--white) 28%); stroke-width: 1; opacity: .96; }
 .skill-icon .skill-icon-prize { fill: var(--skill-highlight, var(--amber)); stroke: rgba(255,253,247,.72); stroke-width: .8; opacity: 1; }
+.skill-icon .skill-icon-memory-trace { fill: none; stroke: color-mix(in srgb, var(--skill-highlight), var(--paper) 14%); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; opacity: .84; vector-effect: non-scaling-stroke; }
+.skill-icon .skill-icon-memory-spark { fill: color-mix(in srgb, var(--skill-highlight), var(--white) 18%); stroke: rgba(255,253,247,.66); stroke-width: .35; opacity: .95; }
 .skill-icon-retrieve-explicit .skill-icon-body { stroke: color-mix(in srgb, var(--skill-highlight), var(--paper) 42%); }
 .skill-icon-retrieve-explicit .skill-icon-prize { stroke-width: .55; }
 .skill-icon-unexplored .skill-icon-body { opacity: .82; }
 .skill-icon-unexplored .skill-icon-link { opacity: .5; }
+.skill-icon-unexplored .skill-icon-memory-trace,
+.skill-icon-unexplored .skill-icon-memory-spark { opacity: .58; }
 .skill-icon-unexplored .skill-icon-prize { opacity: .78; }
 .skill-icon-emerging .skill-icon-prize { opacity: .88; }
 .skill-icon-developing .skill-icon-prize,
