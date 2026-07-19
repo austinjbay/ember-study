@@ -4428,9 +4428,11 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   if (key === "retrieve-explicit") {
     return `<svg ${common}>
       <circle class="skill-icon-body" cx="12" cy="12" r="7.8"></circle>
-      <path class="skill-icon-memory-trace" d="M7.9 10.3a5 5 0 0 1 8.2 0M8.8 15a4.2 4.2 0 0 0 6.4 0"></path>
-      <circle class="skill-icon-prize" cx="12" cy="12" r="2.35"></circle>
-      <circle class="skill-icon-memory-spark" cx="15.4" cy="8.4" r=".9"></circle>
+      <path class="skill-icon-strawberry-leaf" d="M9.7 8.5 12 6.8l2.3 1.7M12 8.4l.1-2.3"></path>
+      <path class="skill-icon-strawberry" d="M12 8.7c-2.45 0-4.35 1.55-4.35 3.9 0 2.8 2.55 5.1 4.35 6 1.8-.9 4.35-3.2 4.35-6 0-2.35-1.9-3.9-4.35-3.9Z"></path>
+      <circle class="skill-icon-strawberry-seed" cx="10.4" cy="12" r=".45"></circle>
+      <circle class="skill-icon-strawberry-seed" cx="13.6" cy="12" r=".45"></circle>
+      <circle class="skill-icon-strawberry-seed" cx="12" cy="14.5" r=".45"></circle>
     </svg>`;
   }
   return `<svg ${common}>
