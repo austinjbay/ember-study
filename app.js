@@ -4425,26 +4425,10 @@ function skillDevelopmentState(days = 0, isCurrent = false) {
 function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", size = 32) {
   const key = readingSkillIconKey(skillId);
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
-  const icons = {
-    "retrieve-explicit": `<svg ${common}><circle class="skill-icon-prize" cx="12" cy="7.2" r="2.25"/><path class="skill-icon-cut" d="M9.2 11h5.6M9.2 14h4.2"/><path class="skill-icon-cut" d="m9.4 17.2 2.6-1.5 2.6 1.5"/></svg>`,
-    "central-claim": `<svg ${common}><circle class="skill-icon-body" cx="12" cy="12" r="6.2"/><circle class="skill-icon-cut" cx="12" cy="12" r="2.8"/><circle class="skill-icon-prize" cx="12" cy="12" r="1.4"/></svg>`,
-    "supporting-ideas": `<svg ${common}><path class="skill-icon-body" d="M12 5.2 18.2 18H5.8Z"/><path class="skill-icon-cut" d="M9.1 16.1h5.8M10.4 12.7h3.2"/><circle class="skill-icon-prize" cx="12" cy="8.8" r="1.3"/></svg>`,
-    "source-fidelity": `<svg ${common}><path class="skill-icon-body" d="M12 5.1 17.7 8v5.2c0 3-2.1 5-5.7 6.1-3.6-1.1-5.7-3.1-5.7-6.1V8Z"/><path class="skill-icon-cut" d="M9.3 12.4h5.4"/><path class="skill-icon-prize" d="m9.4 9.6 1.5 1.4 3.7-3.7"/></svg>`,
-    "connect-ideas": `<svg ${common}><path class="skill-icon-body" d="M6.8 8.2h4.6v4.6H6.8zM12.6 11.2h4.6v4.6h-4.6z"/><path class="skill-icon-cut" d="M10.7 10.7 13.3 13.3"/><circle class="skill-icon-prize" cx="17.2" cy="7.3" r="1.25"/></svg>`,
-    "structure": `<svg ${common}><rect class="skill-icon-body" x="6.4" y="5.4" width="11.2" height="13.2" rx="2"/><path class="skill-icon-cut" d="M9.2 9h5.6M9.2 12h5.6M9.2 15h3.8"/><circle class="skill-icon-prize" cx="16" cy="6.6" r="1.2"/></svg>`,
-    "point-of-view": `<svg ${common}><circle class="skill-icon-body" cx="12" cy="12" r="6.3"/><circle class="skill-icon-cut-fill" cx="12" cy="12" r="2.6"/><circle class="skill-icon-body" cx="12.8" cy="11.2" r="1.3"/><circle class="skill-icon-prize" cx="16.1" cy="7.8" r="1.1"/></svg>`,
-    "match-evidence": `<svg ${common}><path class="skill-icon-body" d="M6.6 7h5.7l1.2 2h3.9v8H6.6Z"/><path class="skill-icon-cut" d="M8.8 12.2h3.2"/><path class="skill-icon-prize" d="m13.8 13 1.1 1.1 2.5-3"/></svg>`,
-    "evaluate-evidence": `<svg ${common}><rect class="skill-icon-body" x="6.2" y="5.8" width="11.6" height="12.4" rx="2.2"/><path class="skill-icon-cut" d="M9 9.8h6M9 12.7h3.7"/><path class="skill-icon-prize" d="m9.1 15.3 1.3 1.2 3.6-4.1"/></svg>`,
-    "evaluate-reasoning": `<svg ${common}><path class="skill-icon-body" d="M10.9 5.4h2.2v11h-2.2zM7.2 16.4h9.6v2.2H7.2z"/><path class="skill-icon-body" d="m7.3 8.5-2 4h4zM16.7 8.5l-2 4h4z"/><circle class="skill-icon-prize" cx="12" cy="8.5" r="1.15"/></svg>`,
-    "build-explanation": `<svg ${common}><path class="skill-icon-body" d="M6.2 16.6h11.6v2.2H6.2zM8.2 12.6h7.6v2.2H8.2zM10 8.6h4v2.2h-4z"/><path class="skill-icon-prize" d="M12 4.8 15.2 8H8.8Z"/></svg>`,
-    "infer-implications": `<svg ${common}><path class="skill-icon-body" d="M6.2 14.9 14.9 6.2l2.9 2.9-8.7 8.7H6.2Z"/><path class="skill-icon-cut" d="M8.4 15.6 15.6 8.4"/><circle class="skill-icon-prize" cx="7" cy="17" r="1.25"/></svg>`,
-    "compare-texts": `<svg ${common}><rect class="skill-icon-body" x="6" y="6" width="5.7" height="11.8" rx="1.4"/><rect class="skill-icon-body" x="12.3" y="6" width="5.7" height="11.8" rx="1.4"/><path class="skill-icon-cut" d="M8.2 10h1.6M14.5 10h1.6M8.2 13.7h1.6M14.5 13.7h1.6"/><circle class="skill-icon-prize" cx="12" cy="18" r=".9"/></svg>`,
-    "clear-explanations": `<svg ${common}><path class="skill-icon-body" d="M5.8 7.6h12.4v7.5h-4.6L10 18.2v-3.1H5.8Z"/><path class="skill-icon-cut" d="M8.5 10.5h7M8.5 13h4.5"/><circle class="skill-icon-prize" cx="17.2" cy="7.2" r="1.2"/></svg>`,
-    "calibrate-confidence": `<svg ${common}><path class="skill-icon-body" d="M6 15.1a6 6 0 1 1 12 0H6Z"/><path class="skill-icon-cut" d="M8.7 14.7h6.6M12 14.3l2.5-4.1"/><circle class="skill-icon-prize" cx="12" cy="14.3" r="1.1"/></svg>`,
-    "apply-with-judgment": `<svg ${common}><path class="skill-icon-body" d="m12 5.1 2.1 4.4 4.8.7-3.5 3.4.8 4.8-4.2-2.3-4.2 2.3.8-4.8-3.5-3.4 4.8-.7z"/><path class="skill-icon-cut" d="m9.3 12.3 1.6 1.6 3.8-4.1"/><circle class="skill-icon-prize" cx="16.2" cy="17.1" r="1"/></svg>`,
-    "evaluate-boundaries": `<svg ${common}><path class="skill-icon-body" d="M12 5.4c3.5 1.6 5.6 4.4 5.6 7.9-1.4 2.5-3.2 4.1-5.6 4.9-2.4-.8-4.2-2.4-5.6-4.9 0-3.5 2.1-6.3 5.6-7.9Z"/><path class="skill-icon-cut" d="M12 8.2v7.4M9.2 12h5.6"/><circle class="skill-icon-prize" cx="16" cy="8.2" r="1"/></svg>`
-  };
-  return icons[key] || icons["central-claim"];
+  return `<svg ${common}>
+    <circle class="skill-icon-body" cx="12" cy="12" r="7.8"></circle>
+    <circle class="skill-icon-prize" cx="12" cy="12" r="3.1"></circle>
+  </svg>`;
 }
 
 const marketingSkillIcons = [
@@ -4550,56 +4534,10 @@ function hydrateStaticSkillBadges() {
 function renderSkillIconSpecimen() {
   const target = $("#skill-icon-specimen");
   if (!target) return;
-  const directions = [
-    {
-      title: "Reading Keepsakes",
-      copy: "Objects a reader might actually save: bookmark, seal, lens, compass. Quiet, tactile, and closest to Ember's current mood.",
-      objects: [
-        ["bookmark", "Remember"],
-        ["seal", "Main idea"],
-        ["lens", "Evidence"],
-        ["compass", "Transfer"]
-      ]
-    },
-    {
-      title: "Desk Charms",
-      copy: "Small study-table objects with more personality: stamp, note card, brass key, pocket gauge. Warmer and more collectible.",
-      objects: [
-        ["stamp", "Review"],
-        ["card", "Details"],
-        ["key", "Connect"],
-        ["gauge", "Confidence"]
-      ]
-    },
-    {
-      title: "Field Notes",
-      copy: "A reading-adventure kit: map pin, trail marker, folded map, signal flag. More game-like without leaving the reading world.",
-      objects: [
-        ["pin", "Locate"],
-        ["trail", "Sequence"],
-        ["map", "Structure"],
-        ["flag", "Apply"]
-      ]
-    }
-  ];
   target.innerHTML = `<div class="skill-icon-specimen-head">
-    <span class="eyebrow">Icon direction prototypes</span>
-    <h2 id="skill-icon-specimen-title">Three ways the skill objects could feel.</h2>
-    <p>These are rough direction studies for the icon language, separate from the current production icons. Pick the emotional lane first, then we can rebuild the whole set around it.</p>
-  </div>
-  <div class="icon-direction-grid" aria-label="Reading skill icon direction prototypes">
-    ${directions.map(direction => `<article>
-      <div>
-        <span>${escapeHtml(direction.title)}</span>
-        <p>${escapeHtml(direction.copy)}</p>
-      </div>
-      <div class="keepsake-row">
-        ${direction.objects.map(([objectName, label]) => `<figure class="keepsake-object keepsake-${escapeHtml(objectName)}">
-          <i aria-hidden="true"></i>
-          <figcaption>${escapeHtml(label)}</figcaption>
-        </figure>`).join("")}
-      </div>
-    </article>`).join("")}
+    <span class="eyebrow">Icon system prototype</span>
+    <h2 id="skill-icon-specimen-title">A quiet dot language for reading skills.</h2>
+    <p>Each skill uses the same simple mark, with a distinct color at the center. The system stays consistent while still giving every skill a recognizable signal.</p>
   </div>
   <div class="skill-specimen-panel">
     <div class="skill-specimen-row" aria-label="All reading skill icons at 24 pixels">
