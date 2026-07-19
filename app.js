@@ -4615,10 +4615,11 @@ function renderFutureWorkModule(vm) {
 }
 
 function buildHomeModules(vm) {
+  const hasReaderEvidence = vm.entryCount > 0 && vm.diagnostic?.confidence !== "preview";
   return [
     homeModule("library-carousel", 5, vm.entryCount > 0, confidenceForEvidence(vm.evidenceState), `${vm.libraryBooks.length} books`, renderLibraryCarouselModule(vm)),
     homeModule("primary-next-action", 10, true, confidenceForEvidence(vm.evidenceState), vm.nextAction?.why, renderPrimaryNextActionModule(vm)),
-    homeModule("reader-diagnostic", 20, true, vm.diagnostic?.confidence, vm.diagnostic?.basis, renderDiagnosticModule(vm)),
+    homeModule("reader-diagnostic", 20, hasReaderEvidence, vm.diagnostic?.confidence, vm.diagnostic?.basis, renderDiagnosticModule(vm)),
     homeModule("memory-resurfacing", vm.evidenceState === "establishing" ? 50 : 30, vm.entryCount > 0 && vm.memoryCandidates.length > 0, confidenceForEvidence(vm.evidenceState), vm.memoryCandidates[0]?.reason, renderMemoryModule(vm)),
     homeModule("skill-development", 40, true, confidenceForEvidence(vm.evidenceState), vm.skillSignals[0]?.basis, renderSkillModule(vm)),
     homeModule("today-practice", 45, true, confidenceForEvidence(vm.evidenceState), vm.practiceState?.skill?.title, renderTodayPracticeModule(vm)),
@@ -4672,6 +4673,7 @@ function renderAdaptiveLoggedInHome(vm) {
   const topZone = id => moduleById.get(id) ? `<div class="home-top-module" data-module-id="${escapeHtml(id)}">${moduleById.get(id)}</div>` : "";
   const hasMemoryResurfacing = moduleById.has("memory-resurfacing");
   const hasLibraryActivity = moduleById.has("library-activity");
+  const hasReaderDiagnostic = moduleById.has("reader-diagnostic");
   const supportModules = modules
     .filter(module => !["primary-next-action", "skill-development", "progress-over-time", "library-carousel", "memory-resurfacing", "today-practice", "reader-diagnostic"].includes(module.id))
     .map(module => `<div class="home-module-shell" data-module-id="${escapeHtml(module.id)}">${module.html}</div>`)
@@ -4695,9 +4697,9 @@ function renderAdaptiveLoggedInHome(vm) {
         ${hasLibraryActivity ? `<section class="reading-world-zone library-zone" aria-label="Library activity">
           ${zone("library-activity")}
         </section>` : ""}
-        <section class="reading-world-zone diagnostic-zone" aria-label="Reading profile">
+        ${hasReaderDiagnostic ? `<section class="reading-world-zone diagnostic-zone" aria-label="Reading profile">
           ${zone("reader-diagnostic")}
-        </section>
+        </section>` : ""}
         ${supportModules ? `<section class="reading-world-zone support-zone" aria-label="Additional setup">${supportModules}</section>` : ""}
       </div>
     </div>`;
