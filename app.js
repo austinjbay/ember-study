@@ -4718,6 +4718,21 @@ const skillMapPositions = {
   "calibrate-confidence": { x: 91, y: 76 }
 };
 
+function skillMapTrimmedLine(start, end) {
+  const iconRadius = 4.1;
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const offsetX = (dx / length) * iconRadius;
+  const offsetY = (dy / length) * iconRadius;
+  return {
+    x1: start.x + offsetX,
+    y1: start.y + offsetY,
+    x2: end.x - offsetX,
+    y2: end.y - offsetY
+  };
+}
+
 const skillMapRegions = [
   {
     id: "recall",
@@ -4876,10 +4891,11 @@ function renderSkillMapPage() {
     const start = skillMapPositions[edge.from];
     const end = skillMapPositions[edge.to];
     if (!start || !end) return "";
+    const line = skillMapTrimmedLine(start, end);
     const active = edge.from === selectedSkill.id || edge.to === selectedSkill.id;
     const regionEdge = selectedRegionIds.includes(edge.from) && selectedRegionIds.includes(edge.to);
     const edgeRegion = skillMapRegionForSkill(edge.from);
-    return `<line class="relationship-${escapeHtml(edge.type)} edge-region-${escapeHtml(edgeRegion)}${active ? " is-active" : ""}${regionEdge ? " is-region-edge" : ""}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}">
+    return `<line class="relationship-${escapeHtml(edge.type)} edge-region-${escapeHtml(edgeRegion)}${active ? " is-active" : ""}${regionEdge ? " is-region-edge" : ""}" x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}">
       <title>${escapeHtml(skillMapTitleFor(edge.from))} to ${escapeHtml(skillMapTitleFor(edge.to))}: ${escapeHtml(skillMapRelationshipLabel(edge.type))}. ${escapeHtml(edge.reason)}</title>
     </line>`;
   }).join("");
