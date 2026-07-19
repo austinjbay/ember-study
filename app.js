@@ -4906,7 +4906,6 @@ function renderSkillMapPage() {
     || canonicalSkillTree[0];
   state.selectedSkillMapSkill = selectedSkill.id;
   const selectedState = skillMapStateFor(selectedSkill, currentSkill);
-  const earnedCount = canonicalSkillTree.filter(skill => skillMapStateFor(skill, currentSkill).days >= 3).length;
   const selectedPathway = skillMapPrimaryPathwayForSkill(selectedSkill.id);
   const pathwayIds = new Set(selectedPathway.skills);
   const selectedParents = skillMapIncomingEdges(selectedSkill.id);
@@ -4957,7 +4956,6 @@ function renderSkillMapPage() {
         <h2 id="skill-map-network-title" class="sr-only">Reading skill network</h2>
         <button class="secondary skill-map-practice-quick" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(currentSkill.id)}">Start current practice</button>
       </div>
-      <p class="skill-map-earned-note">${earnedCount} of ${canonicalSkillTree.length} skills earned · earn each skill with three successful practice days.</p>
       <div class="skill-map-canvas" aria-label="Reading skill network">
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
         ${nodes}
