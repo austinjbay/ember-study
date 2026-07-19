@@ -4189,7 +4189,7 @@ function renderHomeInteractionPrototype(vm) {
           <h3 id="prototype-next-title">Connect the missing relationship.</h3>
           <p>${escapeHtml(vm.nextAction.copy)}</p>
           <dl>
-            <div><dt>Supports</dt><dd>Show how ideas connect</dd></div>
+            <div><dt>Helps build</dt><dd>Show how ideas connect</dd></div>
             <div><dt>Evidence</dt><dd>${supportingChecks} checks</dd></div>
           </dl>
         </div>
@@ -4688,20 +4688,20 @@ const canonicalSkillTree = [
 
 const skillMapRelationshipTypes = {
   prerequisite: {
-    label: "Prerequisite",
-    description: "This skill usually needs to be stable before the next one is fair to practice."
+    label: "Do this first",
+    description: "This move usually needs to feel solid before the connected one is fair to practice."
   },
   supports: {
-    label: "Supports",
-    description: "This skill makes the next one easier, but it is not a strict gate."
+    label: "Helps with",
+    description: "This move makes the connected one easier, but it is not a strict gate."
   },
   extends: {
-    label: "Extends",
-    description: "The next skill carries the same reading move into a more complex task."
+    label: "Builds into",
+    description: "The next move carries the same reading habit into a more complex task."
   },
   metacognitive: {
-    label: "Metacognitive",
-    description: "This connection helps the reader judge how well the skill held up."
+    label: "Checks understanding",
+    description: "This connection helps you compare what felt clear with what actually held up."
   }
 };
 
@@ -4955,7 +4955,7 @@ function renderSkillMapPage() {
       <div class="skill-map-canvas" aria-label="Reading skill network">
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
         ${nodes}
-        <div class="skill-map-relationship-legend" aria-label="Relationship types">${relationshipLegend}</div>
+        <div class="skill-map-relationship-legend" aria-label="Connector types">${relationshipLegend}</div>
       </div>
       <div class="skill-map-inline-detail" aria-labelledby="skill-map-detail-title">
         <div>
