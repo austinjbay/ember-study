@@ -6,7 +6,7 @@
     <title>Ember</title>
     <script>
       (function () {
-        var routes = ["/how-it-works", "/reading-skills", "/why-it-works", "/examples", "/trust", "/settings"];
+        var routes = ["/how-it-works", "/reading-skills", "/skills/map", "/why-it-works", "/examples", "/trust", "/settings"];
         var path = window.location.pathname.replace(/\/+$/, "") || "/";
         if (routes.indexOf(path) >= 0) {
           sessionStorage.setItem("ember-pending-route", path);

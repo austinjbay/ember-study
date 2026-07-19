@@ -154,6 +154,7 @@ const state = {
   draftRestored: false,
   authMode: "login",
   homeFixture: "",
+  selectedSkillMapSkill: "",
   emberChatMessages: [],
   pendingEmberAssistantIndex: null
 };
@@ -177,6 +178,7 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const MARKETING_ROUTES = {
   "how-it-works": "/how-it-works",
   "reading-skills": "/reading-skills",
+  "skill-map": "/skills/map",
   "why-it-works": "/why-it-works",
   examples: "/examples",
   trust: "/trust",
@@ -1668,6 +1670,7 @@ function setView(name, { updateUrl = true, replaceUrl = false } = {}) {
   if (updateUrl && (MARKETING_ROUTES[name] || name === "home")) syncUrlForView(name, replaceUrl ? "replace" : "push");
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (name === "home" || name === "reviews") renderDashboard();
+  if (name === "skill-map") renderSkillMapPage();
   if (name === "account") hydrateAccountSettings();
   renderSidebarGuide();
 }
@@ -4497,7 +4500,108 @@ function renderSkillModule(vm) {
         ${skill.actionLabel ? `<small class="${skill.id === practice.skill.id ? "skill-path-action" : ""}">${escapeHtml(skill.actionLabel)}</small>` : ""}
       </button>`).join("")}
     </div>
+    <button class="text-button skill-map-link" type="button" data-nav="skill-map">View skill map</button>
   </section>`;
+}
+
+const skillMapEdges = [
+  ["central-claim", "connect-ideas"],
+  ["connect-ideas", "match-evidence"],
+  ["connect-ideas", "build-explanation"],
+  ["match-evidence", "build-explanation"]
+];
+
+const skillMapPositions = {
+  "central-claim": { x: 15, y: 28 },
+  "connect-ideas": { x: 48, y: 26 },
+  "match-evidence": { x: 80, y: 34 },
+  "build-explanation": { x: 54, y: 72 }
+};
+
+const skillMapDetails = {
+  "central-claim": {
+    level: "Establish meaning",
+    why: "Every later reading skill depends on knowing what the author wants you to believe.",
+    exercise: "State the author’s central claim in one sentence."
+  },
+  "connect-ideas": {
+    level: "Explain relationships",
+    why: "Readers often remember ideas separately before they can explain the logic between them.",
+    exercise: "Explain whether one idea supports, qualifies, contrasts with, or depends on another."
+  },
+  "match-evidence": {
+    level: "Explain relationships",
+    why: "Evidence is useful when it does work inside the argument, not merely when it is related.",
+    exercise: "Choose the example or reason that actually supports a claim, then explain why."
+  },
+  "build-explanation": {
+    level: "Explain clearly",
+    why: "A complete explanation moves from claim to reason to concrete example.",
+    exercise: "Explain the claim, the reason behind it, and one concrete example."
+  }
+};
+
+function skillMapStateFor(skill, currentSkill) {
+  const days = successfulPracticeDays(skill);
+  const isCurrent = skill.id === currentSkill.id;
+  const stateName = skillDevelopmentState(days, isCurrent);
+  const label = isCurrent ? "Current focus" : days >= 3 ? "Durable" : days > 0 ? `${days}/3 successful days` : "Available";
+  return { days, isCurrent, stateName, label };
+}
+
+function renderSkillMapPage() {
+  const root = $("#skill-map-root");
+  if (!root) return;
+  const practice = currentPracticeSkillState();
+  const currentSkill = practice.skill || practiceSequence[0];
+  const selectedId = state.selectedSkillMapSkill || currentSkill.id;
+  const selectedSkill = practiceSequence.find(skill => skill.id === selectedId) || currentSkill;
+  state.selectedSkillMapSkill = selectedSkill.id;
+  const selectedState = skillMapStateFor(selectedSkill, currentSkill);
+  const selectedDetails = skillMapDetails[selectedSkill.id] || {};
+  const edges = skillMapEdges.map(([from, to]) => {
+    const start = skillMapPositions[from];
+    const end = skillMapPositions[to];
+    if (!start || !end) return "";
+    const active = from === selectedSkill.id || to === selectedSkill.id;
+    return `<line class="${active ? "is-active" : ""}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}" />`;
+  }).join("");
+  const nodes = practiceSequence.map((skill, index) => {
+    const position = skillMapPositions[skill.id] || { x: 50, y: 50 };
+    const nodeState = skillMapStateFor(skill, currentSkill);
+    const selected = skill.id === selectedSkill.id;
+    return `<button class="skill-map-node${nodeState.isCurrent ? " is-current" : ""}${nodeState.days >= 3 ? " is-durable" : ""}${selected ? " is-selected" : ""}" type="button" style="--x:${position.x}%; --y:${position.y}%;" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skill.id)}" data-skill-state="${escapeHtml(nodeState.stateName)}" aria-pressed="${selected}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(nodeState.label)}.">
+      <span class="skill-icon-wrap">${renderSkillIcon(skill.id, nodeState.stateName, 34)}</span>
+      <span>${String(index + 1).padStart(2, "0")}</span>
+      <strong>${escapeHtml(skill.title)}</strong>
+    </button>`;
+  }).join("");
+  root.innerHTML = `<div class="skill-map-layout">
+    <section class="skill-map-canvas-card" aria-labelledby="skill-map-network-title">
+      <div class="skill-map-card-head">
+        <div>
+          <span class="eyebrow">Network</span>
+          <h2 id="skill-map-network-title">How the reading skills connect.</h2>
+        </div>
+        <button class="secondary skill-map-practice-quick" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(currentSkill.id)}">Start practice</button>
+      </div>
+      <div class="skill-map-canvas" aria-label="Reading skill network">
+        <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
+        ${nodes}
+      </div>
+    </section>
+    <aside class="skill-map-detail" aria-labelledby="skill-map-detail-title">
+      <span class="eyebrow">${escapeHtml(selectedDetails.level || "Reading skill")}</span>
+      <h2 id="skill-map-detail-title">${escapeHtml(selectedSkill.title)}</h2>
+      <p>${escapeHtml(selectedSkill.description)}</p>
+      <dl>
+        <div><dt>State</dt><dd>${escapeHtml(selectedState.label)}</dd></div>
+        <div><dt>Why it matters</dt><dd>${escapeHtml(selectedDetails.why || "This skill supports stronger chapter recall and review.")}</dd></div>
+        <div><dt>Exercise</dt><dd>${escapeHtml(selectedDetails.exercise || selectedSkill.description)}</dd></div>
+      </dl>
+      ${selectedState.isCurrent ? `<button class="primary" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}">Start practice</button>` : `<button class="secondary" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}">Practice this skill</button>`}
+    </aside>
+  </div>`;
 }
 
 function renderProgressModule(vm) {
@@ -5960,6 +6064,11 @@ document.addEventListener("click", async event => {
   if (action === "reset-practice") resetPractice();
   if (action === "revisit-practice") revisitPractice(event.target.closest("[data-practice-skill]")?.dataset.practiceSkill);
   if (action === "open-skill-badge") openSkillBadge(event.target.closest("[data-practice-skill]")?.dataset.practiceSkill);
+  if (action === "skill-map-select") {
+    state.selectedSkillMapSkill = event.target.closest("[data-skill-map-id]")?.dataset.skillMapId || "";
+    renderSkillMapPage();
+  }
+  if (action === "skill-map-practice") openSkillBadge(event.target.closest("[data-skill-map-id]")?.dataset.skillMapId);
   if (action === "complete-review") completeReview();
   if (action === "start-review-session") {
     const ids = (event.target.closest("[data-review-session-ids]")?.dataset.reviewSessionIds || "").split(",").filter(Boolean);
