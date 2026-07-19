@@ -4425,6 +4425,17 @@ function skillDevelopmentState(days = 0, isCurrent = false) {
 function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", size = 32) {
   const key = readingSkillIconKey(skillId);
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
+  if (key === "retrieve-explicit") {
+    return `<svg ${common}>
+      <path class="skill-icon-link" d="M8 14.2 12.2 8.1 16.5 14.5M8 14.2h8.5"></path>
+      <circle class="skill-icon-body" cx="8" cy="14.2" r="3.3"></circle>
+      <circle class="skill-icon-body" cx="12.2" cy="8.1" r="3.3"></circle>
+      <circle class="skill-icon-body" cx="16.5" cy="14.5" r="3.3"></circle>
+      <circle class="skill-icon-prize" cx="8" cy="14.2" r="1.35"></circle>
+      <circle class="skill-icon-prize" cx="12.2" cy="8.1" r="1.35"></circle>
+      <circle class="skill-icon-prize" cx="16.5" cy="14.5" r="1.35"></circle>
+    </svg>`;
+  }
   return `<svg ${common}>
     <circle class="skill-icon-body" cx="12" cy="12" r="7.8"></circle>
     <circle class="skill-icon-prize" cx="12" cy="12" r="3.1"></circle>
