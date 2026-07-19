@@ -3835,7 +3835,7 @@ function confidenceForEvidence(stateName) {
 function confidenceCopy(level, basis = "") {
   if (level === "supported") return basis ? `Supported · ${basis}` : "Supported by repeated evidence";
   if (level === "early") return basis ? `Early signal · ${basis}` : "Early signal";
-  return "Preview · personal evidence needed";
+  return "Preview";
 }
 
 function commonGapFromChapters(chapters = []) {
@@ -4474,7 +4474,6 @@ function renderSkillIconSpecimen() {
 
 function renderSkillModule(vm) {
   const practice = vm.practiceState || currentPracticeSkillState();
-  const focusSignals = (vm.skillSignals || []).filter(signal => signal.focusArea);
   const path = practiceSequence.map((skill, index) => {
     const days = successfulPracticeDays(skill);
     const status = days >= 3 ? "Durable" : skill.id === practice.skill.id ? "Recommended" : days > 0 ? "Developing" : "Available";
@@ -4485,13 +4484,6 @@ function renderSkillModule(vm) {
   return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
     <span class="eyebrow">Build Reading Skills</span>
     <h2 id="skill-development-title">${escapeHtml(vm.skillSignals[0]?.title || "Build your first signal.")}</h2>
-    ${focusSignals.length ? `<div class="skill-signal-list">
-      ${focusSignals.map(signal => `<article>
-        <span>Where to focus</span>
-        <strong>${escapeHtml(signal.title)}</strong>
-        <p>${escapeHtml(signal.copy)}</p>
-      </article>`).join("")}
-    </div>` : ""}
     <div class="skill-path-grid" aria-label="Available reading skills">
       ${path.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.days >= 3 ? " is-durable" : ""}" type="button" data-skill-state="${escapeHtml(skill.stateName)}" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.status)}. ${skill.days} of 3 successful days.">
         <span class="skill-icon-wrap">${renderSkillIcon(skill.id, skill.stateName, 32)}</span>
