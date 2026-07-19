@@ -4550,23 +4550,55 @@ function hydrateStaticSkillBadges() {
 function renderSkillIconSpecimen() {
   const target = $("#skill-icon-specimen");
   if (!target) return;
-  const concepts = [
-    { name: "Signal in noise", copy: "The skill reveals the structure hidden inside fragments.", state: "emerging" },
-    { name: "Relationship path", copy: "The icon shows how the reader connects one idea to another.", state: "developing" },
-    { name: "Durable mark", copy: "The strongest version adds a stable ember point only after evidence accumulates.", state: "durable" }
+  const directions = [
+    {
+      title: "Reading Keepsakes",
+      copy: "Objects a reader might actually save: bookmark, seal, lens, compass. Quiet, tactile, and closest to Ember's current mood.",
+      objects: [
+        ["bookmark", "Remember"],
+        ["seal", "Main idea"],
+        ["lens", "Evidence"],
+        ["compass", "Transfer"]
+      ]
+    },
+    {
+      title: "Desk Charms",
+      copy: "Small study-table objects with more personality: stamp, note card, brass key, pocket gauge. Warmer and more collectible.",
+      objects: [
+        ["stamp", "Review"],
+        ["card", "Details"],
+        ["key", "Connect"],
+        ["gauge", "Confidence"]
+      ]
+    },
+    {
+      title: "Field Notes",
+      copy: "A reading-adventure kit: map pin, trail marker, folded map, signal flag. More game-like without leaving the reading world.",
+      objects: [
+        ["pin", "Locate"],
+        ["trail", "Sequence"],
+        ["map", "Structure"],
+        ["flag", "Apply"]
+      ]
+    }
   ];
   target.innerHTML = `<div class="skill-icon-specimen-head">
-    <span class="eyebrow">Icon system prototype</span>
-    <h2 id="skill-icon-specimen-title">A shared alphabet for reading skills.</h2>
-    <p>Each mark uses fragments, anchors, paths, and frames. Progress changes the structure itself instead of swapping in a generic trophy or checkmark.</p>
+    <span class="eyebrow">Icon direction prototypes</span>
+    <h2 id="skill-icon-specimen-title">Three ways the skill objects could feel.</h2>
+    <p>These are rough direction studies for the icon language, separate from the current production icons. Pick the emotional lane first, then we can rebuild the whole set around it.</p>
   </div>
-  <div class="skill-concept-grid" aria-label="Reading skill icon concepts">
-    ${concepts.map(concept => `<article>
-      <span>${escapeHtml(concept.name)}</span>
-      <div class="skill-concept-icons">
-        ${marketingSkillIcons.slice(0, 3).map(skill => `<i>${renderSkillIcon(skill.id, concept.state, 24)}</i>`).join("")}
+  <div class="icon-direction-grid" aria-label="Reading skill icon direction prototypes">
+    ${directions.map(direction => `<article>
+      <div>
+        <span>${escapeHtml(direction.title)}</span>
+        <p>${escapeHtml(direction.copy)}</p>
       </div>
-      <p>${escapeHtml(concept.copy)}</p>
+      <div class="keepsake-row">
+        ${direction.objects.map(([objectName, label]) => `<figure class="keepsake-object keepsake-${escapeHtml(objectName)}">
+          <i aria-hidden="true"></i>
+          <figcaption>${escapeHtml(label)}</figcaption>
+        </figure>`).join("")}
+      </div>
     </article>`).join("")}
   </div>
   <div class="skill-specimen-panel">
