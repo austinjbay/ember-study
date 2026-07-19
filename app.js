@@ -4951,11 +4951,7 @@ function renderSkillMapPage() {
   }).join("");
   const relationshipLegend = Object.entries(skillMapRelationshipTypes).map(([type, detail]) => `<span class="relationship-${escapeHtml(type)}"><i></i>${escapeHtml(detail.label)}</span>`).join("");
   root.innerHTML = `<div class="skill-map-layout">
-    <section class="skill-map-canvas-card" aria-labelledby="skill-map-network-title">
-      <div class="skill-map-toolbar">
-        <h2 id="skill-map-network-title" class="sr-only">Reading skill network</h2>
-        <button class="secondary skill-map-practice-quick" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(currentSkill.id)}">Start current practice</button>
-      </div>
+    <section class="skill-map-canvas-card" aria-labelledby="skill-map-page-title">
       <div class="skill-map-canvas" aria-label="Reading skill network">
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
         ${nodes}
