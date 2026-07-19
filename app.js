@@ -4395,22 +4395,22 @@ function renderMemoryModule(vm) {
 
 function readingSkillIconKey(skillId = "") {
   return {
-    "retrieve-explicit": "central-claim",
+    "retrieve-explicit": "retrieve-explicit",
     "central-claim": "central-claim",
-    "supporting-ideas": "evaluate-evidence",
-    "source-fidelity": "calibrate-confidence",
+    "supporting-ideas": "supporting-ideas",
+    "source-fidelity": "source-fidelity",
     "connect-ideas": "connect-ideas",
-    "structure": "clear-explanations",
-    "point-of-view": "apply-with-judgment",
-    "match-evidence": "evaluate-evidence",
-    "evaluate-reasoning": "evaluate-evidence",
-    "build-explanation": "clear-explanations",
-    "infer-implications": "connect-ideas",
-    "compare-texts": "connect-ideas",
+    "structure": "structure",
+    "point-of-view": "point-of-view",
+    "match-evidence": "match-evidence",
+    "evaluate-reasoning": "evaluate-reasoning",
+    "build-explanation": "build-explanation",
+    "infer-implications": "infer-implications",
+    "compare-texts": "compare-texts",
     "clear-explanations": "clear-explanations",
     "calibrate-confidence": "calibrate-confidence",
     "apply-with-judgment": "apply-with-judgment",
-    "evaluate-boundaries": "apply-with-judgment"
+    "evaluate-boundaries": "evaluate-boundaries"
   }[skillId] || "central-claim";
 }
 
@@ -4426,12 +4426,23 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   const key = readingSkillIconKey(skillId);
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
   const icons = {
+    "retrieve-explicit": `<svg ${common}><path class="skill-icon-foundation" d="M7 5.7h10v12.6H7z"/><path class="skill-icon-operation" d="M9.4 9h5.2M9.4 12h3.2"/><circle class="skill-icon-accent skill-icon-fill" cx="15.2" cy="15.2" r="1.55"/></svg>`,
     "central-claim": `<svg ${common}><circle class="skill-icon-foundation" cx="12" cy="12" r="6.7"/><circle class="skill-icon-operation" cx="12" cy="12" r="3.7"/><circle class="skill-icon-accent skill-icon-fill" cx="12" cy="12" r="1.65"/></svg>`,
+    "supporting-ideas": `<svg ${common}><path class="skill-icon-foundation" d="M12 5.8v12.4M7.2 9.2h9.6M8.8 14.8h6.4"/><circle class="skill-icon-accent skill-icon-fill" cx="7.2" cy="9.2" r="1.15"/><circle class="skill-icon-accent skill-icon-fill" cx="16.8" cy="9.2" r="1.15"/></svg>`,
+    "source-fidelity": `<svg ${common}><path class="skill-icon-foundation" d="M7.2 5.8h9.6v12.4H7.2z"/><path class="skill-icon-operation" d="M9.4 9.2h5.2M9.4 12h5.2"/><path class="skill-icon-accent" d="M9.3 15.3h5.4"/></svg>`,
     "connect-ideas": `<svg ${common}><path class="skill-icon-operation" d="M8.3 12h7.4"/><circle class="skill-icon-foundation" cx="6.5" cy="12" r="3"/><circle class="skill-icon-foundation" cx="17.5" cy="12" r="3"/><circle class="skill-icon-accent skill-icon-fill" cx="6.5" cy="12" r="1"/><circle class="skill-icon-accent skill-icon-fill" cx="17.5" cy="12" r="1"/></svg>`,
+    "structure": `<svg ${common}><path class="skill-icon-foundation" d="M7 6h10M7 12h10M7 18h10"/><path class="skill-icon-operation" d="M9 6v12M15 6v12"/><circle class="skill-icon-accent skill-icon-fill" cx="12" cy="12" r="1.35"/></svg>`,
+    "point-of-view": `<svg ${common}><path class="skill-icon-foundation" d="M4.9 12s2.7-4.5 7.1-4.5 7.1 4.5 7.1 4.5-2.7 4.5-7.1 4.5S4.9 12 4.9 12Z"/><circle class="skill-icon-operation" cx="12" cy="12" r="2.6"/><circle class="skill-icon-accent skill-icon-fill" cx="13" cy="11" r=".85"/></svg>`,
+    "match-evidence": `<svg ${common}><path class="skill-icon-foundation" d="M6.3 7h5.2v5.2H6.3zM12.5 11.8h5.2V17h-5.2z"/><path class="skill-icon-accent" d="m8.1 9.6 1.1 1.1 2.2-2.5M14.3 14.4l1.1 1.1 2.2-2.5"/></svg>`,
     "evaluate-evidence": `<svg ${common}><path class="skill-icon-foundation" d="M6.5 5.8h11v12.4h-11z"/><path class="skill-icon-noise" d="M9 9.2h5.8M9 12.1h3.5"/><path class="skill-icon-accent" d="m8.9 15.2 1.7 1.7 4.4-4.8"/></svg>`,
+    "evaluate-reasoning": `<svg ${common}><path class="skill-icon-foundation" d="M12 6.2v11.6M7.3 8.8h9.4"/><path class="skill-icon-operation" d="m7.3 8.8-2 4.1h4zM16.7 8.8l-2 4.1h4z"/><path class="skill-icon-accent" d="M8.8 17.8h6.4"/></svg>`,
+    "build-explanation": `<svg ${common}><path class="skill-icon-foundation" d="M6.2 16.8h11.6M7.8 13.2h8.4M9.4 9.6h5.2"/><path class="skill-icon-operation" d="m12 5.5 3 4.1H9z"/><circle class="skill-icon-accent skill-icon-fill" cx="12" cy="13.2" r="1.05"/></svg>`,
+    "infer-implications": `<svg ${common}><path class="skill-icon-foundation" d="M7 16.8 17 6.8"/><path class="skill-icon-operation" d="M10.6 6.8H17v6.4"/><circle class="skill-icon-accent skill-icon-fill" cx="7" cy="16.8" r="1.45"/><circle class="skill-icon-accent skill-icon-fill" cx="17" cy="6.8" r="1.45"/></svg>`,
+    "compare-texts": `<svg ${common}><path class="skill-icon-foundation" d="M6.4 6.2h7.2v10.6H6.4zM10.4 7.2h7.2v10.6h-7.2z"/><path class="skill-icon-accent" d="M8.4 10h3.2M12.4 14h3.2"/></svg>`,
     "clear-explanations": `<svg ${common}><path class="skill-icon-foundation" d="M5.5 7.2h13v8.4h-5.1L10 18l.5-2.4h-5z"/><path class="skill-icon-operation" d="M8.8 10.1h6.4M8.8 12.8h4.5"/><path class="skill-icon-accent" d="M16.8 5.6v2.2M15.7 6.7h2.2"/></svg>`,
     "calibrate-confidence": `<svg ${common}><path class="skill-icon-foundation" d="M6.4 15.2a6.2 6.2 0 1 1 11.2 0"/><path class="skill-icon-noise" d="M8.1 14.7h7.8"/><path class="skill-icon-operation" d="M12 13.8 15.1 9"/><circle class="skill-icon-accent skill-icon-fill" cx="12" cy="13.8" r="1.35"/></svg>`,
-    "apply-with-judgment": `<svg ${common}><path class="skill-icon-foundation" d="m12 4.8 2.4 5 5.1.8-3.7 3.8.9 5.2-4.7-2.4-4.7 2.4.9-5.2-3.7-3.8 5.1-.8z"/><path class="skill-icon-accent" d="m9.7 12.3 1.6 1.6 3.4-3.8"/></svg>`
+    "apply-with-judgment": `<svg ${common}><path class="skill-icon-foundation" d="m12 4.8 2.4 5 5.1.8-3.7 3.8.9 5.2-4.7-2.4-4.7 2.4.9-5.2-3.7-3.8 5.1-.8z"/><path class="skill-icon-accent" d="m9.7 12.3 1.6 1.6 3.4-3.8"/></svg>`,
+    "evaluate-boundaries": `<svg ${common}><path class="skill-icon-foundation" d="M6.5 12a5.5 5.5 0 0 1 11 0 5.5 5.5 0 0 1-11 0Z"/><path class="skill-icon-operation" d="M12 6.5v11"/><path class="skill-icon-accent" d="M8.4 12h7.2"/></svg>`
   };
   return icons[key] || icons["central-claim"];
 }
