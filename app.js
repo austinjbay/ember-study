@@ -4902,14 +4902,22 @@ function skillMapSourcePills(source = "") {
 }
 
 function skillMapStateFor(skill, currentSkill) {
-  const practiceReady = Boolean(skill.supported || practiceSequence.some(item => item.id === skill.id));
-  const days = practiceReady ? successfulPracticeDays(skill) : 0;
-  const isCurrent = practiceReady && skill.id === currentSkill.id;
+  const sequenceIndex = practiceSequence.findIndex(item => item.id === skill.id);
+  const currentIndex = practiceSequence.findIndex(item => item.id === currentSkill.id);
+  const isSequenced = sequenceIndex >= 0;
+  const isUnlocked = isSequenced && sequenceIndex <= Math.max(0, currentIndex);
+  const days = isSequenced ? successfulPracticeDays(skill) : 0;
+  const isCurrent = isUnlocked && skill.id === currentSkill.id;
+  const isComplete = days >= 3;
+  const practiceReady = isUnlocked;
   const stateName = practiceReady ? skillDevelopmentState(days, isCurrent) : "unexplored";
-  const label = !practiceReady
+  const label = !isSequenced
     ? "Mapped future skill"
-    : isCurrent ? "Current focus" : days >= 3 ? "Earned" : days > 0 ? `${days}/3 successful days` : "Available";
-  return { days, isCurrent, practiceReady, stateName, label };
+    : !isUnlocked ? "Locked"
+      : isCurrent ? "Current focus"
+        : isComplete ? "Earned"
+          : days > 0 ? `${days}/3 successful days` : "Available";
+  return { days, isCurrent, isComplete, isUnlocked, practiceReady, sequenceIndex, stateName, label };
 }
 
 function renderSkillMapPage() {
@@ -4944,10 +4952,16 @@ function renderSkillMapPage() {
     if (!start || !end) return "";
     const line = skillMapTrimmedLine(start, end);
     const pathwayEdge = pathwayIds.has(edge.from) && pathwayIds.has(edge.to);
-    const active = edge.from === selectedSkill.id || edge.to === selectedSkill.id || pathwayEdge;
+    const fromSkill = canonicalSkillTree.find(skill => skill.id === edge.from);
+    const toSkill = canonicalSkillTree.find(skill => skill.id === edge.to);
+    const fromState = fromSkill ? skillMapStateFor(fromSkill, currentSkill) : null;
+    const toState = toSkill ? skillMapStateFor(toSkill, currentSkill) : null;
+    const complete = Boolean(fromState?.isComplete && toState?.isComplete);
+    const locked = Boolean(!fromState?.isUnlocked || !toState?.isUnlocked);
+    const active = !locked && (edge.from === selectedSkill.id || edge.to === selectedSkill.id || pathwayEdge);
     const regionEdge = selectedRegionIds.includes(edge.from) && selectedRegionIds.includes(edge.to);
     const edgeRegion = skillMapRegionForSkill(edge.from);
-    return `<line class="relationship-${escapeHtml(edge.type)} edge-region-${escapeHtml(edgeRegion)}${active ? " is-active" : ""}${regionEdge ? " is-region-edge" : ""}" x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}">
+    return `<line class="relationship-${escapeHtml(edge.type)} edge-region-${escapeHtml(edgeRegion)}${active ? " is-active" : ""}${regionEdge ? " is-region-edge" : ""}${complete ? " is-complete" : ""}${locked ? " is-locked" : ""}" x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}">
       <title>${escapeHtml(skillMapTitleFor(edge.from))} to ${escapeHtml(skillMapTitleFor(edge.to))}: ${escapeHtml(skillMapRelationshipLabel(edge.type))}. ${escapeHtml(edge.reason)}</title>
     </line>`;
   }).join("");
@@ -4959,7 +4973,7 @@ function renderSkillMapPage() {
     const regionMatch = selectedRegion === "all" || selectedRegion === regionId;
     const pathwayMatch = pathwayIds.has(skill.id);
     const pathway = skillMapPrimaryPathwayForSkill(skill.id);
-    return `<button class="skill-map-node skill-region-${escapeHtml(regionId)}${nodeState.practiceReady ? " is-practice-ready" : " is-mapped"}${nodeState.isCurrent ? " is-current" : ""}${nodeState.days >= 3 ? " is-durable" : ""}${selected ? " is-selected" : ""}${relatedIds.has(skill.id) ? " is-related" : ""}${pathwayMatch ? " is-pathway-member" : ""}${regionMatch ? " is-region-match" : " is-region-dimmed"}" type="button" style="--x:${position.x}%; --y:${position.y}%;" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skill.id)}" data-skill-state="${escapeHtml(nodeState.stateName)}" aria-pressed="${selected}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(nodeState.label)}. Pathway: ${escapeHtml(pathway.title)}. Category: ${escapeHtml(regionId)}. Maps to ${escapeHtml(skill.source)}.">
+    return `<button class="skill-map-node skill-region-${escapeHtml(regionId)}${nodeState.practiceReady ? " is-practice-ready" : " is-mapped"}${nodeState.isUnlocked ? " is-unlocked" : " is-locked"}${nodeState.isCurrent ? " is-current" : ""}${nodeState.isComplete ? " is-durable" : ""}${selected ? " is-selected" : ""}${relatedIds.has(skill.id) ? " is-related" : ""}${pathwayMatch ? " is-pathway-member" : ""}${regionMatch ? " is-region-match" : " is-region-dimmed"}" type="button" style="--x:${position.x}%; --y:${position.y}%;" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skill.id)}" data-skill-state="${escapeHtml(nodeState.stateName)}" aria-pressed="${selected}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(nodeState.label)}. Pathway: ${escapeHtml(pathway.title)}. Category: ${escapeHtml(regionId)}. Maps to ${escapeHtml(skill.source)}.">
       <span class="skill-icon-wrap">${renderSkillIcon(skill.id, nodeState.stateName, 34)}</span>
       <span>${String(index + 1).padStart(2, "0")}</span>
       <strong>${escapeHtml(skill.title)}</strong>
@@ -4982,10 +4996,10 @@ function renderSkillMapPage() {
     </div>
     <div class="skill-map-region-card-controls" aria-label="Flip through skill types">${regionStackControls}</div>
   </aside>`;
-  const pathwayArea = `<div class="skill-map-pathway-area skill-region-${escapeHtml(pathwayRegion)}" style="--area-left:${pathwayBounds.left}%; --area-top:${pathwayBounds.top}%; --area-width:${pathwayBounds.width}%; --area-height:${pathwayBounds.height}%;" aria-hidden="true"></div>`;
+  const pathwayArea = `<div class="skill-map-pathway-area skill-region-${escapeHtml(pathwayRegion)}${selectedState.isUnlocked ? "" : " is-locked"}" style="--area-left:${pathwayBounds.left}%; --area-top:${pathwayBounds.top}%; --area-width:${pathwayBounds.width}%; --area-height:${pathwayBounds.height}%;" aria-hidden="true"></div>`;
   const pathwayCalloutLeft = Math.min(74, Math.max(4, pathwayBounds.left + 1));
   const pathwayCalloutTop = Math.min(78, Math.max(8, pathwayBounds.top + 1));
-  const pathwayCallout = `<aside class="skill-map-pathway-callout skill-region-${escapeHtml(pathwayRegion)}" style="--callout-left:${pathwayCalloutLeft}%; --callout-top:${pathwayCalloutTop}%;" aria-label="Why these skills are connected">
+  const pathwayCallout = `<aside class="skill-map-pathway-callout skill-region-${escapeHtml(pathwayRegion)}${selectedState.isUnlocked ? "" : " is-locked"}" style="--callout-left:${pathwayCalloutLeft}%; --callout-top:${pathwayCalloutTop}%;" aria-label="Why these skills are connected">
     <span>Connected pathway</span>
     <strong>${escapeHtml(selectedPathway.title)}</strong>
     <p>${escapeHtml(selectedPathway.capability)}</p>
@@ -5040,7 +5054,7 @@ function renderSkillMapPage() {
           <div>${pathwaySkills}</div>
         </div>
         ${selectedRelationshipNotes ? `<ul class="skill-map-relationship-notes">${selectedRelationshipNotes}</ul>` : ""}
-        <button class="${selectedState.isCurrent ? "primary" : "secondary"}" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}">${selectedState.isCurrent ? "Start practice" : "Practice this skill"}</button>
+        <button class="${selectedState.isCurrent ? "primary" : "secondary"}" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}"${selectedState.isUnlocked ? "" : " disabled"}>${selectedState.isCurrent ? "Start practice" : selectedState.isUnlocked ? "Practice this skill" : "Unlock this skill"}</button>
       </div>
     </section>
   </div>`;

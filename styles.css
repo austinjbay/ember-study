@@ -1070,8 +1070,15 @@ body.logged-out .landing-footer { display: flex; }
 .relationship-metacognitive { --relationship-color: #7b5f8f; }
 .skill-map-lines line.is-region-edge { stroke: var(--edge-color, var(--green)); stroke-width: 1.7; opacity: .56; }
 .skill-map-lines line.is-active { stroke: var(--edge-color, var(--green)); stroke-width: 2.4; opacity: .92; }
+.skill-map-lines line.is-locked { stroke: #a8aaa2; stroke-width: 1.1; opacity: .18; }
+.skill-map-lines line.is-complete { stroke: var(--edge-color, var(--green)); stroke-width: 2.2; stroke-dasharray: 7 7; opacity: .72; animation: skillConnectionFlow 1.8s linear infinite; }
+@keyframes skillConnectionFlow {
+  to { stroke-dashoffset: -28; }
+}
 .skill-map-pathway-area { position: absolute; z-index: 1; left: var(--area-left); top: var(--area-top); width: var(--area-width); height: var(--area-height); border: 1px solid color-mix(in srgb, var(--region-color, var(--green)), transparent 56%); border-radius: 18px; background: color-mix(in srgb, var(--region-color, var(--green)), transparent 92%); box-shadow: inset 0 0 0 1px rgba(255,253,247,.58), 0 16px 40px rgba(47,49,45,.05); pointer-events: none; transition: left .24s ease, top .24s ease, width .24s ease, height .24s ease, border-color .18s ease, background .18s ease; }
 .skill-map-pathway-callout { position: absolute; z-index: 4; left: var(--callout-left); top: var(--callout-top); display: grid; gap: 5px; width: min(270px, 27%); border: 1px solid color-mix(in srgb, var(--region-color, var(--green)), transparent 58%); border-radius: 8px; background: rgba(255,253,247,.96); color: var(--ink); padding: 12px 14px; box-shadow: 0 14px 28px rgba(47,49,45,.08); pointer-events: none; }
+.skill-map-pathway-area.is-locked,
+.skill-map-pathway-callout.is-locked { --region-color: #8f9289; }
 .skill-map-pathway-callout span,
 .skill-map-region-card span { color: var(--region-color, var(--green)); font-size: .58rem; font-weight: 850; letter-spacing: .13em; line-height: 1; text-transform: uppercase; }
 .skill-map-pathway-callout strong { color: var(--ink); font-family: var(--serif); font-size: .94rem; line-height: 1.08; }
@@ -1112,6 +1119,14 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-node.is-durable .skill-icon-wrap { border-color: color-mix(in srgb, var(--region-color, var(--green)), var(--line-dark) 12%); color: var(--region-color, var(--green)); background: rgba(255,253,247,.94); box-shadow: 0 0 0 4px color-mix(in srgb, var(--region-color, var(--green)), transparent 84%), 0 14px 24px rgba(47,49,45,.12), inset 0 0 0 5px rgba(255,255,255,.48); }
 .skill-map-node.is-durable small { color: var(--region-color, var(--green)); }
 .skill-map-node.is-region-dimmed { opacity: .32; }
+.skill-map-node.is-locked { --region-color: #8f9289; color: var(--faint); opacity: .54; }
+.skill-map-node.is-locked .skill-icon-wrap { border-color: #c6c8bf; background: rgba(246,244,238,.78); color: #a1a49b; box-shadow: 0 0 0 4px rgba(255,253,247,.76), 0 8px 14px rgba(47,49,45,.06), inset 0 0 0 5px rgba(255,255,255,.34); filter: grayscale(1); }
+.skill-map-node.is-locked > span:not(.skill-icon-wrap) { background: #a1a49b; color: var(--white); box-shadow: none; }
+.skill-map-node.is-locked strong,
+.skill-map-node.is-locked em,
+.skill-map-node.is-locked small { color: #8f9289; }
+.skill-map-node.is-locked.is-selected,
+.skill-map-node.is-locked.is-related { opacity: .78; }
 .skill-map-node[data-skill-state="unexplored"] .skill-icon-wrap { color: var(--skill-unexplored); }
 .skill-map-node[data-skill-state="emerging"] .skill-icon-wrap { color: var(--skill-emerging); }
 .skill-map-node[data-skill-state="developing"] .skill-icon-wrap { color: var(--skill-developing); }
@@ -2616,6 +2631,7 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .skill-map-relationship-notes { grid-template-columns: 1fr; }
   .skill-map-inline-detail .primary,
   .skill-map-inline-detail .secondary { justify-self: start; }
+  .skill-map-lines line.is-complete { animation: none; }
   .principles-list, .trust-grid { grid-template-columns: 1fr; }
   .example-flow { grid-template-columns: 1fr; }
   .example-flow article,
