@@ -4878,7 +4878,8 @@ function renderSkillMapPage() {
     if (!start || !end) return "";
     const active = edge.from === selectedSkill.id || edge.to === selectedSkill.id;
     const regionEdge = selectedRegionIds.includes(edge.from) && selectedRegionIds.includes(edge.to);
-    return `<line class="relationship-${escapeHtml(edge.type)}${active ? " is-active" : ""}${regionEdge ? " is-region-edge" : ""}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}">
+    const edgeRegion = skillMapRegionForSkill(edge.from);
+    return `<line class="relationship-${escapeHtml(edge.type)} edge-region-${escapeHtml(edgeRegion)}${active ? " is-active" : ""}${regionEdge ? " is-region-edge" : ""}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}">
       <title>${escapeHtml(skillMapTitleFor(edge.from))} to ${escapeHtml(skillMapTitleFor(edge.to))}: ${escapeHtml(skillMapRelationshipLabel(edge.type))}. ${escapeHtml(edge.reason)}</title>
     </line>`;
   }).join("");
