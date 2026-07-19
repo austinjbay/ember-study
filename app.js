@@ -4656,24 +4656,46 @@ const canonicalSkillTree = [
   }
 ];
 
+const skillMapRelationshipTypes = {
+  prerequisite: {
+    label: "Prerequisite",
+    description: "This skill usually needs to be stable before the next one is fair to practice."
+  },
+  supports: {
+    label: "Supports",
+    description: "This skill makes the next one easier, but it is not a strict gate."
+  },
+  extends: {
+    label: "Extends",
+    description: "The next skill carries the same reading move into a more complex task."
+  },
+  metacognitive: {
+    label: "Metacognitive",
+    description: "This connection helps the reader judge how well the skill held up."
+  }
+};
+
 const skillMapEdges = [
-  ["retrieve-explicit", "central-claim"],
-  ["retrieve-explicit", "supporting-ideas"],
-  ["central-claim", "supporting-ideas"],
-  ["central-claim", "source-fidelity"],
-  ["supporting-ideas", "connect-ideas"],
-  ["source-fidelity", "infer-implications"],
-  ["connect-ideas", "structure"],
-  ["connect-ideas", "match-evidence"],
-  ["structure", "point-of-view"],
-  ["match-evidence", "evaluate-reasoning"],
-  ["evaluate-reasoning", "build-explanation"],
-  ["connect-ideas", "build-explanation"],
-  ["infer-implications", "compare-texts"],
-  ["build-explanation", "apply-with-judgment"],
-  ["compare-texts", "apply-with-judgment"],
-  ["apply-with-judgment", "evaluate-boundaries"],
-  ["evaluate-boundaries", "calibrate-confidence"]
+  { from: "retrieve-explicit", to: "central-claim", type: "prerequisite", reason: "Readers need enough stated detail before they can name the author’s point." },
+  { from: "retrieve-explicit", to: "supporting-ideas", type: "prerequisite", reason: "Supporting ideas are usually concrete details, reasons, or examples recovered from the text." },
+  { from: "central-claim", to: "supporting-ideas", type: "prerequisite", reason: "Support only makes sense once the claim it supports is visible." },
+  { from: "central-claim", to: "source-fidelity", type: "supports", reason: "A clear claim gives the reader an anchor for deciding what belongs to the text." },
+  { from: "supporting-ideas", to: "connect-ideas", type: "prerequisite", reason: "Readers need more than one idea in view before they can explain a relationship." },
+  { from: "source-fidelity", to: "infer-implications", type: "prerequisite", reason: "Inference depends on staying inside what the source can support." },
+  { from: "central-claim", to: "build-explanation", type: "prerequisite", reason: "A complete explanation starts with the claim being explained." },
+  { from: "supporting-ideas", to: "build-explanation", type: "prerequisite", reason: "An explanation needs reasons or examples, not just a stated claim." },
+  { from: "connect-ideas", to: "build-explanation", type: "prerequisite", reason: "A strong explanation shows how the claim, reason, and example fit together." },
+  { from: "connect-ideas", to: "structure", type: "supports", reason: "Seeing relationships helps readers notice the shape of the chapter." },
+  { from: "structure", to: "point-of-view", type: "extends", reason: "Structure often reveals what the author chooses to emphasize or withhold." },
+  { from: "connect-ideas", to: "match-evidence", type: "supports", reason: "Evidence is easier to judge when the reader can explain what it is connected to." },
+  { from: "match-evidence", to: "evaluate-reasoning", type: "prerequisite", reason: "Evaluating reasoning requires first seeing which evidence is doing the work." },
+  { from: "evaluate-reasoning", to: "evaluate-boundaries", type: "extends", reason: "Testing reasoning naturally leads to testing assumptions, limits, and exceptions." },
+  { from: "infer-implications", to: "compare-texts", type: "supports", reason: "Warranted implications help readers compare what different texts suggest." },
+  { from: "build-explanation", to: "apply-with-judgment", type: "extends", reason: "Application asks the reader to carry a complete explanation into a real situation." },
+  { from: "compare-texts", to: "apply-with-judgment", type: "supports", reason: "Comparison gives readers more context for deciding how an idea travels." },
+  { from: "apply-with-judgment", to: "evaluate-boundaries", type: "extends", reason: "Using an idea in practice exposes where it fits and where it breaks down." },
+  { from: "retrieve-explicit", to: "calibrate-confidence", type: "metacognitive", reason: "Confidence should be compared with what the reader could actually retrieve." },
+  { from: "evaluate-boundaries", to: "calibrate-confidence", type: "metacognitive", reason: "Boundary judgment helps readers notice when certainty should become more cautious." }
 ];
 
 const skillMapPositions = {
@@ -4732,19 +4754,29 @@ function skillMapRegionForSkill(skillId) {
   return Object.entries(skillMapRegionSkillIds).find(([, ids]) => ids.includes(skillId))?.[0] || "meaning";
 }
 
-function skillMapParents(skillId) {
-  return skillMapEdges.filter(([, to]) => to === skillId).map(([from]) => from);
+function skillMapIncomingEdges(skillId) {
+  return skillMapEdges.filter(edge => edge.to === skillId);
 }
 
-function skillMapChildren(skillId) {
-  return skillMapEdges.filter(([from]) => from === skillId).map(([, to]) => to);
+function skillMapOutgoingEdges(skillId) {
+  return skillMapEdges.filter(edge => edge.from === skillId);
 }
 
-function skillMapTitleList(ids, emptyLabel = "Starting point") {
-  if (!ids.length) return emptyLabel;
-  return ids
-    .map(id => canonicalSkillTree.find(skill => skill.id === id)?.title)
-    .filter(Boolean)
+function skillMapTitleFor(skillId) {
+  return canonicalSkillTree.find(skill => skill.id === skillId)?.title || skillId;
+}
+
+function skillMapRelationshipLabel(type) {
+  return skillMapRelationshipTypes[type]?.label || "Related";
+}
+
+function skillMapEdgeList(edges, direction, emptyLabel = "Starting point") {
+  if (!edges.length) return emptyLabel;
+  return edges
+    .map(edge => {
+      const skillId = direction === "from" ? edge.from : edge.to;
+      return `${skillMapTitleFor(skillId)} (${skillMapRelationshipLabel(edge.type).toLowerCase()})`;
+    })
     .join(", ");
 }
 
@@ -4779,18 +4811,24 @@ function renderSkillMapPage() {
   state.selectedSkillMapSkill = selectedSkill.id;
   const selectedState = skillMapStateFor(selectedSkill, currentSkill);
   const earnedCount = canonicalSkillTree.filter(skill => skillMapStateFor(skill, currentSkill).days >= 3).length;
-  const selectedParents = skillMapParents(selectedSkill.id);
-  const selectedChildren = skillMapChildren(selectedSkill.id);
-  const relatedIds = new Set([selectedSkill.id, ...selectedParents, ...selectedChildren]);
+  const selectedParents = skillMapIncomingEdges(selectedSkill.id);
+  const selectedChildren = skillMapOutgoingEdges(selectedSkill.id);
+  const relatedIds = new Set([
+    selectedSkill.id,
+    ...selectedParents.map(edge => edge.from),
+    ...selectedChildren.map(edge => edge.to)
+  ]);
   const selectedRegion = state.selectedSkillMapRegion || "all";
   const selectedRegionIds = selectedRegion === "all" ? [] : skillMapRegionSkillIds[selectedRegion] || [];
-  const edges = skillMapEdges.map(([from, to]) => {
-    const start = skillMapPositions[from];
-    const end = skillMapPositions[to];
+  const edges = skillMapEdges.map(edge => {
+    const start = skillMapPositions[edge.from];
+    const end = skillMapPositions[edge.to];
     if (!start || !end) return "";
-    const active = from === selectedSkill.id || to === selectedSkill.id;
-    const regionEdge = selectedRegionIds.includes(from) && selectedRegionIds.includes(to);
-    return `<line class="${active ? "is-active" : ""}${regionEdge ? " is-region-edge" : ""}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}" />`;
+    const active = edge.from === selectedSkill.id || edge.to === selectedSkill.id;
+    const regionEdge = selectedRegionIds.includes(edge.from) && selectedRegionIds.includes(edge.to);
+    return `<line class="relationship-${escapeHtml(edge.type)}${active ? " is-active" : ""}${regionEdge ? " is-region-edge" : ""}" x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}">
+      <title>${escapeHtml(skillMapTitleFor(edge.from))} to ${escapeHtml(skillMapTitleFor(edge.to))}: ${escapeHtml(skillMapRelationshipLabel(edge.type))}. ${escapeHtml(edge.reason)}</title>
+    </line>`;
   }).join("");
   const nodes = canonicalSkillTree.map((skill, index) => {
     const position = skillMapPositions[skill.id] || { x: 50, y: 50 };
@@ -4813,6 +4851,12 @@ function renderSkillMapPage() {
     <strong>${escapeHtml(region.label)}</strong>
     <span>${escapeHtml(region.description)}</span>
   </article>`).join("");
+  const relationshipLegend = Object.entries(skillMapRelationshipTypes).map(([type, detail]) => `<span class="relationship-${escapeHtml(type)}"><i></i>${escapeHtml(detail.label)}</span>`).join("");
+  const selectedRelationshipNotes = selectedParents.concat(selectedChildren).slice(0, 4).map(edge => {
+    const connectedId = edge.to === selectedSkill.id ? edge.from : edge.to;
+    const direction = edge.to === selectedSkill.id ? "Builds from" : "Leads toward";
+    return `<li><strong>${escapeHtml(direction)} ${escapeHtml(skillMapTitleFor(connectedId))}</strong><span>${escapeHtml(skillMapRelationshipLabel(edge.type))}: ${escapeHtml(edge.reason)}</span></li>`;
+  }).join("");
   root.innerHTML = `<div class="skill-map-layout">
     <section class="skill-map-canvas-card" aria-labelledby="skill-map-network-title">
       <div class="skill-map-card-head">
@@ -4825,6 +4869,7 @@ function renderSkillMapPage() {
       </div>
       <p class="skill-map-earned-note">${earnedCount} of ${canonicalSkillTree.length} skills earned · earn each skill with three successful practice days.</p>
       <div class="skill-map-region-tabs" aria-label="Skill categories">${regionTabs}</div>
+      <div class="skill-map-relationship-legend" aria-label="Relationship types">${relationshipLegend}</div>
       <div class="skill-map-canvas" aria-label="Reading skill network">
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
         ${regions}
@@ -4841,10 +4886,11 @@ function renderSkillMapPage() {
         </div>
         <dl>
           <div><dt>Category</dt><dd>${escapeHtml(skillMapRegions.find(region => region.id === skillMapRegionForSkill(selectedSkill.id))?.label || "Reading skill")}</dd></div>
-          <div><dt>Builds from</dt><dd>${escapeHtml(skillMapTitleList(selectedParents, "Starting point"))}</dd></div>
-          <div><dt>Unlocks</dt><dd>${escapeHtml(skillMapTitleList(selectedChildren, "End of this branch"))}</dd></div>
+          <div><dt>Builds from</dt><dd>${escapeHtml(skillMapEdgeList(selectedParents, "from", "Starting point"))}</dd></div>
+          <div><dt>Leads toward</dt><dd>${escapeHtml(skillMapEdgeList(selectedChildren, "to", "End of this branch"))}</dd></div>
           <div><dt>Maps up to</dt><dd>${escapeHtml(selectedSkill.source || "Ember skill model")}</dd></div>
         </dl>
+        ${selectedRelationshipNotes ? `<ul class="skill-map-relationship-notes">${selectedRelationshipNotes}</ul>` : ""}
         <button class="${selectedState.isCurrent ? "primary" : "secondary"}" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}">${selectedState.isCurrent ? "Start practice" : "Practice this skill"}</button>
       </div>
     </section>
