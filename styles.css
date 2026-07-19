@@ -1097,7 +1097,7 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-node strong { grid-area: title; max-width: 126px; font-family: var(--serif); font-size: .78rem; line-height: 1.06; }
 .skill-map-node em { grid-area: level; color: var(--region-color, var(--green)); font-size: .54rem; font-style: normal; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .skill-map-node small { grid-area: status; color: var(--faint); font-size: .52rem; font-weight: 850; letter-spacing: .08em; line-height: 1.1; text-transform: uppercase; }
-.skill-map-canvas:has(.skill-map-node.is-selected) .skill-map-node:not(.is-related) { opacity: .56; }
+.skill-map-canvas:has(.skill-map-node.is-selected) .skill-map-node:not(.is-related) { opacity: 1; }
 .skill-map-node.is-related { opacity: 1; }
 .skill-map-node.is-related strong,
 .skill-map-node.is-pathway-member strong,
@@ -1123,6 +1123,8 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-node[data-skill-state="developing"] .skill-icon-wrap { color: var(--skill-developing); }
 .skill-map-node[data-skill-state="strengthening"] .skill-icon-wrap { color: var(--skill-strengthening); }
 .skill-map-node[data-skill-state="durable"] .skill-icon-wrap { color: var(--skill-durable); --skill-highlight: var(--amber); }
+.skill-map-node.is-unlocked[data-skill-state="unexplored"] .skill-icon-wrap { color: var(--region-color, var(--green)); }
+.skill-map-node.is-locked .skill-icon-wrap { color: #a1a49b; }
 .skill-map-inline-detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .95fr); align-items: center; gap: 18px; margin-top: 20px; border-top: 1px solid var(--line); padding-top: 20px; }
 .skill-map-inline-detail p { margin: 8px 0 0; color: var(--muted); font-size: .82rem; line-height: 1.65; }
 .skill-map-source-pills { display: flex; flex-wrap: wrap; gap: 8px; }
