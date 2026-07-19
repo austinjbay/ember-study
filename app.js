@@ -4456,6 +4456,72 @@ const marketingSkillIcons = [
   { id: "apply-with-judgment", title: "Use the idea wisely", state: "unexplored", label: "06 · Upcoming" }
 ];
 
+const achievementBadges = [
+  { id: "first-review", title: "First Review", description: "Complete one thoughtful review after reading.", status: "Earned", progress: "1 of 1 review", level: "earned" },
+  { id: "strong-start", title: "Strong Start", description: "Begin with enough source material for useful feedback.", status: "Earned", progress: "Source added", level: "earned" },
+  { id: "reading-streak", title: "Reading Streak", description: "Return on multiple days and keep the practice alive.", status: "In progress", progress: "2 day streak", level: "mastered" },
+  { id: "central-idea", title: "Central Idea", description: "Name what the author is really trying to argue.", status: "Earned", progress: "Skill unlocked", level: "earned" },
+  { id: "detail-finder", title: "Detail Finder", description: "Recover the evidence that makes the idea work.", status: "Locked", progress: "Practice to unlock", level: "locked" },
+  { id: "connection-maker", title: "Connection Maker", description: "Explain how one idea changes or supports another.", status: "In progress", progress: "1 of 3 days", level: "earned" },
+  { id: "critical-reader", title: "Critical Reader", description: "Test evidence, reasoning, and point of view.", status: "Locked", progress: "Unlock after evidence", level: "locked" },
+  { id: "lasting-memory", title: "Lasting Memory", description: "Bring an idea back after time has passed.", status: "Mastered", progress: "Review held", level: "mastered" },
+  { id: "book-complete", title: "Book Complete", description: "Finish the review path for an entire book.", status: "Locked", progress: "Finish all chapters", level: "locked" },
+  { id: "mastery", title: "Mastery", description: "Explain, test, and apply ideas across readings.", status: "Mastered", progress: "Durable skill", level: "mastered" }
+];
+
+function achievementBadgeIcon(id = "first-review") {
+  const icons = {
+    "first-review": `<path d="M6.8 8.3c3-.9 5.1-.4 6.2 1.1 1.1-1.5 3.2-2 6.2-1.1v9.2c-3-.7-5.1-.3-6.2 1.1-1.1-1.4-3.2-1.8-6.2-1.1Z"/><path d="M13 9.4v9.2"/><circle cx="13" cy="13.9" r="1.4"/>`,
+    "strong-start": `<path d="m12 5.8 2.3 4.2 4.7.9-3.3 3.5.6 4.8-4.3-2.1-4.3 2.1.6-4.8L5 10.9l4.7-.9Z"/><path d="M9.2 12.1h5.6"/><path d="M12 9.5v5.2"/>`,
+    "reading-streak": `<path d="M7.4 7.5h9.2v10.9H7.4z"/><path d="M9.4 5.7v3.1M14.6 5.7v3.1M7.4 10.7h9.2"/><path d="M10 15c1.2-.4 1.5-1.4 1.1-2.8 1.5.8 2.7 1.8 2.7 3.2a2 2 0 0 1-3.8.8"/>`,
+    "central-idea": `<path d="M5.7 12a6.3 6.3 0 1 0 12.6 0 6.3 6.3 0 0 0-12.6 0Z"/><path d="M8.4 12h7.2M12 8.4v7.2"/><circle cx="12" cy="12" r="1.7"/>`,
+    "detail-finder": `<circle cx="10.8" cy="10.8" r="4.5"/><path d="m14.1 14.1 4.1 4.1"/><path d="M9.1 10.6h3.3M10.7 8.9v3.4"/><circle cx="15.8" cy="7.2" r="1"/>`,
+    "connection-maker": `<circle cx="7.4" cy="12.1" r="2.6"/><circle cx="16.6" cy="8.1" r="2.2"/><circle cx="16.1" cy="16.7" r="2.4"/><path d="m9.8 11 4.6-2M9.7 13.4l4.2 2.1"/>`,
+    "critical-reader": `<path d="M6.1 12h11.8"/><path d="M8.6 8.1 6.5 12l2.1 3.9M15.4 8.1l2.1 3.9-2.1 3.9"/><path d="M10.3 18h3.4"/><circle cx="12" cy="12" r="1.3"/>`,
+    "lasting-memory": `<path d="M7.2 14.6c-1.5-3.4.5-7.1 4.2-7.1 2.9 0 5.4 2.2 5.4 5.1 0 3-2.6 5.9-4.8 7.1-1.1-.6-2.3-1.6-3.2-2.8"/><path d="M9.2 12.2h5.6M12 9.6v5.2"/><circle cx="7.6" cy="17.3" r="1.1"/>`,
+    "book-complete": `<path d="M7.2 6.5h8.8l2 2v10.1H7.2z"/><path d="M16 6.5v3h3"/><path d="m9.5 13.2 1.9 1.9 3.6-4.3"/><path d="M9 18.6v-2.4"/>`,
+    "mastery": `<path d="m12 5.2 5 3.1v6.2l-5 3.1-5-3.1V8.3Z"/><path d="m12 7.9 2.6 1.6v3.2L12 14.3l-2.6-1.6V9.5Z"/><path d="M12 2.8v2.1M12 19.1v2.1M4.7 7.1l1.9 1M17.4 15.9l1.9 1M19.3 7.1l-1.9 1M6.6 15.9l-1.9 1"/>`
+  };
+  return `<svg class="achievement-badge-icon achievement-badge-icon-${escapeHtml(id)}" width="36" height="36" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${icons[id] || icons["first-review"]}</svg>`;
+}
+
+function renderAchievementBadge(badge, stateName = badge.level || "locked", sizeName = "medium") {
+  const aria = `${badge.title} badge. ${stateName}. ${badge.description} ${badge.progress}.`;
+  return `<button class="achievement-badge achievement-badge-${escapeHtml(badge.id)} is-${escapeHtml(stateName)} is-${escapeHtml(sizeName)}" type="button" aria-label="${escapeHtml(aria)}">
+    <span class="achievement-badge-token" aria-hidden="true">${achievementBadgeIcon(badge.id)}</span>
+    <span class="achievement-badge-copy">
+      <strong>${escapeHtml(badge.title)}</strong>
+      <small>${escapeHtml(badge.status)} · ${escapeHtml(badge.progress)}</small>
+    </span>
+  </button>`;
+}
+
+function renderAchievementBadgeGallery() {
+  const firstThree = achievementBadges.slice(0, 3);
+  const states = ["locked", "earned", "mastered"];
+  const sizes = ["small", "medium", "large"];
+  return `<section class="achievement-gallery" aria-labelledby="achievement-gallery-title">
+    <div class="achievement-gallery-head">
+      <span class="eyebrow">Reward badge system</span>
+      <h2 id="achievement-gallery-title">Badges that feel earned, not decorative.</h2>
+      <p>Each reward has a distinct silhouette, warm dimensional surface, plain-language status, and a state that can move from locked to earned to mastered.</p>
+    </div>
+    <div class="achievement-state-lab" aria-label="First badge prototypes across size and state">
+      ${firstThree.map(badge => `<article>
+        <h3>${escapeHtml(badge.title)}</h3>
+        <div>${states.map(stateName => renderAchievementBadge(badge, stateName, "small")).join("")}</div>
+        <div>${sizes.map(sizeName => renderAchievementBadge(badge, badge.level, sizeName)).join("")}</div>
+      </article>`).join("")}
+    </div>
+    <div class="achievement-grid" aria-label="All Ember reward badges">
+      ${achievementBadges.map(badge => `<article>
+        ${renderAchievementBadge(badge, badge.level, "medium")}
+        <p>${escapeHtml(badge.description)}</p>
+      </article>`).join("")}
+    </div>
+  </section>`;
+}
+
 function skillIdForMarketingTitle(title = "") {
   const normalized = title.toLowerCase();
   if (normalized.includes("central claim")) return "central-claim";
@@ -4522,7 +4588,8 @@ function renderSkillIconSpecimen() {
       <article><strong>Color modes</strong><span class="skill-color-modes"><i>${renderSkillIcon("match-evidence", "strengthening", 32)}</i><i>${renderSkillIcon("match-evidence", "strengthening", 32)}</i></span></article>
       <article><strong>Ember relationship</strong><span class="ember-compare-mark" aria-hidden="true">E</span>${renderSkillIcon("connect-ideas", "strengthening", 48)}</article>
     </div>
-  </div>`;
+  </div>
+  ${renderAchievementBadgeGallery()}`;
 }
 
 function renderSkillModule(vm) {
