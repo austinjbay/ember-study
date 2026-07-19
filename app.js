@@ -4538,9 +4538,6 @@ function renderSkillModule(vm) {
         <span>${String(skill.index + 1).padStart(2, "0")}</span>
         <strong>${escapeHtml(skill.title)}</strong>
         <span class="skill-path-desc">${escapeHtml(skill.description)}</span>
-        ${skill.id === practice.skill.id ? "" : `<div class="skill-path-progress" aria-label="${escapeHtml(skill.title)} progress: ${skill.days} of 3 successful days">
-          <i style="width: ${skill.progress}%"></i>
-        </div>`}
         ${skill.actionLabel ? `<small class="${skill.id === practice.skill.id ? "skill-path-action" : ""}">${escapeHtml(skill.actionLabel)}</small>` : ""}
       </button>`).join("")}
     </div>
