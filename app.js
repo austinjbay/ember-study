@@ -4553,7 +4553,7 @@ const canonicalSkillTree = [
     id: "retrieve-explicit",
     title: "Remember key details",
     description: "Find the important things the author actually said.",
-    level: "Retrieve",
+    level: "Remember",
     source: "PIRLS retrieve · CCRA.R.1",
     exercise: "Name one important detail the author directly states.",
     supported: true
@@ -4562,7 +4562,7 @@ const canonicalSkillTree = [
     id: "central-claim",
     title: "Name the main point",
     description: "Say what the author is really trying to argue.",
-    level: "Establish meaning",
+    level: "Understand the point",
     source: "CCRA.R.2 · PIRLS interpret",
     exercise: "State the author’s main point in one sentence.",
     supported: true
@@ -4571,7 +4571,7 @@ const canonicalSkillTree = [
     id: "supporting-ideas",
     title: "Find the support",
     description: "Point to the reasons or examples that make the main point work.",
-    level: "Establish meaning",
+    level: "Understand the point",
     source: "CCRA.R.2",
     exercise: "Name the strongest reason or example behind the main point.",
     supported: true
@@ -4580,7 +4580,7 @@ const canonicalSkillTree = [
     id: "source-fidelity",
     title: "Stay close to the text",
     description: "Keep your answer grounded in the reading instead of adding guesses.",
-    level: "Establish meaning",
+    level: "Understand the point",
     source: "CCRA.R.1",
     exercise: "Separate what the text says from what you inferred.",
     supported: true
@@ -4589,7 +4589,7 @@ const canonicalSkillTree = [
     id: "connect-ideas",
     title: "Show how ideas connect",
     description: "Explain how one idea leads to, depends on, or changes another.",
-    level: "Integrate",
+    level: "Connect ideas",
     source: "CCRA.R.3 · PIRLS integrate",
     exercise: "Explain the relationship between two ideas.",
     supported: true
@@ -4598,7 +4598,7 @@ const canonicalSkillTree = [
     id: "structure",
     title: "Notice the structure",
     description: "Use the chapter’s order, contrasts, and cause-and-effect moves to follow the argument.",
-    level: "Craft",
+    level: "See how it’s built",
     source: "CCRA.R.5",
     exercise: "Name how the chapter is organized and why that matters.",
     supported: true
@@ -4607,7 +4607,7 @@ const canonicalSkillTree = [
     id: "point-of-view",
     title: "Notice the author’s angle",
     description: "See what the author wants you to pay attention to and why.",
-    level: "Craft",
+    level: "See how it’s built",
     source: "CCRA.R.6",
     exercise: "Name what the author is trying to do and what that changes.",
     supported: true
@@ -4616,7 +4616,7 @@ const canonicalSkillTree = [
     id: "match-evidence",
     title: "Pick the proof",
     description: "Choose the example or reason that best supports a claim.",
-    level: "Evaluate",
+    level: "Test the support",
     source: "CCRA.R.8",
     exercise: "Choose the evidence that does the most work.",
     supported: true
@@ -4625,7 +4625,7 @@ const canonicalSkillTree = [
     id: "evaluate-reasoning",
     title: "Check the argument",
     description: "Decide whether the reasons are strong enough to support the claim.",
-    level: "Evaluate",
+    level: "Test the support",
     source: "CCRA.R.8 · PIRLS evaluate",
     exercise: "Test whether the evidence is relevant and strong enough.",
     supported: true
@@ -4634,7 +4634,7 @@ const canonicalSkillTree = [
     id: "build-explanation",
     title: "Explain it clearly",
     description: "Connect the main point, the reason, and a concrete example.",
-    level: "Explain",
+    level: "Explain clearly",
     source: "Ember rubric synthesis",
     exercise: "Explain the point, the reason behind it, and one concrete example.",
     supported: true
@@ -4643,7 +4643,7 @@ const canonicalSkillTree = [
     id: "infer-implications",
     title: "Say what follows",
     description: "Draw a conclusion that fits the text, without inventing more than it supports.",
-    level: "Infer",
+    level: "Read between the lines",
     source: "CCRA.R.1 · PIRLS infer",
     exercise: "State what follows from the argument, and why.",
     supported: true
@@ -4652,7 +4652,7 @@ const canonicalSkillTree = [
     id: "compare-texts",
     title: "Connect readings",
     description: "Relate this reading to another source, idea, or author.",
-    level: "Synthesize",
+    level: "Connect readings",
     source: "CCRA.R.9",
     exercise: "Compare how two sources approach the same idea.",
     supported: true
@@ -4661,7 +4661,7 @@ const canonicalSkillTree = [
     id: "apply-with-judgment",
     title: "Use the idea wisely",
     description: "Apply the idea to real life while noticing where it may not fit.",
-    level: "Transfer",
+    level: "Use it",
     source: "Ember transfer rubric",
     exercise: "Use the idea in practice and name where it might fail.",
     supported: true
@@ -4670,7 +4670,7 @@ const canonicalSkillTree = [
     id: "evaluate-boundaries",
     title: "Find the limits",
     description: "Notice when an idea stops being useful, true, or fair.",
-    level: "Transfer",
+    level: "Use it",
     source: "PIRLS evaluate · Ember boundary challenge",
     exercise: "Name when the argument stops being useful or true.",
     supported: true
@@ -4679,7 +4679,7 @@ const canonicalSkillTree = [
     id: "calibrate-confidence",
     title: "Check what you really know",
     description: "Compare how confident you felt with what you could actually explain.",
-    level: "Metacognition",
+    level: "Check yourself",
     source: "Ember confidence calibration",
     exercise: "Compare your confidence estimate with the evidence in your answer.",
     supported: true
@@ -4760,27 +4760,27 @@ function skillMapTrimmedLine(start, end) {
 const skillMapRegions = [
   {
     id: "recall",
-    label: "Recall",
+    label: "Remember",
     className: "region-foundation",
-    description: "Recover what the text actually says."
+    description: "Bring back what the text actually says."
   },
   {
     id: "meaning",
-    label: "Meaning",
+    label: "Understand",
     className: "region-meaning",
-    description: "Turn details into the author’s argument."
+    description: "Turn details into the author’s point."
   },
   {
     id: "judgment",
-    label: "Judgment",
+    label: "Test",
     className: "region-evaluate",
-    description: "Test evidence, reasoning, and point of view."
+    description: "Check whether the support and reasoning hold up."
   },
   {
     id: "transfer",
-    label: "Transfer",
+    label: "Use",
     className: "region-transfer",
-    description: "Use the idea, compare it, and find its limits."
+    description: "Apply the idea and notice where it fits or breaks."
   }
 ];
 
@@ -4794,37 +4794,37 @@ const skillMapRegionSkillIds = {
 const skillMapPathways = [
   {
     id: "argument-basics",
-    title: "Argument Basics",
+    title: "Main Point Basics",
     capability: "Explain what an author is claiming and the support that makes the claim work.",
     skills: ["retrieve-explicit", "central-claim", "supporting-ideas", "build-explanation"]
   },
   {
     id: "source-grounding",
-    title: "Source Grounding",
+    title: "Stay With the Text",
     capability: "Keep interpretations anchored to the text while making careful inferences.",
     skills: ["retrieve-explicit", "source-fidelity", "infer-implications"]
   },
   {
     id: "relationship-reading",
-    title: "Relationship Reading",
+    title: "How Ideas Fit",
     capability: "Explain how ideas fit together inside a chapter instead of remembering them as loose points.",
     skills: ["supporting-ideas", "connect-ideas", "structure", "point-of-view"]
   },
   {
     id: "evidence-judgment",
-    title: "Evidence Judgment",
+    title: "Check the Support",
     capability: "Judge whether an argument is actually supported, not just whether it sounds persuasive.",
     skills: ["central-claim", "match-evidence", "evaluate-reasoning", "evaluate-boundaries"]
   },
   {
     id: "synthesis-transfer",
-    title: "Synthesis & Transfer",
+    title: "Use Ideas Elsewhere",
     capability: "Carry an idea across contexts, compare it with other texts, and use it with judgment.",
     skills: ["infer-implications", "compare-texts", "apply-with-judgment", "evaluate-boundaries"]
   },
   {
     id: "memory-calibration",
-    title: "Memory Calibration",
+    title: "Check What Lasted",
     capability: "Compare confidence with what actually held up after time.",
     skills: ["retrieve-explicit", "evaluate-boundaries", "calibrate-confidence"]
   }
@@ -6128,10 +6128,10 @@ const practiceQuestionBanks = {
     success: "You compared the authors’ different approaches to note-taking rather than merely naming the shared topic."
   }],
   "apply-with-judgment": [{
-    lessonTitle: "Transfer needs limits",
+    lessonTitle: "Use ideas with limits",
     lessonCopy: "Applying an idea well means naming where it helps and where the situation may be different.",
     exampleOne: "<strong>Idea:</strong> Make habits easy to start.",
-    exampleTwo: "<strong>Judgment:</strong> Useful for routines, weaker for decisions that require deep motivation.",
+    exampleTwo: "<strong>Limit:</strong> Useful for routines, weaker for decisions that require deep motivation.",
     question: "How would you use this idea in practice?",
     passage: "The author argues that people follow through more often when the desired action is visible and easy to begin. Small setup choices can make the first step feel almost automatic.",
     placeholder: "Apply the idea to a real situation and name one limit.",
@@ -6292,7 +6292,7 @@ const practiceCoaching = {
   "apply-with-judgment": {
     parts: ["the idea", "the practical use", "one limit or condition"],
     move: "Next time, include a real use case and one place where the idea may not apply.",
-    diagnostic: "Transfer is strongest when the application is concrete and the limits are visible.",
+    diagnostic: "Using an idea is strongest when the application is concrete and the limits are visible.",
     template: "I would use this by ___. It may not apply when ___."
   },
   "evaluate-boundaries": {
