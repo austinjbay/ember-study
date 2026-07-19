@@ -12,6 +12,7 @@ const LOGIN_PROMPT_KEY = "ember-login-prompt-index";
 const SESSION_PROMPT_KEY = "ember-session-login-prompt";
 const EMBER_CHAT_MINIMIZED_KEY = "ember-chat-minimized-v1";
 const SIDEBAR_OPENED_KEY = "ember-sidebar-opened-by-user-v1";
+const DAILY_QUESTION_KEY = "ember-daily-question-v1";
 const DEFAULT_COLOR_THEME = "moss-paper";
 const DEFAULT_COLOR_MODE = "light";
 
@@ -4586,15 +4587,28 @@ function renderTodayPracticeModule(vm) {
 
 function renderPersonalizationModule(vm) {
   if (vm.evidenceState !== "establishing") return "";
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const saved = safeReadStorage(DAILY_QUESTION_KEY, {});
+  const selected = saved.date === todayKey ? saved.answer : "";
+  const options = [
+    { id: "remember", label: "Remember the main idea", percent: 46 },
+    { id: "explain", label: "Explain it clearly", percent: 34 },
+    { id: "apply", label: "Use it in real life", percent: 20 }
+  ];
   return `<section class="adaptive-module personalization-module" aria-labelledby="personalization-title">
-    <span class="eyebrow">Personalization setup</span>
-    <h2 id="personalization-title">Optional signals for better guidance.</h2>
-    <div class="setup-prompt-list">
-      <button type="button">I read to remember ideas</button>
-      <button type="button">I want stronger explanations</button>
-      <button type="button">Bring ideas back weekly</button>
+    <span class="eyebrow">Daily Question</span>
+    <h2 id="personalization-title">What do you most want today’s reading to help you do?</h2>
+    <div class="setup-prompt-list" role="group" aria-label="Daily question answers">
+      ${options.map(option => `<button type="button" class="${selected === option.id ? "is-selected" : ""}" data-action="daily-question-answer" data-daily-answer="${escapeHtml(option.id)}">${escapeHtml(option.label)}</button>`).join("")}
     </div>
-    ${renderWhy("These are local prototype prompts only. They do not change skill assessments yet.", "preview")}
+    ${selected ? `<div class="daily-question-results" aria-label="Anonymous daily results">
+      <span>Anonymous responses today</span>
+      ${options.map(option => `<div class="${selected === option.id ? "is-selected" : ""}">
+        <strong>${escapeHtml(option.label)}</strong>
+        <i aria-hidden="true"><b style="width:${option.percent}%"></b></i>
+        <em>${option.percent}%</em>
+      </div>`).join("")}
+    </div>` : ""}
   </section>`;
 }
 
@@ -5872,6 +5886,11 @@ document.addEventListener("click", async event => {
   }
   if (action === "home-fixture") {
     state.homeFixture = event.target.closest("[data-fixture-state]")?.dataset.fixtureState || "";
+    renderDashboard();
+  }
+  if (action === "daily-question-answer") {
+    const answer = event.target.closest("[data-daily-answer]")?.dataset.dailyAnswer || "";
+    safeWriteStorage(DAILY_QUESTION_KEY, { date: new Date().toISOString().slice(0, 10), answer });
     renderDashboard();
   }
   if (action === "prototype-complete-mission") completePrototypeMission();
