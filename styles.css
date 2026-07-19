@@ -1048,22 +1048,18 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-relationship-legend .relationship-supports i { border-top-style: dashed; }
 .skill-map-relationship-legend .relationship-extends i { border-top-style: dotted; }
 .skill-map-relationship-legend .relationship-metacognitive i { border-top-style: double; }
-.skill-map-canvas { position: relative; min-height: 660px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background:
-  radial-gradient(circle at 20% 52%, rgba(159,121,69,.12), transparent 19%),
-  radial-gradient(circle at 56% 22%, rgba(73,101,83,.12), transparent 18%),
-  radial-gradient(circle at 81% 68%, rgba(123,95,143,.1), transparent 20%),
-  linear-gradient(135deg, rgba(255,253,247,.88), rgba(240,235,223,.72)); }
-.skill-map-canvas::before { content: ""; position: absolute; left: 50%; top: 51%; width: min(560px, 68%); aspect-ratio: 1; transform: translate(-50%, -50%); border: 1px solid rgba(54,91,74,.12); border-radius: 50%; background:
-  repeating-conic-gradient(from 10deg, rgba(54,91,74,.07) 0 2deg, transparent 2deg 13deg),
-  radial-gradient(circle, transparent 0 42%, rgba(54,91,74,.08) 42% 43%, transparent 43% 56%, rgba(154,100,44,.08) 56% 57%, transparent 57%);
-  opacity: .8; pointer-events: none; }
+.skill-map-canvas { position: relative; min-height: 760px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background:
+  linear-gradient(90deg, rgba(111,127,114,.08) 0 18%, transparent 18% 20%, rgba(73,101,83,.07) 20% 54%, transparent 54% 56%, rgba(154,100,44,.07) 56% 74%, transparent 74% 76%, rgba(123,95,143,.07) 76% 100%),
+  linear-gradient(180deg, rgba(255,253,247,.94), rgba(240,235,223,.72)); }
+.skill-map-canvas::before { content: ""; position: absolute; inset: 72px 7% 56px; border-top: 1px solid rgba(47,49,45,.08); border-bottom: 1px solid rgba(47,49,45,.08); background:
+  linear-gradient(90deg, transparent 0 17.5%, rgba(47,49,45,.08) 17.5% 17.7%, transparent 17.7% 36%, rgba(47,49,45,.08) 36% 36.2%, transparent 36.2% 56%, rgba(47,49,45,.08) 56% 56.2%, transparent 56.2% 75%, rgba(47,49,45,.08) 75% 75.2%, transparent 75.2%);
+  opacity: .9; pointer-events: none; }
 .skill-map-canvas::after { content: ""; position: absolute; inset: 0; background:
   radial-gradient(circle, rgba(54,91,74,.11) 1px, transparent 1.5px) 0 0 / 34px 34px,
-  linear-gradient(115deg, transparent 0 27%, rgba(54,91,74,.06) 27% 29%, transparent 29% 100%),
-  linear-gradient(28deg, transparent 0 63%, rgba(154,100,44,.07) 63% 65%, transparent 65% 100%); opacity: .56; pointer-events: none; }
+  linear-gradient(180deg, rgba(255,253,247,.22), transparent 26%, transparent 74%, rgba(255,253,247,.18)); opacity: .32; pointer-events: none; }
 .skill-map-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
-.skill-map-lines line { stroke: color-mix(in srgb, var(--line-dark), var(--green) 24%); stroke-width: 1.4; stroke-dasharray: 2 3; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .62; }
-.skill-map-lines line.relationship-prerequisite { stroke: var(--green); stroke-width: 1.8; stroke-dasharray: 0; opacity: .7; }
+.skill-map-lines line { stroke: color-mix(in srgb, var(--line-dark), var(--green) 24%); stroke-width: 1.2; stroke-dasharray: 2 3; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .24; }
+.skill-map-lines line.relationship-prerequisite { stroke: var(--green); stroke-width: 1.7; stroke-dasharray: 0; opacity: .36; }
 .skill-map-lines line.relationship-supports { stroke-dasharray: 4 4; }
 .skill-map-lines line.relationship-extends { stroke: var(--amber); stroke-dasharray: 1 5; }
 .skill-map-lines line.relationship-metacognitive { stroke: #7b5f8f; stroke-dasharray: 7 3 1 3; }
@@ -1071,24 +1067,24 @@ body.logged-out .landing-footer { display: flex; }
 .relationship-supports { --relationship-color: color-mix(in srgb, var(--line-dark), var(--green) 24%); }
 .relationship-extends { --relationship-color: var(--amber); }
 .relationship-metacognitive { --relationship-color: #7b5f8f; }
-.skill-map-lines line.is-region-edge { stroke: var(--amber); stroke-width: 1.9; opacity: .82; }
-.skill-map-lines line.is-active { stroke: var(--green); stroke-width: 2.4; opacity: 1; }
+.skill-map-lines line.is-region-edge { stroke: var(--amber); stroke-width: 1.7; opacity: .5; }
+.skill-map-lines line.is-active { stroke: var(--green); stroke-width: 2.4; opacity: .92; }
 .skill-map-region { position: absolute; z-index: 1; display: grid; gap: 3px; max-width: 176px; border: 1px solid color-mix(in srgb, var(--region-color, var(--green)), transparent 68%); border-radius: 8px; background: rgba(255,253,247,.62); color: var(--region-color, var(--green)); padding: 9px 11px; pointer-events: none; }
 .skill-map-region strong { font-size: .62rem; font-weight: 850; letter-spacing: .14em; line-height: 1; text-transform: uppercase; }
 .skill-map-region span { color: var(--muted); font-size: .64rem; line-height: 1.25; }
-.region-foundation { left: 5%; top: 7%; }
-.region-meaning { left: 34%; top: 38%; }
-.region-evaluate { right: 7%; top: 8%; }
-.region-transfer { right: 5%; bottom: 4%; }
+.region-foundation { left: 4%; top: 4%; }
+.region-meaning { left: 22%; top: 4%; }
+.region-evaluate { left: 58%; top: 4%; }
+.region-transfer { right: 4%; top: 4%; }
 .skill-region-recall { --region-color: #6f7f72; --region-soft: rgba(111,127,114,.14); }
 .skill-region-meaning { --region-color: #496553; --region-soft: rgba(73,101,83,.14); }
 .skill-region-judgment { --region-color: #9a642c; --region-soft: rgba(154,100,44,.14); }
 .skill-region-transfer { --region-color: #7b5f8f; --region-soft: rgba(123,95,143,.13); }
-.skill-map-node { position: absolute; left: var(--x); top: var(--y); z-index: 2; display: grid; grid-template-areas: "icon" "title" "level" "status"; justify-items: center; align-items: center; gap: 4px; width: min(138px, 15vw); min-height: 132px; transform: translate(-50%, -50%); border: 0; background: transparent; color: var(--ink); padding: 0; text-align: center; transition: transform .2s cubic-bezier(.2,.8,.2,1), filter .18s ease, opacity .18s ease; }
+.skill-map-node { position: absolute; left: var(--x); top: var(--y); z-index: 2; display: grid; grid-template-areas: "icon" "title" "level" "status"; justify-items: center; align-items: center; gap: 4px; width: min(126px, 13vw); min-height: 124px; transform: translate(-50%, -50%); border: 0; background: transparent; color: var(--ink); padding: 0; text-align: center; transition: transform .2s cubic-bezier(.2,.8,.2,1), filter .18s ease, opacity .18s ease; }
 .skill-map-node:hover { transform: translate(-50%, calc(-50% - 4px)) scale(1.03); filter: brightness(1.1); }
-.skill-map-node .skill-icon-wrap { grid-area: icon; display: grid; place-items: center; width: 62px; height: 62px; border: 1px solid color-mix(in srgb, var(--region-color, var(--green)), var(--line-dark) 18%); border-radius: 50%; background: radial-gradient(circle at 38% 30%, var(--white), var(--region-soft, var(--green-soft)) 55%, rgba(255,253,247,.92)); color: var(--region-color, var(--green)); box-shadow: 0 0 0 4px var(--region-soft, var(--green-soft)), 0 12px 22px rgba(47,49,45,.1), inset 0 0 0 5px rgba(255,255,255,.46); }
-.skill-map-node > span:not(.skill-icon-wrap) { position: absolute; left: calc(50% + 17px); top: 16px; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--region-color, var(--green)); color: var(--white); font-family: var(--serif); font-size: .72rem; font-style: italic; line-height: 1; box-shadow: 0 8px 12px rgba(47,49,45,.12); }
-.skill-map-node strong { grid-area: title; max-width: 136px; font-family: var(--serif); font-size: .86rem; line-height: 1.05; }
+.skill-map-node .skill-icon-wrap { grid-area: icon; display: grid; place-items: center; width: 56px; height: 56px; border: 1px solid color-mix(in srgb, var(--region-color, var(--green)), var(--line-dark) 18%); border-radius: 50%; background: radial-gradient(circle at 38% 30%, var(--white), var(--region-soft, var(--green-soft)) 55%, rgba(255,253,247,.92)); color: var(--region-color, var(--green)); box-shadow: 0 0 0 4px var(--region-soft, var(--green-soft)), 0 12px 22px rgba(47,49,45,.1), inset 0 0 0 5px rgba(255,255,255,.46); }
+.skill-map-node > span:not(.skill-icon-wrap) { position: absolute; left: calc(50% + 14px); top: 16px; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--region-color, var(--green)); color: var(--white); font-family: var(--serif); font-size: .72rem; font-style: italic; line-height: 1; box-shadow: 0 8px 12px rgba(47,49,45,.12); }
+.skill-map-node strong { grid-area: title; max-width: 126px; font-family: var(--serif); font-size: .78rem; line-height: 1.06; }
 .skill-map-node em { grid-area: level; color: var(--region-color, var(--green)); font-size: .54rem; font-style: normal; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .skill-map-node small { grid-area: status; color: var(--faint); font-size: .52rem; font-weight: 850; letter-spacing: .08em; line-height: 1.1; text-transform: uppercase; }
 .skill-map-canvas:has(.skill-map-node.is-selected) .skill-map-node:not(.is-related) { opacity: .56; }

@@ -4701,21 +4701,21 @@ const skillMapEdges = [
 ];
 
 const skillMapPositions = {
-  "retrieve-explicit": { x: 10, y: 52 },
-  "central-claim": { x: 23, y: 34 },
-  "supporting-ideas": { x: 23, y: 70 },
-  "source-fidelity": { x: 38, y: 18 },
-  "connect-ideas": { x: 40, y: 52 },
-  "structure": { x: 55, y: 32 },
-  "point-of-view": { x: 70, y: 22 },
-  "match-evidence": { x: 55, y: 70 },
-  "evaluate-reasoning": { x: 70, y: 64 },
-  "build-explanation": { x: 70, y: 84 },
-  "infer-implications": { x: 55, y: 10 },
-  "compare-texts": { x: 86, y: 36 },
-  "apply-with-judgment": { x: 86, y: 58 },
-  "evaluate-boundaries": { x: 86, y: 79 },
-  "calibrate-confidence": { x: 70, y: 96 }
+  "retrieve-explicit": { x: 10, y: 54 },
+  "central-claim": { x: 27, y: 28 },
+  "supporting-ideas": { x: 27, y: 54 },
+  "source-fidelity": { x: 27, y: 80 },
+  "infer-implications": { x: 45, y: 24 },
+  "connect-ideas": { x: 45, y: 54 },
+  "structure": { x: 45, y: 82 },
+  "point-of-view": { x: 64, y: 24 },
+  "match-evidence": { x: 64, y: 48 },
+  "evaluate-reasoning": { x: 64, y: 72 },
+  "build-explanation": { x: 79, y: 24 },
+  "compare-texts": { x: 79, y: 48 },
+  "apply-with-judgment": { x: 79, y: 70 },
+  "evaluate-boundaries": { x: 91, y: 48 },
+  "calibrate-confidence": { x: 91, y: 76 }
 };
 
 const skillMapRegions = [
