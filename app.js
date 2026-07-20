@@ -4425,40 +4425,83 @@ function skillDevelopmentState(days = 0, isCurrent = false) {
 function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", size = 32) {
   const key = readingSkillIconKey(skillId);
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
-  if (key === "retrieve-explicit") {
-    return `<svg ${common}>
-      <path class="skill-icon-puzzle-depth" d="M5.2 6.5h4.5c.3-1.5 1.2-2.5 2.5-2.5s2.3 1 2.5 2.5h4.1c.9 0 1.6.7 1.6 1.6v3.1c0 .7-.5 1.3-1.1 1.5-.7.2-1.3 0-1.8-.6-.3-.3-.6-.5-1-.5-1 0-1.8.8-1.8 1.8s.8 1.8 1.8 1.8c.4 0 .8-.2 1-.5.5-.5 1.1-.8 1.8-.6.7.2 1.1.8 1.1 1.5v2.5c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.2-.7.1-1.3.6-1.7.4-.3.6-.7.6-1.2 0-1-.8-1.8-1.8-1.8s-1.8.8-1.8 1.8c0 .5.2.9.6 1.2.5.4.8 1.1.6 1.7-.2.7-.8 1.1-1.5 1.1h-5.4c-.9 0-1.6-.7-1.6-1.6v-4.2c0-.7.5-1.3 1.1-1.5.7-.2 1.3.1 1.7.6.3.4.7.6 1.2.6 1 0 1.8-.8 1.8-1.8s-.8-1.8-1.8-1.8c-.5 0-.9.2-1.2.6-.4.5-1.1.8-1.7.6-.7-.2-1.1-.8-1.1-1.5v-3.6c0-.9.7-1.6 1.6-1.6Z"></path>
-      <path class="skill-icon-puzzle-piece" d="M5.2 5.8h4.5c.3-1.5 1.2-2.5 2.5-2.5s2.3 1 2.5 2.5h4.1c.9 0 1.6.7 1.6 1.6v3.1c0 .7-.5 1.3-1.1 1.5-.7.2-1.3 0-1.8-.6-.3-.3-.6-.5-1-.5-1 0-1.8.8-1.8 1.8s.8 1.8 1.8 1.8c.4 0 .8-.2 1-.5.5-.5 1.1-.8 1.8-.6.7.2 1.1.8 1.1 1.5v2.5c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.2-.7.1-1.3.6-1.7.4-.3.6-.7.6-1.2 0-1-.8-1.8-1.8-1.8s-1.8.8-1.8 1.8c0 .5.2.9.6 1.2.5.4.8 1.1.6 1.7-.2.7-.8 1.1-1.5 1.1h-5.4c-.9 0-1.6-.7-1.6-1.6v-4.2c0-.7.5-1.3 1.1-1.5.7-.2 1.3.1 1.7.6.3.4.7.6 1.2.6 1 0 1.8-.8 1.8-1.8s-.8-1.8-1.8-1.8c-.5 0-.9.2-1.2.6-.4.5-1.1.8-1.7.6-.7-.2-1.1-.8-1.1-1.5v-3.6c0-.9.7-1.6 1.6-1.6Z"></path>
-      <path class="skill-icon-puzzle-terminator" d="M9.9 13.4c.5-.4.8-1 .8-1.7 0-.8-.3-1.4-.9-1.8 1.3-.5 2.6-.8 4-.9-.4.4-.6 1-.6 1.7 0 1.1.7 2.1 1.7 2.5-1.7.7-3.4.8-5 .2Z"></path>
-      <path class="skill-icon-puzzle-core-shadow" d="M18.7 12.8c.9.1 1.5.8 1.5 1.7v2.9c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.1-.3 0-.7.1-1 2.2-.4 4.2-1.8 5.7-4.1Z"></path>
-      <path class="skill-icon-puzzle-reflected-light" d="M5.2 16.3c1.2.5 2.6.6 4.1.4.2.5.5.9 1 1.2.4.3.7.7.8 1.1h-4.3c-.9 0-1.6-.7-1.6-1.6v-1.1Z"></path>
-    </svg>`;
-  }
-  const pieceMarks = {
-    "central-claim": `<circle class="skill-icon-piece-dot" cx="12" cy="12" r="2.3"></circle><path class="skill-icon-piece-mark" d="M7.7 12h8.6M12 7.7v8.6"></path>`,
-    "supporting-ideas": `<path class="skill-icon-piece-mark" d="M8.6 8.7h6.8M8.6 12h6.8M8.6 15.3h6.8"></path><circle class="skill-icon-piece-dot" cx="7" cy="8.7" r=".75"></circle><circle class="skill-icon-piece-dot" cx="7" cy="12" r=".75"></circle><circle class="skill-icon-piece-dot" cx="7" cy="15.3" r=".75"></circle>`,
-    "source-fidelity": `<path class="skill-icon-piece-mark" d="m8.2 12.2 2.4 2.4 5.2-6.2"></path><path class="skill-icon-piece-accent" d="M8.9 7.5h5.4M8.9 16.5h5.4"></path>`,
-    "connect-ideas": `<circle class="skill-icon-piece-ring" cx="8.4" cy="12" r="2.1"></circle><circle class="skill-icon-piece-ring" cx="15.6" cy="12" r="2.1"></circle><path class="skill-icon-piece-mark" d="M10.2 12h3.6"></path>`,
-    "structure": `<path class="skill-icon-piece-mark" d="M8.5 7.8v8.4M15.5 7.8v8.4M8.5 9.5h7M8.5 12h7M8.5 14.5h7"></path>`,
-    "point-of-view": `<path class="skill-icon-piece-mark" d="M6.8 12c1.4-2.1 3-3.1 5.2-3.1s3.8 1 5.2 3.1c-1.4 2.1-3 3.1-5.2 3.1S8.2 14.1 6.8 12Z"></path><circle class="skill-icon-piece-dot" cx="12" cy="12" r="1.5"></circle>`,
-    "match-evidence": `<path class="skill-icon-piece-mark" d="M8.2 13.8a3.7 3.7 0 1 1 2.2 2.1l-2.2 2.2H6.3v-1.9h-1.9v-1.8h2Z"></path><circle class="skill-icon-piece-dot" cx="12.3" cy="9.7" r="1.1"></circle>`,
-    "evaluate-reasoning": `<path class="skill-icon-piece-mark" d="M12 7.1v8.4M7.2 9.8h9.6M8.7 9.8 7.1 14h3.2ZM15.3 9.8 13.7 14h3.2Z"></path>`,
-    "build-explanation": `<path class="skill-icon-piece-mark" d="M7.8 15.6h8.4M8.8 12.3h6.4M9.9 9h4.2"></path><path class="skill-icon-piece-accent" d="m8.4 15.6 3.6-6.6 3.6 6.6"></path>`,
-    "infer-implications": `<path class="skill-icon-piece-mark" d="M8 16.4h8M8.9 13.6h6.2M9.4 10.8a2.6 2.6 0 0 1 5.2 0c0 1.1-.7 1.8-1.5 2.4-.5.4-.8.8-.8 1.4"></path><circle class="skill-icon-piece-dot" cx="12" cy="17.7" r=".55"></circle>`,
-    "compare-texts": `<path class="skill-icon-piece-mark" d="M7.1 8.2h4.2c.8 0 1.4.6 1.4 1.4v6.2c-.6-.5-1.2-.7-2-.7H7.1ZM16.9 8.2h-4.2c-.8 0-1.4.6-1.4 1.4v6.2c.6-.5 1.2-.7 2-.7h3.6Z"></path><path class="skill-icon-piece-accent" d="M12 9.4v6.4"></path>`,
-    "clear-explanations": `<path class="skill-icon-piece-mark" d="M7 10.6h3l5.8-3.2v9.2L10 13.4H7Z"></path><path class="skill-icon-piece-accent" d="M17 10c.7.5 1.1 1.2 1.1 2s-.4 1.5-1.1 2"></path>`,
-    "calibrate-confidence": `<path class="skill-icon-piece-mark" d="M7.2 15.6a4.8 4.8 0 0 1 9.6 0M8.6 15.6h6.8M12 14.9l3-3.8"></path><path class="skill-icon-piece-accent" d="M8.8 12.3 7.6 11.5M15.2 12.3l1.2-.8M12 10.3V9"></path>`,
-    "apply-with-judgment": `<path class="skill-icon-piece-mark" d="M8.4 12.8 12.3 9l3.7 3.7-3.9 3.9a2.6 2.6 0 0 1-3.7-3.8Z"></path><path class="skill-icon-piece-accent" d="m13.5 7.8 2-2 2.7 2.7-2 2"></path>`,
-    "evaluate-boundaries": `<path class="skill-icon-piece-mark" d="M7.2 8.5v7.8M12 7.3v9M16.8 8.5v7.8M6.4 11h11.2M6.4 14h11.2"></path>`
+  const puzzleShape = "M5.2 5.8h4.5c.3-1.5 1.2-2.5 2.5-2.5s2.3 1 2.5 2.5h4.1c.9 0 1.6.7 1.6 1.6v3.1c0 .7-.5 1.3-1.1 1.5-.7.2-1.3 0-1.8-.6-.3-.3-.6-.5-1-.5-1 0-1.8.8-1.8 1.8s.8 1.8 1.8 1.8c.4 0 .8-.2 1-.5.5-.5 1.1-.8 1.8-.6.7.2 1.1.8 1.1 1.5v2.5c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.2-.7.1-1.3.6-1.7.4-.3.6-.7.6-1.2 0-1-.8-1.8-1.8-1.8s-1.8.8-1.8 1.8c0 .5.2.9.6 1.2.5.4.8 1.1.6 1.7-.2.7-.8 1.1-1.5 1.1h-5.4c-.9 0-1.6-.7-1.6-1.6v-4.2c0-.7.5-1.3 1.1-1.5.7-.2 1.3.1 1.7.6.3.4.7.6 1.2.6 1 0 1.8-.8 1.8-1.8s-.8-1.8-1.8-1.8c-.5 0-.9.2-1.2.6-.4.5-1.1.8-1.7.6-.7-.2-1.1-.8-1.1-1.5v-3.6c0-.9.7-1.6 1.6-1.6Z";
+  const skillTokens = {
+    "retrieve-explicit": {
+      shape: puzzleShape,
+      classes: { depth: "skill-icon-puzzle-depth", face: "skill-icon-puzzle-piece", shade: "skill-icon-puzzle-core-shadow", glow: "skill-icon-puzzle-reflected-light" },
+      mark: `<path class="skill-icon-puzzle-terminator" d="M9.9 13.4c.5-.4.8-1 .8-1.7 0-.8-.3-1.4-.9-1.8 1.3-.5 2.6-.8 4-.9-.4.4-.6 1-.6 1.7 0 1.1.7 2.1 1.7 2.5-1.7.7-3.4.8-5 .2Z"></path>`
+    },
+    "central-claim": {
+      shape: "M12 3.2 14 6l3.3-.8-.1 3.4 2.8 1.8-3 1.6.5 3.3-3.4-.5L12 17.6l-2.1-2.8-3.4.5.5-3.3-3-1.6 2.8-1.8-.1-3.4L10 6Z",
+      mark: `<circle class="skill-icon-piece-dot" cx="12" cy="11.1" r="2.4"></circle><path class="skill-icon-piece-accent" d="M8.4 11.1h7.2M12 7.5v7.2"></path>`
+    },
+    "supporting-ideas": {
+      shape: "M5.4 6.8c0-1 1-1.6 1.9-1.3l9.8 3.8c.7.3 1.1.9 1.1 1.6v5.3c0 1.1-1.1 1.8-2.1 1.4l-9.8-3.8c-.6-.3-.9-.8-.9-1.5Z",
+      mark: `<path class="skill-icon-piece-mark" d="M8.1 9.4h7.3M8.1 12h7.3M8.1 14.6h5.4"></path>`
+    },
+    "source-fidelity": {
+      shape: "M7.2 4.4h9.6c.8 0 1.4.6 1.4 1.4v13.5L12 16l-6.2 3.3V5.8c0-.8.6-1.4 1.4-1.4Z",
+      mark: `<path class="skill-icon-piece-mark" d="m8.7 11.8 2.1 2.1 4.7-5.9"></path><path class="skill-icon-piece-accent" d="M9 7.5h5.5"></path>`
+    },
+    "connect-ideas": {
+      shape: "M8.1 6h7.8c2 0 3.6 1.6 3.6 3.6v4.8c0 2-1.6 3.6-3.6 3.6H8.1c-2 0-3.6-1.6-3.6-3.6V9.6C4.5 7.6 6.1 6 8.1 6Z",
+      mark: `<circle class="skill-icon-piece-ring" cx="8.7" cy="12" r="2.2"></circle><circle class="skill-icon-piece-ring" cx="15.3" cy="12" r="2.2"></circle><path class="skill-icon-piece-mark" d="M10.6 12h2.8"></path>`
+    },
+    "structure": {
+      shape: "M7.2 4.4h9.6c1 0 1.8.8 1.8 1.8v11.6c0 1-.8 1.8-1.8 1.8H7.2c-1 0-1.8-.8-1.8-1.8V6.2c0-1 .8-1.8 1.8-1.8Z",
+      mark: `<path class="skill-icon-piece-mark" d="M8.4 8h7.2M8.4 11.4h7.2M8.4 14.8h7.2M10.2 8v6.8M13.8 8v6.8"></path>`
+    },
+    "point-of-view": {
+      shape: "M4.8 12c1.6-3.7 4-5.5 7.2-5.5s5.6 1.8 7.2 5.5c-1.6 3.7-4 5.5-7.2 5.5S6.4 15.7 4.8 12Z",
+      mark: `<circle class="skill-icon-piece-ring" cx="12" cy="12" r="3"></circle><circle class="skill-icon-piece-dot" cx="12" cy="12" r="1.2"></circle>`
+    },
+    "match-evidence": {
+      shape: "M12.3 4.6c3.1 0 5.6 2.5 5.6 5.6 0 1.2-.4 2.2-1 3.1l-6.3 6.1H7v-3H4v-3h2.9l1.2-1.2c-.8-3.7 1.1-7.6 4.2-7.6Z",
+      mark: `<circle class="skill-icon-piece-ring" cx="12.8" cy="9.8" r="2.1"></circle><path class="skill-icon-piece-accent" d="M6.8 16.4 10 13.2"></path>`
+    },
+    "evaluate-reasoning": {
+      shape: "M12 4.4 19.2 8v5.4c0 3-2.1 5-7.2 6-5.1-1-7.2-3-7.2-6V8Z",
+      mark: `<path class="skill-icon-piece-mark" d="M12 7.8v7.8M7.8 10.3h8.4M8.9 10.3 7.4 14h3ZM15.1 10.3 13.6 14h3Z"></path>`
+    },
+    "build-explanation": {
+      shape: "M5.2 16.8 12 4.5l6.8 12.3c.6 1.1-.2 2.3-1.4 2.3H6.6c-1.2 0-2-1.2-1.4-2.3Z",
+      mark: `<path class="skill-icon-piece-mark" d="M8.5 15.3h7M9.5 12.4h5M10.5 9.5h3"></path><path class="skill-icon-piece-accent" d="M8.5 15.3 12 8.7l3.5 6.6"></path>`
+    },
+    "infer-implications": {
+      shape: "M12 4.4c3 0 5.4 2.2 5.4 5.1 0 2-1.2 3.6-2.8 4.6l-.8 3.5h-3.6l-.8-3.5c-1.6-1-2.8-2.6-2.8-4.6 0-2.9 2.4-5.1 5.4-5.1Z",
+      mark: `<path class="skill-icon-piece-mark" d="M9.3 9.8a2.7 2.7 0 0 1 5.4 0c0 1-.7 1.7-1.5 2.3-.6.5-.8.9-.8 1.5"></path><circle class="skill-icon-piece-dot" cx="12" cy="15.8" r=".6"></circle>`
+    },
+    "compare-texts": {
+      shape: "M6.4 5.3h4.5c1 0 1.7.8 1.7 1.7v11c-.7-.5-1.4-.7-2.2-.7h-4c-.8 0-1.5-.7-1.5-1.5v-9c0-.8.7-1.5 1.5-1.5Zm11.2 0h-4.5c-1 0-1.7.8-1.7 1.7v11c.7-.5 1.4-.7 2.2-.7h4c.8 0 1.5-.7 1.5-1.5v-9c0-.8-.7-1.5-1.5-1.5Z",
+      mark: `<path class="skill-icon-piece-mark" d="M8 8.7h2.3M13.7 8.7H16M8 11.4h2.3M13.7 11.4H16"></path><path class="skill-icon-piece-accent" d="M12 7.2v9"></path>`
+    },
+    "clear-explanations": {
+      shape: "M5.2 9.9h3.6l6.8-4v12.2l-6.8-4H5.2c-.8 0-1.4-.6-1.4-1.4v-1.4c0-.8.6-1.4 1.4-1.4Z",
+      mark: `<path class="skill-icon-piece-accent" d="M17 9.7c.7.5 1.1 1.4 1.1 2.3s-.4 1.8-1.1 2.3M18.9 8c1.2 1 1.8 2.4 1.8 4s-.6 3-1.8 4"></path><path class="skill-icon-piece-mark" d="M7.1 11v2"></path>`
+    },
+    "calibrate-confidence": {
+      shape: "M4.9 14.8a7.1 7.1 0 0 1 14.2 0v3.2H4.9Z",
+      mark: `<path class="skill-icon-piece-mark" d="M7.4 15h9.2M12 14.1l3.2-4.1M7.6 12.4l1.1.6M16.4 12.4l-1.1.6M12 9.3v1.1"></path>`
+    },
+    "apply-with-judgment": {
+      shape: "M8.5 10.9 12.6 6.8c.8-.8 2-.8 2.8 0l1.8 1.8c.8.8.8 2 0 2.8l-4.1 4.1c-1.3 1.3-3.4 1.3-4.6 0s-1.3-3.3 0-4.6Z",
+      mark: `<path class="skill-icon-piece-mark" d="M10.3 12.4 13 15.1M14 8l2 2"></path><path class="skill-icon-piece-accent" d="M8.2 16 5.9 18.3"></path>`
+    },
+    "evaluate-boundaries": {
+      shape: "M5.8 7.3h12.4c.7 0 1.2.5 1.2 1.2v9.1H4.6V8.5c0-.7.5-1.2 1.2-1.2Z",
+      mark: `<path class="skill-icon-piece-mark" d="M7.3 8.8v7.6M12 8.8v7.6M16.7 8.8v7.6M5.9 11.4h12.2M5.9 14.2h12.2"></path>`
+    }
   };
-  const mark = pieceMarks[key] || pieceMarks["central-claim"];
+  const token = skillTokens[key] || skillTokens["central-claim"];
+  const classes = token.classes || { depth: "skill-icon-token-depth", face: "skill-icon-token-face", shade: "skill-icon-token-shade", glow: "skill-icon-token-glow" };
   const tokenCommon = common.replace('class="skill-icon ', 'class="skill-icon skill-icon-piece-token ');
   return `<svg ${tokenCommon}>
-    <path class="skill-icon-token-depth" d="M5.2 6.5h4.5c.3-1.5 1.2-2.5 2.5-2.5s2.3 1 2.5 2.5h4.1c.9 0 1.6.7 1.6 1.6v3.1c0 .7-.5 1.3-1.1 1.5-.7.2-1.3 0-1.8-.6-.3-.3-.6-.5-1-.5-1 0-1.8.8-1.8 1.8s.8 1.8 1.8 1.8c.4 0 .8-.2 1-.5.5-.5 1.1-.8 1.8-.6.7.2 1.1.8 1.1 1.5v2.5c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.2-.7.1-1.3.6-1.7.4-.3.6-.7.6-1.2 0-1-.8-1.8-1.8-1.8s-1.8.8-1.8 1.8c0 .5.2.9.6 1.2.5.4.8 1.1.6 1.7-.2.7-.8 1.1-1.5 1.1h-5.4c-.9 0-1.6-.7-1.6-1.6v-4.2c0-.7.5-1.3 1.1-1.5.7-.2 1.3.1 1.7.6.3.4.7.6 1.2.6 1 0 1.8-.8 1.8-1.8s-.8-1.8-1.8-1.8c-.5 0-.9.2-1.2.6-.4.5-1.1.8-1.7.6-.7-.2-1.1-.8-1.1-1.5v-3.6c0-.9.7-1.6 1.6-1.6Z"></path>
-    <path class="skill-icon-token-face" d="M5.2 5.8h4.5c.3-1.5 1.2-2.5 2.5-2.5s2.3 1 2.5 2.5h4.1c.9 0 1.6.7 1.6 1.6v3.1c0 .7-.5 1.3-1.1 1.5-.7.2-1.3 0-1.8-.6-.3-.3-.6-.5-1-.5-1 0-1.8.8-1.8 1.8s.8 1.8 1.8 1.8c.4 0 .8-.2 1-.5.5-.5 1.1-.8 1.8-.6.7.2 1.1.8 1.1 1.5v2.5c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.2-.7.1-1.3.6-1.7.4-.3.6-.7.6-1.2 0-1-.8-1.8-1.8-1.8s-1.8.8-1.8 1.8c0 .5.2.9.6 1.2.5.4.8 1.1.6 1.7-.2.7-.8 1.1-1.5 1.1h-5.4c-.9 0-1.6-.7-1.6-1.6v-4.2c0-.7.5-1.3 1.1-1.5.7-.2 1.3.1 1.7.6.3.4.7.6 1.2.6 1 0 1.8-.8 1.8-1.8s-.8-1.8-1.8-1.8c-.5 0-.9.2-1.2.6-.4.5-1.1.8-1.7.6-.7-.2-1.1-.8-1.1-1.5v-3.6c0-.9.7-1.6 1.6-1.6Z"></path>
-    <path class="skill-icon-token-shade" d="M18.7 12.8c.9.1 1.5.8 1.5 1.7v2.9c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.1-.3 0-.7.1-1 2.2-.4 4.2-1.8 5.7-4.1Z"></path>
-    <path class="skill-icon-token-glow" d="M5.2 16.3c1.2.5 2.6.6 4.1.4.2.5.5.9 1 1.2.4.3.7.7.8 1.1h-4.3c-.9 0-1.6-.7-1.6-1.6v-1.1Z"></path>
-    <g class="skill-icon-piece-symbol">${mark}</g>
+    <path class="${classes.depth}" d="${token.shape}"></path>
+    <path class="${classes.face}" d="${token.shape}"></path>
+    <path class="${classes.shade}" d="M18.7 12.8c.9.1 1.5.8 1.5 1.7v2.9c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.1-.3 0-.7.1-1 2.2-.4 4.2-1.8 5.7-4.1Z"></path>
+    <path class="${classes.glow}" d="M5.2 16.3c1.2.5 2.6.6 4.1.4.2.5.5.9 1 1.2.4.3.7.7.8 1.1h-4.3c-.9 0-1.6-.7-1.6-1.6v-1.1Z"></path>
+    <g class="skill-icon-piece-symbol">${token.mark}</g>
   </svg>`;
 }
 
