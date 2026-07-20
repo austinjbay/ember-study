@@ -674,8 +674,8 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon-developing .skill-icon-prize,
 .skill-icon-strengthening .skill-icon-prize,
 .skill-icon-durable .skill-icon-prize { opacity: 1; }
-.skill-icon-wrap:has(.skill-icon-retrieve-explicit) { --badge-accent: #b98547; --badge-ink: var(--ink); --skill-highlight: #f1c77b; isolation: isolate; border-color: color-mix(in srgb, #b98547, var(--paper) 38%); border-radius: 22px 18px 20px 18px; background: radial-gradient(circle at 31% 20%, rgba(255,253,247,.82) 0 10%, rgba(255,253,247,.28) 11% 18%, transparent 19%), radial-gradient(circle at 73% 67%, rgba(126,82,42,.26) 0 12%, transparent 13%), linear-gradient(145deg, #e5c77f 0%, #bd8b49 52%, #8c5c30 100%); clip-path: polygon(13% 16%, 39% 16%, 43% 7%, 57% 7%, 62% 16%, 86% 16%, 86% 41%, 96% 45%, 96% 58%, 86% 63%, 86% 84%, 58% 84%, 54% 94%, 40% 94%, 36% 84%, 14% 84%, 14% 61%, 5% 56%, 5% 45%, 14% 40%); box-shadow: inset 4px 5px 0 rgba(255,255,255,.38), inset -5px -10px 0 rgba(47,49,45,.18), inset 0 -2px 0 rgba(101,63,30,.3), 0 2px 0 color-mix(in srgb, #f1c77b, var(--white) 18%), 0 9px 0 #704722, 0 18px 20px rgba(47,49,45,.16); filter: none; transform-style: preserve-3d; }
-.skill-icon-wrap:has(.skill-icon-retrieve-explicit)::before { content: ""; position: absolute; inset: 5px 6px 9px 6px; z-index: 0; background: linear-gradient(145deg, rgba(255,253,247,.28), rgba(255,253,247,0) 42%, rgba(47,49,45,.12)); clip-path: inherit; pointer-events: none; }
+.skill-icon-wrap:has(.skill-icon-retrieve-explicit) { --badge-accent: #b98547; --badge-ink: var(--ink); --skill-highlight: #b98547; isolation: isolate; border-color: transparent; border-radius: 22px 18px 20px 18px; background: #b98547; clip-path: polygon(13% 16%, 39% 16%, 43% 7%, 57% 7%, 62% 16%, 86% 16%, 86% 41%, 96% 45%, 96% 58%, 86% 63%, 86% 84%, 58% 84%, 54% 94%, 40% 94%, 36% 84%, 14% 84%, 14% 61%, 5% 56%, 5% 45%, 14% 40%); box-shadow: 0 7px 0 #704722, 0 16px 18px rgba(47,49,45,.14); filter: none; transform-style: preserve-3d; }
+.skill-icon-wrap:has(.skill-icon-retrieve-explicit)::before { content: none; }
 .skill-icon-wrap:has(.skill-icon-retrieve-explicit)::after { content: ""; position: absolute; inset: auto 9px 2px 11px; z-index: -1; height: 9px; border-radius: 999px; background: rgba(47,49,45,.2); filter: blur(7px); pointer-events: none; transform: translateY(7px); }
 .skill-icon-wrap:has(.skill-icon-central-claim) { --skill-highlight: #5f8f76; }
 .skill-icon-wrap:has(.skill-icon-supporting-ideas) { --skill-highlight: #9aa763; }
@@ -695,7 +695,7 @@ body.logged-out .landing-footer { display: flex; }
 .skill-path-node:hover .skill-icon-wrap,
 .skill-map-node:hover .skill-icon-wrap { border-color: color-mix(in srgb, var(--skill-highlight), var(--ink) 18%); animation: badge-pop .55s cubic-bezier(.2,.9,.25,1.25); box-shadow: inset 2px 3px 0 rgba(255,255,255,.7), inset -1px -4px 0 rgba(47,49,45,.08), 0 10px 18px color-mix(in srgb, var(--skill-highlight), transparent 76%); transform: translateY(-3px) scale(1.04); }
 .skill-path-node:hover .skill-icon-wrap:has(.skill-icon-retrieve-explicit),
-.skill-map-node:hover .skill-icon-wrap:has(.skill-icon-retrieve-explicit) { box-shadow: inset 4px 5px 0 rgba(255,255,255,.42), inset -5px -10px 0 rgba(47,49,45,.17), inset 0 -2px 0 rgba(101,63,30,.3), 0 2px 0 color-mix(in srgb, #f1c77b, var(--white) 18%), 0 10px 0 #704722, 0 20px 24px rgba(47,49,45,.18); }
+.skill-map-node:hover .skill-icon-wrap:has(.skill-icon-retrieve-explicit) { box-shadow: 0 8px 0 #704722, 0 18px 22px rgba(47,49,45,.16); }
 .skill-path-node:active .skill-icon-wrap,
 .skill-map-node:active .skill-icon-wrap { box-shadow: inset 1px 2px 0 rgba(255,255,255,.5), inset -1px -2px 0 rgba(47,49,45,.08), 0 4px 8px rgba(47,49,45,.08); transform: translateY(2px) scale(.98); }
 .skill-path-node > span:not(.skill-icon-wrap) { position: relative; color: var(--green); font-family: var(--serif); font-size: 1rem; font-style: italic; }
