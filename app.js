@@ -3882,12 +3882,12 @@ function commonGapFromChapters(chapters = []) {
 }
 
 function skillTitleForGap(gap = "") {
-  if (gap === "Missed central claim") return "Name the main point";
+  if (gap === "Missed central claim") return "Find the main point";
   if (gap === "Missed supporting evidence") return "Pick the proof";
   if (gap === "Weak synthesis") return "Show how ideas connect";
   if (gap === "Weak application") return "Use the idea wisely";
   if (gap === "Insufficient response") return "Explain it clearly";
-  return "Name the main point";
+  return "Find the main point";
 }
 
 function practiceReasonForGap(gap = "") {
@@ -4101,7 +4101,7 @@ function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
       scheduled: scheduled.length,
       drafts: drafts.length,
       hasReading: chapters.length > 0,
-      skillTitle: practiceState?.skill?.title || skillSignals[0]?.title || "Name the main point",
+      skillTitle: practiceState?.skill?.title || skillSignals[0]?.title || "Find the main point",
       practiceDone: Boolean(practiceState?.completedToday)
     },
     unsupportedDiagnostics: unsupportedHomeDiagnostics
@@ -4164,7 +4164,7 @@ function renderHomeInteractionPrototype(vm) {
   const supportingChecks = vm.metrics.completedChecks || 4;
   const delayedReviews = vm.metrics.delayedReviews || 1;
   const skillNodes = [
-    { title: "Name the main point", state: "Developing", evidence: "4 checks", active: true },
+    { title: "Find the main point", state: "Developing", evidence: "4 checks", active: true },
     { title: "Show how ideas connect", state: "Emerging", evidence: "2 gaps", active: true },
     { title: "Pick the proof", state: "Unmeasured", evidence: "Future signal", active: false },
     { title: "Explain it clearly", state: "Developing", evidence: "3 attempts", active: true },
@@ -4463,7 +4463,7 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
 }
 
 const marketingSkillIcons = [
-  { id: "central-claim", title: "Name the main point", state: "durable", label: "01 · Earned" },
+  { id: "central-claim", title: "Find the main point", state: "durable", label: "01 · Earned" },
   { id: "connect-ideas", title: "Show how ideas connect", state: "strengthening", label: "02 · In progress" },
   { id: "match-evidence", title: "Pick the proof", state: "developing", label: "03 · Upcoming" },
   { id: "build-explanation", title: "Explain it clearly", state: "emerging", label: "04 · Upcoming" },
@@ -4636,7 +4636,7 @@ const canonicalSkillTree = [
   },
   {
     id: "central-claim",
-    title: "Name the main point",
+    title: "Find the main point",
     description: "Say what the author is really trying to argue.",
     level: "Understand the point",
     source: "CCRA.R.2 · PIRLS interpret",
@@ -4645,7 +4645,7 @@ const canonicalSkillTree = [
   },
   {
     id: "supporting-ideas",
-    title: "Find the support",
+    title: "Understand supporting evidence",
     description: "Point to the reasons or examples that make the main point work.",
     level: "Understand the point",
     source: "CCRA.R.2",
@@ -4654,7 +4654,7 @@ const canonicalSkillTree = [
   },
   {
     id: "source-fidelity",
-    title: "Stay close to the text",
+    title: "Capture the meaning",
     description: "Keep your answer grounded in the reading instead of adding guesses.",
     level: "Understand the point",
     source: "CCRA.R.1",
@@ -5210,7 +5210,7 @@ function renderAdaptiveHomeStateHeader(vm) {
   const draftLabel = today.drafts
     ? `${today.drafts} draft${today.drafts === 1 ? "" : "s"} waiting`
     : "No drafts waiting";
-  const practiceLabel = today.practiceDone ? "Practice done" : `Skill: ${today.skillTitle || "Name the main point"}`;
+  const practiceLabel = today.practiceDone ? "Practice done" : `Skill: ${today.skillTitle || "Find the main point"}`;
   return `<header class="adaptive-home-state" aria-label="Today in Ember">
     <h1>Today in Ember</h1>
     <div class="adaptive-home-state-list" aria-label="Current reading state">
@@ -6037,9 +6037,9 @@ function cancelManagedReview(id) {
 
 const practiceSequence = [
   { id: "retrieve-explicit", title: "Remember key details", description: "Find the important things the author actually said." },
-  { id: "central-claim", title: "Name the main point", description: "Say what the author is really trying to argue." },
-  { id: "supporting-ideas", title: "Find the support", description: "Point to the reasons or examples that make the main point work." },
-  { id: "source-fidelity", title: "Stay close to the text", description: "Keep your answer grounded in the reading instead of adding guesses." },
+  { id: "central-claim", title: "Find the main point", description: "Say what the author is really trying to argue." },
+  { id: "supporting-ideas", title: "Understand supporting evidence", description: "Point to the reasons or examples that make the main point work." },
+  { id: "source-fidelity", title: "Capture the meaning", description: "Keep your answer grounded in the reading instead of adding guesses." },
   { id: "connect-ideas", title: "Show how ideas connect", description: "Explain how one idea leads to, depends on, or changes another." },
   { id: "structure", title: "Notice the structure", description: "Use the chapter’s order, contrasts, and cause-and-effect moves to follow the argument." },
   { id: "point-of-view", title: "Notice the author’s angle", description: "See what the author wants you to pay attention to and why." },
