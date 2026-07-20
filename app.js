@@ -4427,11 +4427,7 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
   if (key === "retrieve-explicit") {
     return `<svg ${common}>
-      <path class="skill-icon-recall-page" d="M7.3 6.9h7.9l1.5 1.6v8.8H7.3Z"></path>
-      <path class="skill-icon-recall-corner" d="M15.2 6.9v2h1.5"></path>
-      <path class="skill-icon-recall-quote" d="M9.2 10.3c.7-.7 1.4-.8 2-.3-.5.3-.8.8-.8 1.4v.4H9.2Z"></path>
-      <path class="skill-icon-recall-lines" d="M9.2 13.1h5.6M9.2 15.3h4.1"></path>
-      <circle class="skill-icon-recall-pin" cx="15.3" cy="10.7" r="1.05"></circle>
+      <path class="skill-icon-puzzle-glint" d="M8.7 7.9c1.7-.9 3.7-1.1 5.6-.5"></path>
     </svg>`;
   }
   return `<svg ${common}>
