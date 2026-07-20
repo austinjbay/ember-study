@@ -667,12 +667,15 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon .skill-icon-link { fill: none; stroke: color-mix(in srgb, var(--skill-highlight), var(--ink) 22%); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; opacity: .82; vector-effect: non-scaling-stroke; }
 .skill-icon .skill-icon-body { fill: color-mix(in srgb, var(--ink), var(--white) 6%); stroke: color-mix(in srgb, var(--ink), var(--white) 28%); stroke-width: 1; opacity: .96; }
 .skill-icon .skill-icon-prize { fill: var(--skill-highlight, var(--amber)); stroke: rgba(255,253,247,.72); stroke-width: .8; opacity: 1; }
+.skill-icon-retrieve-explicit { width: 92%; height: 92%; }
 .skill-icon .skill-icon-puzzle-depth { fill: #76502a; stroke: none; opacity: .95; }
 .skill-icon .skill-icon-puzzle-piece { fill: #b98547; stroke: none; filter: drop-shadow(0 1px 0 rgba(255,253,247,.46)) drop-shadow(0 6px 9px rgba(47,49,45,.18)); }
+.skill-icon .skill-icon-puzzle-sheen { fill: rgba(255,253,247,.32); stroke: none; opacity: .9; }
 .skill-icon-unexplored .skill-icon-body { opacity: .82; }
 .skill-icon-unexplored .skill-icon-link { opacity: .5; }
 .skill-icon-unexplored .skill-icon-puzzle-depth,
-.skill-icon-unexplored .skill-icon-puzzle-piece { opacity: .78; }
+.skill-icon-unexplored .skill-icon-puzzle-piece,
+.skill-icon-unexplored .skill-icon-puzzle-sheen { opacity: .78; }
 .skill-icon-unexplored .skill-icon-prize { opacity: .78; }
 .skill-icon-emerging .skill-icon-prize { opacity: .88; }
 .skill-icon-developing .skill-icon-prize,
@@ -680,7 +683,7 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon-durable .skill-icon-prize { opacity: 1; }
 .skill-icon-wrap:has(.skill-icon-retrieve-explicit) { --badge-accent: #b98547; --badge-ink: var(--ink); --skill-highlight: #b98547; isolation: isolate; border-color: transparent; background: transparent; box-shadow: none; filter: none; transform-style: preserve-3d; }
 .skill-icon-wrap:has(.skill-icon-retrieve-explicit)::before { content: none; }
-.skill-icon-wrap:has(.skill-icon-retrieve-explicit)::after { content: ""; position: absolute; inset: auto 10px 0 11px; z-index: -1; height: 10px; border-radius: 999px; background: rgba(47,49,45,.18); filter: blur(7px); pointer-events: none; transform: translateY(7px); }
+.skill-icon-wrap:has(.skill-icon-retrieve-explicit)::after { content: ""; position: absolute; inset: auto 6px -1px 7px; z-index: -1; height: 12px; border-radius: 999px; background: rgba(47,49,45,.18); filter: blur(8px); pointer-events: none; transform: translateY(8px); }
 .skill-icon-wrap:has(.skill-icon-central-claim) { --skill-highlight: #5f8f76; }
 .skill-icon-wrap:has(.skill-icon-supporting-ideas) { --skill-highlight: #9aa763; }
 .skill-icon-wrap:has(.skill-icon-source-fidelity) { --skill-highlight: #b98458; }
