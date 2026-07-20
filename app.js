@@ -4496,6 +4496,18 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   const token = skillTokens[key] || skillTokens["central-claim"];
   const classes = token.classes || { depth: "skill-icon-token-depth", face: "skill-icon-token-face", shade: "skill-icon-token-shade", glow: "skill-icon-token-glow" };
   const tokenCommon = common.replace('class="skill-icon ', 'class="skill-icon skill-icon-piece-token ');
+  if (key === "retrieve-explicit") {
+    return `<svg ${tokenCommon}>
+      <rect class="skill-icon-puzzle-shadow" x="4.7" y="20.1" width="14.6" height="1.35" rx=".675"></rect>
+      <g class="skill-icon-puzzle-emblem" transform="rotate(-4 12 12)">
+        <path class="${classes.depth}" transform="translate(.85 1.05)" d="${token.shape}"></path>
+        <path class="${classes.face}" d="${token.shape}"></path>
+        <path class="${classes.shade}" d="M14.1 5.8h4.7c.9 0 1.6.7 1.6 1.6v3.1c0 .7-.5 1.3-1.1 1.5-.7.2-1.3 0-1.8-.6-.3-.3-.6-.5-1-.5-.3 0-.6.1-.9.2.1-2-.4-3.8-1.5-5.3Zm1.4 8.6c.3.1.6.1 1 .1.4 0 .8-.2 1-.5.5-.5 1.1-.8 1.8-.6.7.2 1.1.8 1.1 1.5v2.5c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.1-.3 0-.7.1-1 1-.5 1.8-1.4 2.3-2.5Z"></path>
+        <path class="${classes.glow}" d="M5.2 5.8h4.5c.3-1.5 1.2-2.5 2.5-2.5.9 0 1.7.4 2.1 1.1-3.2.4-6 1.7-8.3 3.8-.3.3-.6.5-.8.8V5.8Z"></path>
+        <path class="skill-icon-puzzle-rim" d="M5.7 6.4h4.5c.3-1.2 1-2 2-2 1 0 1.7.6 2.1 1.5"></path>
+      </g>
+    </svg>`;
+  }
   return `<svg ${tokenCommon}>
     <path class="${classes.depth}" d="${token.shape}"></path>
     <path class="${classes.face}" d="${token.shape}"></path>
