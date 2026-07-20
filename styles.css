@@ -482,11 +482,6 @@ body.logged-out .logged-out-section { display: block; }
   72% { transform: translateY(-2px) scale(1.03) rotate(1deg); }
   100% { transform: translateY(-3px) scale(1.05) rotate(0); }
 }
-@keyframes puzzle-sheen-pass {
-  0% { opacity: 0; stroke-dashoffset: 17; }
-  18% { opacity: .7; }
-  100% { opacity: 0; stroke-dashoffset: -7; }
-}
 @keyframes homeRise {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -673,20 +668,20 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon .skill-icon-body { fill: color-mix(in srgb, var(--ink), var(--white) 6%); stroke: color-mix(in srgb, var(--ink), var(--white) 28%); stroke-width: 1; opacity: .96; }
 .skill-icon .skill-icon-prize { fill: var(--skill-highlight, var(--amber)); stroke: rgba(255,253,247,.72); stroke-width: .8; opacity: 1; }
 .skill-icon-retrieve-explicit { width: 112%; height: 112%; }
-.skill-icon .skill-icon-puzzle-depth { fill: #77502a; stroke: none; opacity: .98; }
-.skill-icon .skill-icon-puzzle-piece { fill: #bd8547; stroke: rgba(255,253,247,.22); stroke-width: .35; filter: drop-shadow(0 1px 0 rgba(255,253,247,.3)); }
-.skill-icon .skill-icon-puzzle-edge-light { fill: none; stroke: rgba(255,244,216,.36); stroke-width: .9; stroke-linecap: round; stroke-linejoin: round; opacity: .84; }
-.skill-icon .skill-icon-puzzle-surface-light { fill: none; stroke: rgba(255,244,216,.18); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; opacity: .58; }
-.skill-icon .skill-icon-puzzle-shine-sweep { fill: none; stroke: rgba(255,253,247,.58); stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 4.5 18; stroke-dashoffset: 16; opacity: 0; }
-.skill-icon .skill-icon-puzzle-core-shadow { fill: rgba(84,49,24,.22); stroke: none; opacity: .95; }
-.skill-icon .skill-icon-puzzle-reflected-light { fill: rgba(255,228,173,.13); stroke: none; opacity: .82; }
+.skill-icon .skill-icon-puzzle-depth { fill: #73502b; stroke: none; opacity: .98; }
+.skill-icon .skill-icon-puzzle-piece { fill: #bd8547; stroke: rgba(255,253,247,.2); stroke-width: .35; filter: drop-shadow(0 1px 0 rgba(255,253,247,.28)); }
+.skill-icon .skill-icon-puzzle-lit-rim { fill: none; stroke: rgba(255,244,216,.42); stroke-width: .85; stroke-linecap: round; stroke-linejoin: round; opacity: .78; }
+.skill-icon .skill-icon-puzzle-half-tone { fill: none; stroke: rgba(255,234,190,.18); stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; opacity: .62; }
+.skill-icon .skill-icon-puzzle-terminator { fill: rgba(120,76,38,.1); stroke: none; opacity: .78; }
+.skill-icon .skill-icon-puzzle-core-shadow { fill: rgba(75,45,24,.2); stroke: none; opacity: .9; }
+.skill-icon .skill-icon-puzzle-reflected-light { fill: rgba(255,222,166,.1); stroke: none; opacity: .72; }
 .skill-icon-unexplored .skill-icon-body { opacity: .82; }
 .skill-icon-unexplored .skill-icon-link { opacity: .5; }
 .skill-icon-unexplored .skill-icon-puzzle-depth,
 .skill-icon-unexplored .skill-icon-puzzle-piece,
-.skill-icon-unexplored .skill-icon-puzzle-edge-light,
-.skill-icon-unexplored .skill-icon-puzzle-surface-light,
-.skill-icon-unexplored .skill-icon-puzzle-shine-sweep,
+.skill-icon-unexplored .skill-icon-puzzle-lit-rim,
+.skill-icon-unexplored .skill-icon-puzzle-half-tone,
+.skill-icon-unexplored .skill-icon-puzzle-terminator,
 .skill-icon-unexplored .skill-icon-puzzle-core-shadow,
 .skill-icon-unexplored .skill-icon-puzzle-reflected-light { opacity: .78; }
 .skill-icon-unexplored .skill-icon-prize { opacity: .78; }
@@ -718,10 +713,6 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-node:hover .skill-icon-wrap:has(.skill-icon-retrieve-explicit) { box-shadow: none; }
 .skill-path-node:hover .skill-icon-puzzle-piece,
 .skill-map-node:hover .skill-icon-puzzle-piece { filter: drop-shadow(0 1px 0 rgba(255,253,247,.42)); }
-.skill-path-node:hover .skill-icon-puzzle-shine-sweep,
-.skill-map-node:hover .skill-icon-puzzle-shine-sweep {
-  animation: puzzle-sheen-pass .72s ease-out both;
-}
 .skill-path-node:active .skill-icon-wrap,
 .skill-map-node:active .skill-icon-wrap { box-shadow: inset 1px 2px 0 rgba(255,255,255,.5), inset -1px -2px 0 rgba(47,49,45,.08), 0 4px 8px rgba(47,49,45,.08); transform: translateY(2px) scale(.98); }
 .skill-path-node > span:not(.skill-icon-wrap) { position: relative; color: var(--green); font-family: var(--serif); font-size: 1rem; font-style: italic; }
@@ -2525,8 +2516,6 @@ body.sidebar-collapsed .brand:hover .brand-mark {
   }
   .skill-path-node:hover .skill-icon-wrap,
   .skill-path-node:active .skill-icon-wrap,
-  .skill-path-node:hover .skill-icon-puzzle-shine-sweep,
-  .skill-map-node:hover .skill-icon-puzzle-shine-sweep,
   .achievement-badge,
   .achievement-badge:hover,
   .achievement-badge:active {
