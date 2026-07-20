@@ -668,18 +668,16 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon .skill-icon-body { fill: color-mix(in srgb, var(--ink), var(--white) 6%); stroke: color-mix(in srgb, var(--ink), var(--white) 28%); stroke-width: 1; opacity: .96; }
 .skill-icon .skill-icon-prize { fill: var(--skill-highlight, var(--amber)); stroke: rgba(255,253,247,.72); stroke-width: .8; opacity: 1; }
 .skill-icon-retrieve-explicit { width: 112%; height: 112%; }
-.skill-icon .skill-icon-puzzle-depth { fill: #704824; stroke: none; opacity: .96; }
-.skill-icon .skill-icon-puzzle-piece { fill: #bb8446; stroke: rgba(255,253,247,.28); stroke-width: .35; filter: drop-shadow(0 1px 0 rgba(255,253,247,.42)); }
-.skill-icon .skill-icon-puzzle-sheen { fill: rgba(255,253,247,.24); stroke: none; opacity: 1; }
-.skill-icon .skill-icon-puzzle-gloss { fill: none; stroke: rgba(255,253,247,.62); stroke-width: 1.05; stroke-linecap: round; opacity: .92; }
-.skill-icon .skill-icon-puzzle-glint { fill: rgba(255,253,247,.72); stroke: none; opacity: .9; }
+.skill-icon .skill-icon-puzzle-depth { fill: #76502a; stroke: none; opacity: .95; }
+.skill-icon .skill-icon-puzzle-piece { fill: #b98547; stroke: rgba(255,253,247,.2); stroke-width: .35; filter: drop-shadow(0 1px 0 rgba(255,253,247,.36)); }
+.skill-icon .skill-icon-puzzle-sheen { fill: rgba(255,253,247,.3); stroke: none; opacity: .88; }
+.skill-icon .skill-icon-puzzle-gloss { fill: none; stroke: rgba(255,253,247,.4); stroke-width: .95; stroke-linecap: round; opacity: .72; }
 .skill-icon-unexplored .skill-icon-body { opacity: .82; }
 .skill-icon-unexplored .skill-icon-link { opacity: .5; }
 .skill-icon-unexplored .skill-icon-puzzle-depth,
 .skill-icon-unexplored .skill-icon-puzzle-piece,
 .skill-icon-unexplored .skill-icon-puzzle-sheen,
-.skill-icon-unexplored .skill-icon-puzzle-gloss,
-.skill-icon-unexplored .skill-icon-puzzle-glint { opacity: .78; }
+.skill-icon-unexplored .skill-icon-puzzle-gloss { opacity: .78; }
 .skill-icon-unexplored .skill-icon-prize { opacity: .78; }
 .skill-icon-emerging .skill-icon-prize { opacity: .88; }
 .skill-icon-developing .skill-icon-prize,
