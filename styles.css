@@ -667,7 +667,7 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon .skill-icon-link { fill: none; stroke: color-mix(in srgb, var(--skill-highlight), var(--ink) 22%); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; opacity: .82; vector-effect: non-scaling-stroke; }
 .skill-icon .skill-icon-body { fill: color-mix(in srgb, var(--ink), var(--white) 6%); stroke: color-mix(in srgb, var(--ink), var(--white) 28%); stroke-width: 1; opacity: .96; }
 .skill-icon .skill-icon-prize { fill: var(--skill-highlight, var(--amber)); stroke: rgba(255,253,247,.72); stroke-width: .8; opacity: 1; }
-.skill-icon-retrieve-explicit { width: 100%; height: 100%; }
+.skill-icon-retrieve-explicit { width: 112%; height: 112%; }
 .skill-icon .skill-icon-puzzle-depth { fill: #76502a; stroke: none; opacity: .95; }
 .skill-icon .skill-icon-puzzle-piece { fill: #b98547; stroke: rgba(255,253,247,.22); stroke-width: .35; filter: drop-shadow(0 1px 0 rgba(255,253,247,.38)); }
 .skill-icon .skill-icon-puzzle-sheen { fill: rgba(255,253,247,.38); stroke: none; opacity: .95; }
