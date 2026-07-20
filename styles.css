@@ -667,16 +667,20 @@ body.logged-out .landing-footer { display: flex; }
 .skill-icon .skill-icon-link { fill: none; stroke: color-mix(in srgb, var(--skill-highlight), var(--ink) 22%); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; opacity: .82; vector-effect: non-scaling-stroke; }
 .skill-icon .skill-icon-body { fill: color-mix(in srgb, var(--ink), var(--white) 6%); stroke: color-mix(in srgb, var(--ink), var(--white) 28%); stroke-width: 1; opacity: .96; }
 .skill-icon .skill-icon-prize { fill: var(--skill-highlight, var(--amber)); stroke: rgba(255,253,247,.72); stroke-width: .8; opacity: 1; }
+.skill-icon .skill-icon-puzzle-depth { fill: #76502a; stroke: none; opacity: .95; }
+.skill-icon .skill-icon-puzzle-piece { fill: #b98547; stroke: none; filter: drop-shadow(0 1px 0 rgba(255,253,247,.46)) drop-shadow(0 6px 9px rgba(47,49,45,.18)); }
 .skill-icon-unexplored .skill-icon-body { opacity: .82; }
 .skill-icon-unexplored .skill-icon-link { opacity: .5; }
+.skill-icon-unexplored .skill-icon-puzzle-depth,
+.skill-icon-unexplored .skill-icon-puzzle-piece { opacity: .78; }
 .skill-icon-unexplored .skill-icon-prize { opacity: .78; }
 .skill-icon-emerging .skill-icon-prize { opacity: .88; }
 .skill-icon-developing .skill-icon-prize,
 .skill-icon-strengthening .skill-icon-prize,
 .skill-icon-durable .skill-icon-prize { opacity: 1; }
-.skill-icon-wrap:has(.skill-icon-retrieve-explicit) { --badge-accent: #b98547; --badge-ink: var(--ink); --skill-highlight: #b98547; isolation: isolate; border-color: transparent; border-radius: 22px 18px 20px 18px; background: #b98547; clip-path: polygon(13% 16%, 39% 16%, 43% 7%, 57% 7%, 62% 16%, 86% 16%, 86% 41%, 96% 45%, 96% 58%, 86% 63%, 86% 84%, 58% 84%, 54% 94%, 40% 94%, 36% 84%, 14% 84%, 14% 61%, 5% 56%, 5% 45%, 14% 40%); box-shadow: 0 7px 0 #704722, 0 16px 18px rgba(47,49,45,.14); filter: none; transform-style: preserve-3d; }
+.skill-icon-wrap:has(.skill-icon-retrieve-explicit) { --badge-accent: #b98547; --badge-ink: var(--ink); --skill-highlight: #b98547; isolation: isolate; border-color: transparent; background: transparent; box-shadow: none; filter: none; transform-style: preserve-3d; }
 .skill-icon-wrap:has(.skill-icon-retrieve-explicit)::before { content: none; }
-.skill-icon-wrap:has(.skill-icon-retrieve-explicit)::after { content: ""; position: absolute; inset: auto 9px 2px 11px; z-index: -1; height: 9px; border-radius: 999px; background: rgba(47,49,45,.2); filter: blur(7px); pointer-events: none; transform: translateY(7px); }
+.skill-icon-wrap:has(.skill-icon-retrieve-explicit)::after { content: ""; position: absolute; inset: auto 10px 0 11px; z-index: -1; height: 10px; border-radius: 999px; background: rgba(47,49,45,.18); filter: blur(7px); pointer-events: none; transform: translateY(7px); }
 .skill-icon-wrap:has(.skill-icon-central-claim) { --skill-highlight: #5f8f76; }
 .skill-icon-wrap:has(.skill-icon-supporting-ideas) { --skill-highlight: #9aa763; }
 .skill-icon-wrap:has(.skill-icon-source-fidelity) { --skill-highlight: #b98458; }
@@ -695,7 +699,9 @@ body.logged-out .landing-footer { display: flex; }
 .skill-path-node:hover .skill-icon-wrap,
 .skill-map-node:hover .skill-icon-wrap { border-color: color-mix(in srgb, var(--skill-highlight), var(--ink) 18%); animation: badge-pop .55s cubic-bezier(.2,.9,.25,1.25); box-shadow: inset 2px 3px 0 rgba(255,255,255,.7), inset -1px -4px 0 rgba(47,49,45,.08), 0 10px 18px color-mix(in srgb, var(--skill-highlight), transparent 76%); transform: translateY(-3px) scale(1.04); }
 .skill-path-node:hover .skill-icon-wrap:has(.skill-icon-retrieve-explicit),
-.skill-map-node:hover .skill-icon-wrap:has(.skill-icon-retrieve-explicit) { box-shadow: 0 8px 0 #704722, 0 18px 22px rgba(47,49,45,.16); }
+.skill-map-node:hover .skill-icon-wrap:has(.skill-icon-retrieve-explicit) { box-shadow: none; }
+.skill-path-node:hover .skill-icon-puzzle-piece,
+.skill-map-node:hover .skill-icon-puzzle-piece { filter: drop-shadow(0 1px 0 rgba(255,253,247,.46)) drop-shadow(0 8px 11px rgba(47,49,45,.2)); }
 .skill-path-node:active .skill-icon-wrap,
 .skill-map-node:active .skill-icon-wrap { box-shadow: inset 1px 2px 0 rgba(255,255,255,.5), inset -1px -2px 0 rgba(47,49,45,.08), 0 4px 8px rgba(47,49,45,.08); transform: translateY(2px) scale(.98); }
 .skill-path-node > span:not(.skill-icon-wrap) { position: relative; color: var(--green); font-family: var(--serif); font-size: 1rem; font-style: italic; }
