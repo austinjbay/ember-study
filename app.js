@@ -397,14 +397,14 @@ function renderAuthState() {
   updateProfileUI();
   if (loggedIn) {
     $("#onboarding-title").innerHTML = `<span data-local-greeting>${localGreeting()}</span><br><em data-login-prompt>${activeLoggedInPrompt()}</em>`;
-    $("#onboarding-copy").textContent = "Add the reading you want to understand well enough to explain, question, and use.";
+    $("#onboarding-copy").textContent = "Add an assigned reading and see what held up well enough to explain, question, and use.";
     $("#hero-start-label").textContent = "Start a chapter check";
     $("#hero-reassurance").textContent = "No perfect summary required. Start with what you remember.";
   } else {
-    $("#onboarding-title").innerHTML = "Remember what you read.<br><em>Use it when it matters.</em>";
-    $("#onboarding-copy").textContent = "You already highlight, annotate, and save the good parts. Ember helps you find out what actually stuck, strengthen what didn’t, and turn nonfiction into knowledge you can explain and apply.";
-    $("#hero-start-label").textContent = "Try it on a chapter";
-    $("#hero-reassurance").textContent = "Use it for the chapters worth remembering. A focused check takes about six minutes.";
+    $("#onboarding-title").innerHTML = "Finish the reading.<br><em>See what stuck.</em>";
+    $("#onboarding-copy").textContent = "A comprehension coach for high school seniors, college freshmen, and sophomores taking on more complex assigned reading.";
+    $("#hero-start-label").textContent = "See what stuck";
+    $("#hero-reassurance").textContent = "No perfect summary required. Start from memory; a focused check takes about six minutes.";
   }
   $("#profile-menu").hidden = true;
   $("#profile-button").setAttribute("aria-expanded", "false");
@@ -3905,9 +3905,9 @@ function firstBookNextAction(evidenceState = "establishing", why = "") {
     kind: "first-book",
     label: "Start here",
     marker: "01",
-    title: "Review what you're reading",
-    copy: "Start with a book or article you read. Ember helps you see what stuck, strengthen what didn’t, and turn useful ideas into something you can use.",
-    text: "Start review",
+    title: "See what stuck from your reading",
+    copy: "Start from memory. Ember shows what held up, identifies one important gap, and gives you a focused way to strengthen it.",
+    text: "Start check",
     why: why || (evidenceState === "establishing" ? "Recommended because Ember needs a book before it can organize chapter reviews." : "Recommended because there is no active reading activity."),
     attrs: 'data-action="home-start-new-book"'
   };
@@ -4587,12 +4587,12 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
 }
 
 const marketingSkillIcons = [
-  { id: "central-claim", title: "Find the main point", state: "durable", label: "01 · Earned" },
-  { id: "connect-ideas", title: "Show how ideas connect", state: "strengthening", label: "02 · In progress" },
-  { id: "match-evidence", title: "Pick the proof", state: "developing", label: "03 · Upcoming" },
-  { id: "build-explanation", title: "Explain it clearly", state: "emerging", label: "04 · Upcoming" },
-  { id: "calibrate-confidence", title: "Check what you really know", state: "unexplored", label: "05 · Upcoming" },
-  { id: "apply-with-judgment", title: "Use the idea wisely", state: "unexplored", label: "06 · Upcoming" }
+  { id: "central-claim", title: "Find the main point", state: "durable", label: "01 · Reliable evidence" },
+  { id: "connect-ideas", title: "Show how ideas connect", state: "strengthening", label: "02 · Developing evidence" },
+  { id: "match-evidence", title: "Pick the proof", state: "developing", label: "03 · Early evidence" },
+  { id: "build-explanation", title: "Explain it clearly", state: "emerging", label: "04 · Not enough evidence" },
+  { id: "calibrate-confidence", title: "Check what you really know", state: "unexplored", label: "05 · Not enough evidence" },
+  { id: "apply-with-judgment", title: "Use the idea wisely", state: "unexplored", label: "06 · Not enough evidence" }
 ];
 
 const achievementBadges = [
@@ -4713,33 +4713,34 @@ function renderSkillIconSpecimen() {
       <article><strong>Color modes</strong><span class="skill-color-modes"><i>${renderSkillIcon("match-evidence", "strengthening", 32)}</i><i>${renderSkillIcon("match-evidence", "strengthening", 32)}</i></span></article>
       <article><strong>Ember relationship</strong><span class="ember-compare-mark" aria-hidden="true">E</span>${renderSkillIcon("connect-ideas", "strengthening", 48)}</article>
     </div>
-  </div>
-  ${renderAchievementBadgeGallery()}`;
+  </div>`;
 }
 
 function renderSkillModule(vm) {
   const practice = vm.practiceState || currentPracticeSkillState();
   const chapters = vm.chapters || loadChapters().filter(chapter => chapter.status !== "Draft");
   const path = practiceSequence.map((skill) => {
-    const index = practiceSequence.findIndex(item => item.id === skill.id);
     const days = successfulPracticeDays(skill);
     const reviewEvidence = skillReviewEvidence(skill.id, chapters);
     const stateName = skillDevelopmentState(days, skill.id === practice.skill.id, reviewEvidence);
     const stateLabel = skillDevelopmentLabel(stateName);
     const evidence = skillEvidenceCopy(days, reviewEvidence, skill.id === practice.skill.id);
-    return { ...skill, index, days, reviewEvidence, stateName, stateLabel, evidence };
+    return { ...skill, days, reviewEvidence, stateName, stateLabel, evidence };
   });
-  const previewPath = path.slice(0, 4);
   return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
     <div class="skill-collection-heading">
       <div>
-        <span class="eyebrow">Build Reading Skills</span>
-        <h2 id="skill-development-title">Collect skills as your reading gets stronger.</h2>
-        <p class="skill-module-copy">Each stone represents a reading move you can practice with books and articles you care about.</p>
+        <span class="eyebrow">Evidence across your reading</span>
+        <h2 id="skill-development-title">See which comprehension skills are becoming reliable.</h2>
+        <p class="skill-module-copy">Each stone represents a specific reading capability. It becomes more defined only when source-grounded performance holds up across practice, delayed recall, and new readings.</p>
+      </div>
+      <div class="skill-collection-summary" aria-label="Reliable skill evidence summary">
+        <strong>${path.filter(skill => skill.stateName === "durable").length}</strong>
+        <span>durable of ${path.length}</span>
       </div>
     </div>
-    <div class="skill-path-grid" aria-label="Reading skill stone collection">
-      ${previewPath.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.stateName === "durable" ? " is-durable" : ""}${state.justRefinedSkillId === skill.id ? " is-just-refined" : ""}" type="button" data-skill-state="${escapeHtml(skill.stateName)}" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" title="${escapeHtml(`${skill.stateLabel}: ${skill.evidence}`)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.stateLabel)}. ${escapeHtml(skill.evidence)}.">
+    <div class="skill-path-grid" aria-label="Evidence for reading skill development">
+      ${path.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.stateName === "durable" ? " is-durable" : ""}${state.justRefinedSkillId === skill.id ? " is-just-refined" : ""}" type="button" data-skill-state="${escapeHtml(skill.stateName)}" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" title="${escapeHtml(`${skill.stateLabel}: ${skill.evidence}`)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.stateLabel)}. ${escapeHtml(skill.evidence)}.">
         <span class="skill-icon-wrap">${renderSkillIcon(skill.id, skill.stateName, 32)}</span>
         <strong>${escapeHtml(skill.title)}</strong>
         <small>${escapeHtml(skill.stateLabel)}</small>
