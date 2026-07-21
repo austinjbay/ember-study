@@ -154,6 +154,7 @@ const state = {
   draftRestored: false,
   authMode: "login",
   homeFixture: "",
+  justRefinedSkillId: "",
   selectedSkillMapSkill: "",
   selectedSkillMapRegion: "all",
   emberChatMessages: [],
@@ -4088,6 +4089,7 @@ function buildHomeViewModel({ entries, chapters, drafts, scheduled, due }) {
     evidenceState,
     metrics,
     entryCount: entries.length,
+    chapters,
     nextAction: buildAdaptiveNextAction({ evidenceState, entries, chapters, drafts, due, currentReading, practiceState }),
     diagnostic: buildReaderDiagnostic({ evidenceState, chapters, metrics, skillSignals }),
     skillSignals,
@@ -4351,10 +4353,10 @@ function renderPrimaryNextActionModule(vm) {
   return `<section class="next-action-card adaptive-next-action" aria-labelledby="next-action-title">
     <div class="next-action-marker" aria-hidden="true">${escapeHtml(action.marker)}</div>
     <div class="next-action-copy">
-      <span class="eyebrow">${escapeHtml(action.label)}</span>
+      <span class="eyebrow">Today’s Focus</span>
       <h2 id="next-action-title">${escapeHtml(action.title)}</h2>
       <div class="next-action-subrow">
-        <p>${escapeHtml(action.copy)}</p>
+        <p><span class="today-focus-kind">${escapeHtml(action.label)}</span>${escapeHtml(action.copy)}</p>
         <button class="primary" type="button" ${action.attrs}>${escapeHtml(action.text)}</button>
       </div>
     </div>
@@ -4414,24 +4416,104 @@ function readingSkillIconKey(skillId = "") {
   }[skillId] || "central-claim";
 }
 
-function skillDevelopmentState(days = 0, isCurrent = false) {
-  if (days >= 3) return "durable";
-  if (days >= 2) return "strengthening";
-  if (days >= 1) return "developing";
-  if (isCurrent) return "emerging";
+function skillIdForReviewGap(gap = "") {
+  if (gap === "Missed central claim") return "central-claim";
+  if (gap === "Missed supporting evidence") return "match-evidence";
+  if (["Weak relationship between ideas", "Weak synthesis"].includes(gap)) return "connect-ideas";
+  if (gap === "Weak application") return "apply-with-judgment";
+  if (gap === "Insufficient response") return "build-explanation";
+  if (["Unsupported claim", "Distorted idea"].includes(gap)) return "source-fidelity";
+  if (isStudyChallengeGap(gap)) return "evaluate-boundaries";
+  return "";
+}
+
+function skillReviewEvidence(skillId, chapters = []) {
+  const results = [];
+  chapters.forEach(chapter => {
+    const gapSkillId = skillIdForReviewGap(chapter.evaluation?.gapType || "");
+    (chapter.delayedAttempts || []).forEach(attempt => {
+      const bands = [];
+      if (skillId === "central-claim" && attempt.band) bands.push(attempt.band);
+      if (skillId === gapSkillId && attempt.gapBand) bands.push(attempt.gapBand);
+      if (!bands.length) return;
+      const band = bands.sort((a, b) => resultRank(a) - resultRank(b))[0];
+      results.push({ band, createdAt: attempt.createdAt || chapter.updatedAt || chapter.createdAt || "" });
+    });
+  });
+  const latest = [...results].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0];
+  return {
+    attempts: results.length,
+    strong: results.filter(result => result.band === "Strong").length,
+    partial: results.filter(result => result.band === "Developing").length,
+    latestBand: latest?.band || ""
+  };
+}
+
+function skillDevelopmentState(days = 0, isCurrent = false, reviewEvidence = {}) {
+  const strongReviews = reviewEvidence.strong || 0;
+  const partialReviews = reviewEvidence.partial || 0;
+  const delayedReviews = reviewEvidence.attempts || 0;
+  if (strongReviews >= 1 && (days >= 2 || delayedReviews >= 2)) return "durable";
+  if (days >= 2 || strongReviews >= 1 || partialReviews >= 2) return "strengthening";
+  if (days >= 1 || partialReviews >= 1) return "developing";
+  if (isCurrent || delayedReviews >= 1) return "emerging";
   return "unexplored";
+}
+
+function skillDevelopmentLabel(stateName = "unexplored") {
+  return {
+    unexplored: "Unexplored",
+    emerging: "Emerging",
+    developing: "Developing",
+    strengthening: "Strengthening",
+    durable: "Durable"
+  }[stateName] || "Unexplored";
+}
+
+function skillEvidenceCopy(days = 0, reviewEvidence = {}, isCurrent = false) {
+  const practiceCopy = days ? `${Math.min(3, days)} practice day${days === 1 ? "" : "s"}` : "";
+  if (reviewEvidence.latestBand && resultRank(reviewEvidence.latestBand) === 0) {
+    return practiceCopy ? `${practiceCopy} · review again` : "Review again";
+  }
+  if (reviewEvidence.strong) {
+    const reviewCopy = `${reviewEvidence.strong} delayed review${reviewEvidence.strong === 1 ? "" : "s"} held`;
+    return practiceCopy ? `${reviewCopy} · ${practiceCopy}` : reviewCopy;
+  }
+  if (reviewEvidence.partial) {
+    const reviewCopy = `${reviewEvidence.partial} delayed review${reviewEvidence.partial === 1 ? "" : "s"} partly held`;
+    return practiceCopy ? `${reviewCopy} · ${practiceCopy}` : reviewCopy;
+  }
+  if (practiceCopy) return practiceCopy;
+  return isCurrent ? "Ready for practice" : "Not practiced yet";
 }
 
 function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", size = 32) {
   const key = readingSkillIconKey(skillId);
   const common = `class="skill-icon skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"`;
-  const puzzleShape = "M5.2 5.8h4.5c.3-1.5 1.2-2.5 2.5-2.5s2.3 1 2.5 2.5h4.1c.9 0 1.6.7 1.6 1.6v3.1c0 .7-.5 1.3-1.1 1.5-.7.2-1.3 0-1.8-.6-.3-.3-.6-.5-1-.5-1 0-1.8.8-1.8 1.8s.8 1.8 1.8 1.8c.4 0 .8-.2 1-.5.5-.5 1.1-.8 1.8-.6.7.2 1.1.8 1.1 1.5v2.5c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.2-.7.1-1.3.6-1.7.4-.3.6-.7.6-1.2 0-1-.8-1.8-1.8-1.8s-1.8.8-1.8 1.8c0 .5.2.9.6 1.2.5.4.8 1.1.6 1.7-.2.7-.8 1.1-1.5 1.1h-5.4c-.9 0-1.6-.7-1.6-1.6v-4.2c0-.7.5-1.3 1.1-1.5.7-.2 1.3.1 1.7.6.3.4.7.6 1.2.6 1 0 1.8-.8 1.8-1.8s-.8-1.8-1.8-1.8c-.5 0-.9.2-1.2.6-.4.5-1.1.8-1.7.6-.7-.2-1.1-.8-1.1-1.5v-3.6c0-.9.7-1.6 1.6-1.6Z";
+  const renderedEmblem = {
+    "retrieve-explicit": "/assets/retrieve-explicit-stone-stylized-emblem.png",
+    "central-claim": "/assets/central-claim-stone-stylized-emblem.png",
+    "supporting-ideas": "/assets/supporting-ideas-stone-stylized-emblem.png",
+    "source-fidelity": "/assets/source-fidelity-stone-stylized-emblem.png",
+    "connect-ideas": "/assets/connect-ideas-stone-stylized-emblem.png",
+    "structure": "/assets/structure-stone-stylized-emblem.png",
+    "point-of-view": "/assets/point-of-view-stone-stylized-emblem.png",
+    "match-evidence": "/assets/match-evidence-stone-stylized-emblem.png",
+    "evaluate-reasoning": "/assets/evaluate-reasoning-stone-stylized-emblem.png",
+    "build-explanation": "/assets/build-explanation-stone-stylized-emblem.png",
+    "infer-implications": "/assets/infer-implications-stone-stylized-emblem.png",
+    "compare-texts": "/assets/compare-texts-stone-stylized-emblem.png",
+    "clear-explanations": "/assets/build-explanation-stone-stylized-emblem.png",
+    "calibrate-confidence": "/assets/calibrate-confidence-stone-stylized-emblem.png",
+    "apply-with-judgment": "/assets/apply-with-judgment-stone-stylized-emblem.png",
+    "evaluate-boundaries": "/assets/evaluate-boundaries-stone-stylized-emblem.png"
+  }[key];
+  if (renderedEmblem) {
+    return `<span class="skill-icon-hover-stage" aria-hidden="true">
+      <img class="skill-icon skill-icon-rendered-emblem skill-icon-${escapeHtml(key)} skill-icon-${escapeHtml(stateName)}" src="${renderedEmblem}" width="${size}" height="${size}" alt="" decoding="async">
+    </span>`;
+  }
   const skillTokens = {
-    "retrieve-explicit": {
-      shape: puzzleShape,
-      classes: { depth: "skill-icon-puzzle-depth", face: "skill-icon-puzzle-piece", shade: "skill-icon-puzzle-core-shadow", glow: "skill-icon-puzzle-reflected-light" },
-      mark: `<path class="skill-icon-puzzle-terminator" d="M9.9 13.4c.5-.4.8-1 .8-1.7 0-.8-.3-1.4-.9-1.8 1.3-.5 2.6-.8 4-.9-.4.4-.6 1-.6 1.7 0 1.1.7 2.1 1.7 2.5-1.7.7-3.4.8-5 .2Z"></path>`
-    },
     "central-claim": {
       shape: "M12 3.2 14 6l3.3-.8-.1 3.4 2.8 1.8-3 1.6.5 3.3-3.4-.5L12 17.6l-2.1-2.8-3.4.5.5-3.3-3-1.6 2.8-1.8-.1-3.4L10 6Z",
       mark: `<circle class="skill-icon-piece-dot" cx="12" cy="11.1" r="2.4"></circle><path class="skill-icon-piece-accent" d="M8.4 11.1h7.2M12 7.5v7.2"></path>`
@@ -4496,18 +4578,6 @@ function renderSkillIcon(skillId = "central-claim", stateName = "unexplored", si
   const token = skillTokens[key] || skillTokens["central-claim"];
   const classes = token.classes || { depth: "skill-icon-token-depth", face: "skill-icon-token-face", shade: "skill-icon-token-shade", glow: "skill-icon-token-glow" };
   const tokenCommon = common.replace('class="skill-icon ', 'class="skill-icon skill-icon-piece-token ');
-  if (key === "retrieve-explicit") {
-    return `<svg ${tokenCommon}>
-      <rect class="skill-icon-puzzle-shadow" x="4.7" y="20.1" width="14.6" height="1.35" rx=".675"></rect>
-      <g class="skill-icon-puzzle-emblem" transform="rotate(-4 12 12)">
-        <path class="${classes.depth}" transform="translate(.85 1.05)" d="${token.shape}"></path>
-        <path class="${classes.face}" d="${token.shape}"></path>
-        <path class="${classes.shade}" d="M14.1 5.8h4.7c.9 0 1.6.7 1.6 1.6v3.1c0 .7-.5 1.3-1.1 1.5-.7.2-1.3 0-1.8-.6-.3-.3-.6-.5-1-.5-.3 0-.6.1-.9.2.1-2-.4-3.8-1.5-5.3Zm1.4 8.6c.3.1.6.1 1 .1.4 0 .8-.2 1-.5.5-.5 1.1-.8 1.8-.6.7.2 1.1.8 1.1 1.5v2.5c0 .9-.7 1.6-1.6 1.6h-4.2c-.7 0-1.3-.5-1.5-1.1-.1-.3 0-.7.1-1 1-.5 1.8-1.4 2.3-2.5Z"></path>
-        <path class="${classes.glow}" d="M5.2 5.8h4.5c.3-1.5 1.2-2.5 2.5-2.5.9 0 1.7.4 2.1 1.1-3.2.4-6 1.7-8.3 3.8-.3.3-.6.5-.8.8V5.8Z"></path>
-        <path class="skill-icon-puzzle-rim" d="M5.7 6.4h4.5c.3-1.2 1-2 2-2 1 0 1.7.6 2.1 1.5"></path>
-      </g>
-    </svg>`;
-  }
   return `<svg ${tokenCommon}>
     <path class="${classes.depth}" d="${token.shape}"></path>
     <path class="${classes.face}" d="${token.shape}"></path>
@@ -4650,32 +4720,41 @@ function renderSkillIconSpecimen() {
 
 function renderSkillModule(vm) {
   const practice = vm.practiceState || currentPracticeSkillState();
-  const activeIndex = Math.max(0, practiceSequence.findIndex(skill => skill.id === practice.skill.id));
-  const startIndex = Math.min(Math.max(0, activeIndex - 1), Math.max(0, practiceSequence.length - 4));
-  const visibleSkills = practiceSequence.slice(startIndex, startIndex + 4);
-  const path = visibleSkills.map((skill) => {
+  const chapters = vm.chapters || loadChapters().filter(chapter => chapter.status !== "Draft");
+  const path = practiceSequence.map((skill) => {
     const index = practiceSequence.findIndex(item => item.id === skill.id);
     const days = successfulPracticeDays(skill);
-    const status = days >= 3 ? "Durable" : skill.id === practice.skill.id ? "Recommended" : days > 0 ? "Developing" : "Available";
-    const progress = Math.min(100, Math.round(Math.min(3, days) / 3 * 100));
-    const stateName = skillDevelopmentState(days, skill.id === practice.skill.id);
-    const actionLabel = skill.id === practice.skill.id ? "Start practice" : days ? `${status} · ${days}/3` : "";
-    return { ...skill, index, days, status, progress, stateName, actionLabel };
+    const reviewEvidence = skillReviewEvidence(skill.id, chapters);
+    const stateName = skillDevelopmentState(days, skill.id === practice.skill.id, reviewEvidence);
+    const stateLabel = skillDevelopmentLabel(stateName);
+    const evidence = skillEvidenceCopy(days, reviewEvidence, skill.id === practice.skill.id);
+    return { ...skill, index, days, reviewEvidence, stateName, stateLabel, evidence };
   });
   return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
-    <span class="eyebrow">Build Reading Skills</span>
-    <h2 id="skill-development-title">${escapeHtml(vm.skillSignals[0]?.title || "Build your first signal.")}</h2>
-    <p class="skill-module-copy">${escapeHtml(vm.skillSignals[0]?.copy || "Practice reading skills that help ideas last beyond the page.")}</p>
-    <div class="skill-path-grid" aria-label="Available reading skills">
-      ${path.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.days >= 3 ? " is-durable" : ""}" type="button" data-skill-state="${escapeHtml(skill.stateName)}" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.status)}. ${skill.days} of 3 successful days.">
+    <div class="skill-collection-heading">
+      <div>
+        <span class="eyebrow">Your Skill Stones</span>
+        <h2 id="skill-development-title">Build a reading practice that holds up.</h2>
+        <p class="skill-module-copy">Each stone becomes more defined through successful practice and delayed recall. Durable stones have held up after time away.</p>
+      </div>
+      <div class="skill-collection-summary" aria-label="Skill stone summary">
+        <strong>${path.filter(skill => skill.stateName === "durable").length}</strong>
+        <span>durable of ${path.length}</span>
+      </div>
+    </div>
+    <div class="skill-path-grid" aria-label="Reading skill stone collection">
+      ${path.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.stateName === "durable" ? " is-durable" : ""}${state.justRefinedSkillId === skill.id ? " is-just-refined" : ""}" type="button" data-skill-state="${escapeHtml(skill.stateName)}" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" title="${escapeHtml(`${skill.stateLabel}: ${skill.evidence}`)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.stateLabel)}. ${escapeHtml(skill.evidence)}.">
         <span class="skill-icon-wrap">${renderSkillIcon(skill.id, skill.stateName, 32)}</span>
         <span>${String(skill.index + 1).padStart(2, "0")}</span>
         <strong>${escapeHtml(skill.title)}</strong>
-        <span class="skill-path-desc">${escapeHtml(skill.description)}</span>
-        ${skill.actionLabel ? `<small class="${skill.id === practice.skill.id ? "skill-path-action" : ""}">${escapeHtml(skill.actionLabel)}</small>` : ""}
+        <small>${escapeHtml(skill.stateLabel)}</small>
+        <span class="skill-path-evidence">${escapeHtml(skill.evidence)}</span>
       </button>`).join("")}
     </div>
-    <button class="text-button skill-map-link" type="button" data-nav="skill-map">View skill map</button>
+    <div class="skill-collection-footer">
+      <span>Refinement reflects practice and delayed-review evidence, not points.</span>
+      <button class="text-button skill-map-link" type="button" data-nav="skill-map">View skill map</button>
+    </div>
   </section>`;
 }
 
@@ -5007,23 +5086,25 @@ function skillMapSourcePills(source = "") {
     .join("");
 }
 
-function skillMapStateFor(skill, currentSkill) {
+function skillMapStateFor(skill, currentSkill, chapters = []) {
   const sequenceIndex = practiceSequence.findIndex(item => item.id === skill.id);
   const currentIndex = practiceSequence.findIndex(item => item.id === currentSkill.id);
   const isSequenced = sequenceIndex >= 0;
   const isUnlocked = isSequenced && sequenceIndex <= Math.max(0, currentIndex);
   const days = isSequenced ? successfulPracticeDays(skill) : 0;
   const isCurrent = isUnlocked && skill.id === currentSkill.id;
-  const isComplete = days >= 3;
   const practiceReady = isUnlocked;
-  const stateName = practiceReady ? skillDevelopmentState(days, isCurrent) : "unexplored";
+  const reviewEvidence = skillReviewEvidence(skill.id, chapters);
+  const stateName = practiceReady ? skillDevelopmentState(days, isCurrent, reviewEvidence) : "unexplored";
+  const isComplete = stateName === "durable";
+  const evidence = skillEvidenceCopy(days, reviewEvidence, isCurrent);
   const label = !isSequenced
     ? "Mapped future skill"
     : !isUnlocked ? "Locked"
       : isCurrent ? "Current focus"
-        : isComplete ? "Earned"
-          : days > 0 ? `${days}/3 successful days` : "Available";
-  return { days, isCurrent, isComplete, isUnlocked, practiceReady, sequenceIndex, stateName, label };
+        : isComplete ? `Durable · ${evidence}`
+          : evidence;
+  return { days, reviewEvidence, evidence, isCurrent, isComplete, isUnlocked, practiceReady, sequenceIndex, stateName, label };
 }
 
 function renderSkillMapPage() {
@@ -5031,12 +5112,13 @@ function renderSkillMapPage() {
   if (!root) return;
   const practice = currentPracticeSkillState();
   const currentSkill = practice.skill || practiceSequence[0];
+  const chapters = loadChapters().filter(chapter => chapter.status !== "Draft");
   const selectedId = state.selectedSkillMapSkill || currentSkill.id;
   const selectedSkill = canonicalSkillTree.find(skill => skill.id === selectedId)
     || canonicalSkillTree.find(skill => skill.id === currentSkill.id)
     || canonicalSkillTree[0];
   state.selectedSkillMapSkill = selectedSkill.id;
-  const selectedState = skillMapStateFor(selectedSkill, currentSkill);
+  const selectedState = skillMapStateFor(selectedSkill, currentSkill, chapters);
   const selectedPathway = skillMapPrimaryPathwayForSkill(selectedSkill.id);
   const pathwayIds = new Set(selectedPathway.skills);
   const selectedParents = skillMapIncomingEdges(selectedSkill.id);
@@ -5055,8 +5137,8 @@ function renderSkillMapPage() {
     const pathwayEdge = pathwayIds.has(edge.from) && pathwayIds.has(edge.to);
     const fromSkill = canonicalSkillTree.find(skill => skill.id === edge.from);
     const toSkill = canonicalSkillTree.find(skill => skill.id === edge.to);
-    const fromState = fromSkill ? skillMapStateFor(fromSkill, currentSkill) : null;
-    const toState = toSkill ? skillMapStateFor(toSkill, currentSkill) : null;
+    const fromState = fromSkill ? skillMapStateFor(fromSkill, currentSkill, chapters) : null;
+    const toState = toSkill ? skillMapStateFor(toSkill, currentSkill, chapters) : null;
     const complete = Boolean(fromState?.isComplete && toState?.isComplete);
     const locked = Boolean(!fromState?.isUnlocked || !toState?.isUnlocked);
     const active = edge.from === selectedSkill.id || edge.to === selectedSkill.id || pathwayEdge;
@@ -5067,13 +5149,13 @@ function renderSkillMapPage() {
   }).join("");
   const nodes = canonicalSkillTree.map((skill, index) => {
     const position = skillMapPositions[skill.id] || { x: 50, y: 50 };
-    const nodeState = skillMapStateFor(skill, currentSkill);
+    const nodeState = skillMapStateFor(skill, currentSkill, chapters);
     const selected = skill.id === selectedSkill.id;
     const regionId = skillMapRegionForSkill(skill.id);
     const pathwayMatch = pathwayIds.has(skill.id);
     const pathway = skillMapPrimaryPathwayForSkill(skill.id);
-    return `<button class="skill-map-node skill-region-${escapeHtml(regionId)}${nodeState.practiceReady ? " is-practice-ready" : " is-mapped"}${nodeState.isUnlocked ? " is-unlocked" : " is-locked"}${nodeState.isCurrent ? " is-current" : ""}${nodeState.isComplete ? " is-durable" : ""}${selected ? " is-selected" : ""}${relatedIds.has(skill.id) ? " is-related" : ""}${pathwayMatch ? " is-pathway-member" : ""}" type="button" style="--x:${position.x}%; --y:${position.y}%;" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skill.id)}" data-skill-state="${escapeHtml(nodeState.stateName)}" aria-pressed="${selected}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(nodeState.label)}. Pathway: ${escapeHtml(pathway.title)}. Category: ${escapeHtml(regionId)}. Maps to ${escapeHtml(skill.source)}.">
-      <span class="skill-icon-wrap">${renderSkillIcon(skill.id, nodeState.stateName, 34)}</span>
+    return `<button class="skill-map-node skill-region-${escapeHtml(regionId)}${nodeState.practiceReady ? " is-practice-ready" : " is-mapped"}${nodeState.isUnlocked ? " is-unlocked" : " is-locked"}${nodeState.isCurrent ? " is-current" : ""}${nodeState.isComplete ? " is-durable" : ""}${selected ? " is-selected" : ""}${relatedIds.has(skill.id) ? " is-related" : ""}${pathwayMatch ? " is-pathway-member" : ""}" type="button" style="--x:${position.x}%; --y:${position.y}%;" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skill.id)}" data-skill-state="${escapeHtml(nodeState.stateName)}" title="${escapeHtml(`${skillDevelopmentLabel(nodeState.stateName)}: ${nodeState.label}`)}" aria-pressed="${selected}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(nodeState.label)}. Pathway: ${escapeHtml(pathway.title)}. Category: ${escapeHtml(regionId)}. Maps to ${escapeHtml(skill.source)}.">
+      <span class="skill-icon-wrap">${renderSkillIcon(skill.id, nodeState.stateName, 44)}</span>
       <span>${String(index + 1).padStart(2, "0")}</span>
       <strong>${escapeHtml(skill.title)}</strong>
       <em>${escapeHtml(skill.level)}</em>
@@ -5082,6 +5164,13 @@ function renderSkillMapPage() {
   }).join("");
   const relationshipLegend = Object.entries(skillMapRelationshipTypes).map(([type, detail]) => `<span class="relationship-${escapeHtml(type)}"><i></i>${escapeHtml(detail.label)}</span>`).join("");
   root.innerHTML = `<div class="skill-map-layout">
+    <div class="skill-map-page-action">
+      <button class="${selectedState.isCurrent ? "primary" : "secondary"}" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}"${selectedState.isUnlocked ? "" : " disabled"}>${selectedState.isCurrent ? "Start practice" : selectedState.isUnlocked ? "Practice this skill" : "Unlock this skill"}</button>
+    </div>
+    <header class="skill-map-title">
+      <span class="eyebrow">Your stone library</span>
+      <h1 id="skill-map-page-title">Skill Map</h1>
+    </header>
     <section class="skill-map-canvas-card" aria-labelledby="skill-map-page-title">
       <div class="skill-map-canvas" aria-label="Reading skill network">
         <svg class="skill-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${edges}</svg>
@@ -5089,15 +5178,20 @@ function renderSkillMapPage() {
         <div class="skill-map-relationship-legend" aria-label="Connector types">${relationshipLegend}</div>
       </div>
       <div class="skill-map-inline-detail" aria-labelledby="skill-map-detail-title">
-        <div>
-          <span class="eyebrow">${escapeHtml(selectedSkill.level || "Reading skill")}</span>
-          <h2 id="skill-map-detail-title">${escapeHtml(selectedSkill.title)}</h2>
-          <p>${escapeHtml(selectedSkill.description)}</p>
-          <div class="skill-map-source-pills" aria-label="Standards and frameworks this skill maps to">
-            ${skillMapSourcePills(selectedSkill.source || "Ember skill model")}
+        <div class="skill-map-detail-lead" data-skill-state="${escapeHtml(selectedState.stateName)}">
+          <span class="skill-map-detail-stone skill-icon-wrap">${renderSkillIcon(selectedSkill.id, selectedState.stateName, 76)}</span>
+          <div>
+            <span class="eyebrow">${escapeHtml(selectedSkill.level || "Reading skill")}</span>
+            <h2 id="skill-map-detail-title">${escapeHtml(selectedSkill.title)}</h2>
+            <p>${escapeHtml(selectedSkill.description)}</p>
+            <div class="skill-map-source-pills" aria-label="Standards and frameworks this skill maps to">
+              ${skillMapSourcePills(selectedSkill.source || "Ember skill model")}
+            </div>
           </div>
         </div>
         <dl>
+          <div><dt>Refinement</dt><dd>${escapeHtml(skillDevelopmentLabel(selectedState.stateName))}</dd></div>
+          <div><dt>Evidence</dt><dd>${escapeHtml(selectedState.evidence)}</dd></div>
           <div><dt>Pathway</dt><dd>${escapeHtml(selectedPathway.title)}</dd></div>
           <div><dt>Capability</dt><dd>${escapeHtml(selectedPathway.capability)}</dd></div>
           <div><dt>Category</dt><dd>${escapeHtml(skillMapRegions.find(region => region.id === skillMapRegionForSkill(selectedSkill.id))?.label || "Reading skill")}</dd></div>
@@ -5105,7 +5199,6 @@ function renderSkillMapPage() {
           <div><dt>Leads toward</dt><dd>${escapeHtml(skillMapEdgeList(selectedChildren, "to", "End of this branch"))}</dd></div>
           <div><dt>Maps up to</dt><dd>${escapeHtml(selectedSkill.source || "Ember skill model")}</dd></div>
         </dl>
-        <button class="${selectedState.isCurrent ? "primary" : "secondary"}" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}"${selectedState.isUnlocked ? "" : " disabled"}>${selectedState.isCurrent ? "Start practice" : selectedState.isUnlocked ? "Practice this skill" : "Unlock this skill"}</button>
       </div>
     </section>
   </div>`;
@@ -5170,7 +5263,7 @@ function renderLibraryActivityModule(vm) {
 function renderTodayPracticeModule(vm) {
   const practice = vm.practiceState || currentPracticeSkillState();
   const complete = Boolean(practice.completedToday);
-  const stateName = skillDevelopmentState(practice.successfulDays, !complete);
+  const stateName = skillDevelopmentState(practice.successfulDays, !complete, practice.reviewEvidence);
   return `<section class="adaptive-module today-practice-module" aria-labelledby="today-practice-title">
     <span class="eyebrow">${complete ? "Practice complete" : "Today’s practice"}</span>
     <div class="today-practice-heading" data-skill-state="${escapeHtml(stateName)}">
@@ -5310,6 +5403,12 @@ function renderAdaptiveLoggedInHome(vm) {
         ${supportModules ? `<section class="reading-world-zone support-zone" aria-label="Additional setup">${supportModules}</section>` : ""}
       </div>
     </div>`;
+  if (state.justRefinedSkillId && state.view === "home") {
+    window.setTimeout(() => {
+      $(".skill-path-node.is-just-refined")?.classList.remove("is-just-refined");
+      state.justRefinedSkillId = "";
+    }, 1800);
+  }
 }
 
 function renderDashboard() {
@@ -5776,6 +5875,9 @@ function completeReview() {
   };
   chapter.updatedAt = new Date().toISOString();
   chapters[index] = chapter;
+  const reviewedGapSkillId = skillIdForReviewGap(chapter.evaluation?.gapType || "");
+  if (attempt.gapBand === "Strong" && reviewedGapSkillId) state.justRefinedSkillId = reviewedGapSkillId;
+  else if (attempt.band === "Strong") state.justRefinedSkillId = "central-claim";
   saveChapters(chapters);
   renderDashboard();
   const nextSessionId = state.reviewSession?.ids?.[state.reviewSession.index + 1];
@@ -6317,9 +6419,11 @@ function currentPracticeSkillState() {
   const activeIndex = nextIndex < 0 ? practiceSequence.length - 1 : nextIndex;
   const skill = practiceSequence[activeIndex] || practiceSequence[0];
   const successfulDays = Math.min(3, daysBySkill.get(skill.id) || 0);
+  const chapters = loadChapters().filter(chapter => chapter.status !== "Draft");
   return {
     skill,
     successfulDays,
+    reviewEvidence: skillReviewEvidence(skill.id, chapters),
     completedToday: hasPracticeCompletionToday(),
     progressPercent: Math.min(100, Math.round(successfulDays / 3 * 100))
   };
@@ -6562,6 +6666,7 @@ function checkPracticeAnswer() {
     );
     if (!alreadyCompletedToday) records.push({ skillId: skill.id, skill: skill.title, result: "Completed", practiceDate: localDateKey(), createdAt: new Date().toISOString() });
     localStorage.setItem(PRACTICE_KEY, JSON.stringify(records));
+    if (!alreadyCompletedToday) state.justRefinedSkillId = skill.id;
     renderPracticeProgress(true);
     showDailyCompleteState();
     toast("Daily practice complete. One successful day added.");
