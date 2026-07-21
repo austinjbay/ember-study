@@ -4988,6 +4988,7 @@ const skillMapLayers = [
     eyebrow: "Main Point Basics · Stay With the Text",
     summary: "Recover the claim, its support, and the boundaries of what the source actually says.",
     unlock: "An accurate account of what the text says",
+    requirements: [],
     skills: ["retrieve-explicit", "central-claim", "supporting-ideas", "source-fidelity"]
   },
   {
@@ -4997,6 +4998,7 @@ const skillMapLayers = [
     eyebrow: "How Ideas Fit",
     summary: "Connect ideas, inferences, structure, and point of view into a coherent account.",
     unlock: "A connected explanation of how the ideas work",
+    requirements: ["central-claim", "supporting-ideas", "source-fidelity"],
     skills: ["infer-implications", "connect-ideas", "structure", "point-of-view"]
   },
   {
@@ -5006,6 +5008,7 @@ const skillMapLayers = [
     eyebrow: "What Backs It Up",
     summary: "Match claims to evidence and judge whether the reasoning holds together.",
     unlock: "A defensible judgment about evidence and reasoning",
+    requirements: ["infer-implications", "connect-ideas", "structure"],
     skills: ["match-evidence", "evaluate-reasoning", "build-explanation", "compare-texts"]
   },
   {
@@ -5015,6 +5018,7 @@ const skillMapLayers = [
     eyebrow: "Use Ideas in New Places · Check What Lasted",
     summary: "Transfer the idea with judgment, test its limits, and compare confidence with evidence.",
     unlock: "Responsible use with limits and confidence calibrated",
+    requirements: ["match-evidence", "evaluate-reasoning", "build-explanation"],
     skills: ["apply-with-judgment", "evaluate-boundaries", "calibrate-confidence"]
   }
 ];
@@ -5111,25 +5115,109 @@ function skillMapSourcePills(source = "") {
     .join("");
 }
 
-function skillMapStateFor(skill, currentSkill, chapters = []) {
-  const sequenceIndex = practiceSequence.findIndex(item => item.id === skill.id);
-  const currentIndex = practiceSequence.findIndex(item => item.id === currentSkill.id);
-  const isSequenced = sequenceIndex >= 0;
-  const isUnlocked = isSequenced && sequenceIndex <= Math.max(0, currentIndex);
-  const days = isSequenced ? successfulPracticeDays(skill) : 0;
-  const isCurrent = isUnlocked && skill.id === currentSkill.id;
-  const practiceReady = isUnlocked;
-  const reviewEvidence = skillReviewEvidence(skill.id, chapters);
-  const stateName = practiceReady ? skillDevelopmentState(days, isCurrent, reviewEvidence) : "unexplored";
+function skillMapIsStable(stateName = "unexplored") {
+  return stateName === "strengthening" || stateName === "durable";
+}
+
+function skillMapOrderedSkills() {
+  const byId = new Map(practiceSequence.map(skill => [skill.id, skill]));
+  return skillMapLayers
+    .flatMap(layer => layer.skills)
+    .map(skillId => byId.get(skillId) || canonicalSkillTree.find(skill => skill.id === skillId))
+    .filter(Boolean);
+}
+
+function skillMapProgressModel(chapters = []) {
+  const orderedSkills = skillMapOrderedSkills();
+  const evidenceStates = new Map(orderedSkills.map(skill => {
+    const days = successfulPracticeDays(skill);
+    const reviewEvidence = skillReviewEvidence(skill.id, chapters);
+    const stateName = skillDevelopmentState(days, false, reviewEvidence);
+    return [skill.id, {
+      days,
+      reviewEvidence,
+      stateName,
+      isStable: skillMapIsStable(stateName)
+    }];
+  }));
+  const layerStates = new Map(skillMapLayers.map(layer => {
+    const blockers = (layer.requirements || []).filter(skillId => !evidenceStates.get(skillId)?.isStable);
+    return [layer.id, { isUnlocked: blockers.length === 0, blockers }];
+  }));
+  const states = new Map(orderedSkills.map((skill, sequenceIndex) => {
+    const evidence = evidenceStates.get(skill.id);
+    const layer = skillMapLayerForSkill(skill.id);
+    const layerState = layerStates.get(layer.id);
+    const prerequisiteBlockers = skillMapIncomingEdges(skill.id)
+      .filter(edge => edge.type === "prerequisite")
+      .map(edge => edge.from)
+      .filter(skillId => !evidenceStates.get(skillId)?.isStable);
+    const blockedBy = [...new Set([...(layerState?.blockers || []), ...prerequisiteBlockers])];
+    return [skill.id, {
+      ...evidence,
+      sequenceIndex,
+      layer,
+      isUnlocked: Boolean(layerState?.isUnlocked) && prerequisiteBlockers.length === 0,
+      blockedBy
+    }];
+  }));
+  const recommendedSkill = orderedSkills.find(skill => {
+    const skillState = states.get(skill.id);
+    return skillState?.isUnlocked && !skillState.isStable;
+  }) || [...orderedSkills].reverse().find(skill => states.get(skill.id)?.isUnlocked) || orderedSkills[0];
+  return { orderedSkills, states, layerStates, recommendedSkill };
+}
+
+function skillMapUnlockCopy(skillState) {
+  if (skillState.isUnlocked) {
+    return skillState.isCurrent
+      ? "Recommended now because its prerequisites are ready."
+      : "Available now. Its prerequisite skills are ready.";
+  }
+  const blockerTitles = skillState.blockedBy.map(skillMapTitleFor);
+  if (!blockerTitles.length) return "More reading evidence is needed before this opens.";
+  const visible = blockerTitles.slice(0, 2).join(" and ");
+  const remainder = blockerTitles.length > 2 ? ` and ${blockerTitles.length - 2} more` : "";
+  return `Strengthen ${visible}${remainder} to unlock this skill.`;
+}
+
+function skillMapLayerStatus(layer, progressModel) {
+  const layerState = progressModel.layerStates.get(layer.id);
+  if (layerState?.isUnlocked) return "Open for practice";
+  const blockerTitles = (layerState?.blockers || []).map(skillMapTitleFor);
+  const visible = blockerTitles.slice(0, 2).join(" and ");
+  const remainder = blockerTitles.length > 2 ? ` + ${blockerTitles.length - 2}` : "";
+  return `Unlocks after ${visible}${remainder}`;
+}
+
+function skillMapStateFor(skill, currentSkill, chapters = [], progressModel = null) {
+  const model = progressModel || skillMapProgressModel(chapters);
+  const progressState = model.states.get(skill.id) || {
+    days: 0,
+    reviewEvidence: {},
+    stateName: "unexplored",
+    isUnlocked: false,
+    blockedBy: [],
+    sequenceIndex: -1
+  };
+  const isCurrent = progressState.isUnlocked && skill.id === currentSkill.id;
+  const stateName = isCurrent && progressState.stateName === "unexplored" ? "emerging" : progressState.stateName;
   const isComplete = stateName === "durable";
-  const evidence = skillEvidenceCopy(days, reviewEvidence, isCurrent);
-  const label = !isSequenced
-    ? "Mapped future skill"
-    : !isUnlocked ? "Locked"
-      : isCurrent ? "Current focus"
-        : isComplete ? `Durable · ${evidence}`
-          : evidence;
-  return { days, reviewEvidence, evidence, isCurrent, isComplete, isUnlocked, practiceReady, sequenceIndex, stateName, label };
+  const evidence = skillEvidenceCopy(progressState.days, progressState.reviewEvidence, isCurrent);
+  const label = !progressState.isUnlocked
+    ? "Locked"
+    : isCurrent ? "Current focus"
+      : isComplete ? `Durable · ${evidence}`
+        : evidence;
+  return {
+    ...progressState,
+    evidence,
+    isCurrent,
+    isComplete,
+    practiceReady: progressState.isUnlocked,
+    stateName,
+    label
+  };
 }
 
 function renderSkillMapPage() {
@@ -5138,12 +5226,13 @@ function renderSkillMapPage() {
   const practice = currentPracticeSkillState();
   const currentSkill = practice.skill || practiceSequence[0];
   const chapters = loadChapters().filter(chapter => chapter.status !== "Draft");
+  const progressModel = practice.progressModel || skillMapProgressModel(chapters);
   const selectedId = state.selectedSkillMapSkill || currentSkill.id;
   const selectedSkill = canonicalSkillTree.find(skill => skill.id === selectedId)
     || canonicalSkillTree.find(skill => skill.id === currentSkill.id)
     || canonicalSkillTree[0];
   state.selectedSkillMapSkill = selectedSkill.id;
-  const selectedState = skillMapStateFor(selectedSkill, currentSkill, chapters);
+  const selectedState = skillMapStateFor(selectedSkill, currentSkill, chapters, progressModel);
   const selectedPathways = skillMapPathwaysForSkill(selectedSkill.id);
   const pathwayIds = new Set(selectedPathways.flatMap(pathway => pathway.skills));
   const selectedParents = skillMapIncomingEdges(selectedSkill.id);
@@ -5161,7 +5250,7 @@ function renderSkillMapPage() {
       .filter(Boolean)
       .map(skill => {
         const position = skillMapPositions[skill.id] || { x: 50, y: 50 };
-        const nodeState = skillMapStateFor(skill, currentSkill, chapters);
+        const nodeState = skillMapStateFor(skill, currentSkill, chapters, progressModel);
         const selected = skill.id === selectedSkill.id;
         const regionId = skillMapRegionForSkill(skill.id);
         const pathwayMatch = pathwayIds.has(skill.id);
@@ -5174,17 +5263,24 @@ function renderSkillMapPage() {
           <small>${escapeHtml(skillDevelopmentLabel(nodeState.stateName))}</small>
         </button>`;
       }).join("");
-    return `<section class="skill-map-row" aria-labelledby="skill-map-row-${escapeHtml(layer.id)}">
+    const layerState = progressModel.layerStates.get(layer.id);
+    return `<section class="skill-map-row skill-layer-${escapeHtml(layer.id)}${layerState?.isUnlocked ? " is-unlocked" : " is-locked"}" aria-labelledby="skill-map-row-${escapeHtml(layer.id)}">
       <header class="skill-map-row-eyebrow" style="--row-y:${rowLabels[layerIndex]}%;">
         <span>Layer ${escapeHtml(layer.number)}</span>
         <strong id="skill-map-row-${escapeHtml(layer.id)}">${escapeHtml(layer.eyebrow)}</strong>
         <small>${escapeHtml(layer.summary)}</small>
+        <em>${escapeHtml(skillMapLayerStatus(layer, progressModel))}</em>
       </header>
       ${nodes}
     </section>`;
   }).join("");
   const selectedRegion = skillMapRegions.find(region => region.id === skillMapRegionForSkill(selectedSkill.id)) || skillMapRegions[0];
   const selectedLayer = skillMapLayerForSkill(selectedSkill.id);
+  const selectedPathwayCards = selectedPathways.map(pathway => `<article>
+    <strong>${escapeHtml(pathway.title)}</strong>
+    <p>${escapeHtml(pathway.capability)}</p>
+    <div>${pathway.skills.map(skillId => `<button type="button" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skillId)}"${skillId === selectedSkill.id ? " class=\"is-active\"" : ""}>${escapeHtml(skillMapTitleFor(skillId))}</button>`).join("")}</div>
+  </article>`).join("");
   root.innerHTML = `<div class="skill-map-layout">
     <section class="skill-map-canvas-card" aria-label="Emergent reading network">
       <div class="skill-map-canvas" aria-label="Reading-skill gemstones arranged in four comprehension layers">
@@ -5206,12 +5302,17 @@ function renderSkillMapPage() {
         <dl>
           <div><dt>Refinement</dt><dd>${escapeHtml(skillDevelopmentLabel(selectedState.stateName))}</dd></div>
           <div><dt>Evidence</dt><dd>${escapeHtml(selectedState.evidence)}</dd></div>
+          <div><dt>Availability</dt><dd>${escapeHtml(skillMapUnlockCopy(selectedState))}</dd></div>
           <div><dt>Layer result</dt><dd>${escapeHtml(selectedLayer.unlock)}</dd></div>
           <div><dt>Skill role</dt><dd>${escapeHtml(selectedRegion.label)}</dd></div>
           <div><dt>Builds from</dt><dd>${escapeHtml(skillMapEdgeList(selectedParents, "from", "Starting point"))}</dd></div>
           <div><dt>Leads toward</dt><dd>${escapeHtml(skillMapEdgeList(selectedChildren, "to", "End of this branch"))}</dd></div>
           <div><dt>Maps up to</dt><dd>${escapeHtml(selectedSkill.source || "Ember skill model")}</dd></div>
         </dl>
+        ${selectedPathwayCards ? `<details class="skill-map-capabilities">
+          <summary>${selectedPathways.length} connected ${selectedPathways.length === 1 ? "capability" : "capabilities"}</summary>
+          <div aria-label="Capabilities these skills combine into">${selectedPathwayCards}</div>
+        </details>` : ""}
       </aside>
     </section>
   </div>`;
@@ -6427,18 +6528,18 @@ function hasPracticeCompletionToday() {
 }
 
 function currentPracticeSkillState() {
-  const daysBySkill = new Map(practiceSequence.map(skill => [skill.id, successfulPracticeDays(skill)]));
-  const nextIndex = practiceSequence.findIndex(skill => (daysBySkill.get(skill.id) || 0) < 3);
-  const activeIndex = nextIndex < 0 ? practiceSequence.length - 1 : nextIndex;
-  const skill = practiceSequence[activeIndex] || practiceSequence[0];
-  const successfulDays = Math.min(3, daysBySkill.get(skill.id) || 0);
   const chapters = loadChapters().filter(chapter => chapter.status !== "Draft");
+  const progressModel = skillMapProgressModel(chapters);
+  const skill = progressModel.recommendedSkill || practiceSequence[0];
+  const skillState = progressModel.states.get(skill.id);
+  const successfulDays = Math.min(3, skillState?.days || 0);
   return {
     skill,
     successfulDays,
-    reviewEvidence: skillReviewEvidence(skill.id, chapters),
+    reviewEvidence: skillState?.reviewEvidence || skillReviewEvidence(skill.id, chapters),
     completedToday: hasPracticeCompletionToday(),
-    progressPercent: Math.min(100, Math.round(successfulDays / 3 * 100))
+    progressPercent: Math.min(100, Math.round(successfulDays / 3 * 100)),
+    progressModel
   };
 }
 

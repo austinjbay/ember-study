@@ -1115,6 +1115,8 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-row-eyebrow span { color: var(--faint); font-size: .5rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
 .skill-map-row-eyebrow strong { color: var(--green); font-size: .58rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
 .skill-map-row-eyebrow small { overflow: hidden; color: var(--faint); font-size: .58rem; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.skill-map-row-eyebrow em { flex: 0 0 auto; border: 1px solid color-mix(in srgb, var(--layer-color, var(--green)), transparent 64%); border-radius: 999px; color: var(--layer-color, var(--green)); padding: 4px 7px; font-size: .48rem; font-style: normal; font-weight: 850; letter-spacing: .07em; line-height: 1; text-transform: uppercase; }
+.skill-map-row.is-locked .skill-map-row-eyebrow em { border-color: var(--line-dark); color: var(--faint); }
 .skill-layer-ground { --layer-color: #5f7468; --layer-ground: #e4e9e1; }
 .skill-layer-connect { --layer-color: #3f6f68; --layer-ground: #dfe9e6; }
 .skill-layer-test { --layer-color: #956632; --layer-ground: #eee2cf; }
@@ -1204,6 +1206,16 @@ body.logged-out .landing-footer { display: flex; }
 .skill-map-inline-detail dl > div { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 10px; border-bottom: 1px solid var(--line); padding: 10px 0; }
 .skill-map-inline-detail dt { color: var(--atlas-accent); font-size: .6rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
 .skill-map-inline-detail dd { margin: 5px 0 0; color: var(--muted); font-size: .76rem; line-height: 1.5; }
+.skill-map-capabilities { border: 0; }
+.skill-map-capabilities > summary { color: var(--atlas-accent); cursor: pointer; font-size: .6rem; font-weight: 850; letter-spacing: .09em; list-style-position: inside; text-transform: uppercase; }
+.skill-map-capabilities > div { display: grid; gap: 10px; margin-top: 10px; }
+.skill-map-capabilities article { display: grid; gap: 6px; border: 1px solid color-mix(in srgb, var(--atlas-accent), var(--line) 68%); border-radius: 6px; background: color-mix(in srgb, var(--atlas-accent), transparent 95%); padding: 12px; }
+.skill-map-capabilities article > strong { font-family: var(--serif); font-size: .9rem; }
+.skill-map-capabilities article p { margin: 0; font-size: .73rem; line-height: 1.45; }
+.skill-map-capabilities article div { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 3px; }
+.skill-map-capabilities button { min-height: 28px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); padding: 4px 8px; font-size: .58rem; font-weight: 750; }
+.skill-map-capabilities button:hover,
+.skill-map-capabilities button.is-active { border-color: var(--atlas-accent); color: var(--atlas-accent); }
 .skill-map-pathway-card { grid-column: 1 / -1; border: 1px solid var(--line); border-radius: 8px; background: transparent; padding: 16px; }
 .skill-map-pathway-card h3 { margin: 6px 0 5px; font-family: var(--serif); font-size: 1.08rem; font-weight: 600; line-height: 1.15; }
 .skill-map-pathway-card p { max-width: 760px; margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
@@ -2744,6 +2756,7 @@ body.logged-out.sidebar-collapsed .signed-out-mark svg {
   .skill-map-row + .skill-map-row { border-top: 1px solid var(--line); padding-top: 20px; }
   .skill-map-row-eyebrow { position: static; display: grid; gap: 4px; max-width: none; transform: none; }
   .skill-map-row-eyebrow small { overflow: visible; white-space: normal; }
+  .skill-map-row-eyebrow em { justify-self: start; margin-top: 4px; }
   .skill-map-node { position: static; grid-template-areas: "icon title" "icon level" "icon status"; grid-template-columns: 76px minmax(0, 1fr); grid-template-rows: auto auto auto; justify-items: start; align-content: center; width: 100%; min-height: 104px; transform: none; border-bottom: 1px solid color-mix(in srgb, var(--region-color), transparent 74%); padding: 8px 0; text-align: left; }
   .skill-map-node:hover { transform: none; }
   .skill-map-node .skill-icon-wrap { grid-row: 1 / -1; }
