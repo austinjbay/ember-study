@@ -4351,7 +4351,6 @@ function choosePrototypePath(choice = "") {
 function renderPrimaryNextActionModule(vm) {
   const action = vm.nextAction;
   return `<section class="next-action-card adaptive-next-action" aria-labelledby="next-action-title">
-    <div class="next-action-marker" aria-hidden="true">${escapeHtml(action.marker)}</div>
     <div class="next-action-copy">
       <span class="eyebrow">Today’s Focus</span>
       <h2 id="next-action-title">${escapeHtml(action.title)}</h2>
@@ -4730,22 +4729,18 @@ function renderSkillModule(vm) {
     const evidence = skillEvidenceCopy(days, reviewEvidence, skill.id === practice.skill.id);
     return { ...skill, index, days, reviewEvidence, stateName, stateLabel, evidence };
   });
+  const previewPath = path.slice(0, 4);
   return `<section class="adaptive-module skill-module" aria-labelledby="skill-development-title">
     <div class="skill-collection-heading">
       <div>
-        <span class="eyebrow">Your Skill Stones</span>
-        <h2 id="skill-development-title">Build a reading practice that holds up.</h2>
-        <p class="skill-module-copy">Each stone becomes more defined through successful practice and delayed recall. Durable stones have held up after time away.</p>
-      </div>
-      <div class="skill-collection-summary" aria-label="Skill stone summary">
-        <strong>${path.filter(skill => skill.stateName === "durable").length}</strong>
-        <span>durable of ${path.length}</span>
+        <span class="eyebrow">Build Reading Skills</span>
+        <h2 id="skill-development-title">Collect skills as your reading gets stronger.</h2>
+        <p class="skill-module-copy">Each stone represents a reading move you can practice with books and articles you care about.</p>
       </div>
     </div>
     <div class="skill-path-grid" aria-label="Reading skill stone collection">
-      ${path.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.stateName === "durable" ? " is-durable" : ""}${state.justRefinedSkillId === skill.id ? " is-just-refined" : ""}" type="button" data-skill-state="${escapeHtml(skill.stateName)}" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" title="${escapeHtml(`${skill.stateLabel}: ${skill.evidence}`)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.stateLabel)}. ${escapeHtml(skill.evidence)}.">
+      ${previewPath.map(skill => `<button class="skill-path-node${skill.id === practice.skill.id ? " is-current" : ""}${skill.stateName === "durable" ? " is-durable" : ""}${state.justRefinedSkillId === skill.id ? " is-just-refined" : ""}" type="button" data-skill-state="${escapeHtml(skill.stateName)}" data-action="open-skill-badge" data-practice-skill="${escapeHtml(skill.id)}" title="${escapeHtml(`${skill.stateLabel}: ${skill.evidence}`)}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(skill.stateLabel)}. ${escapeHtml(skill.evidence)}.">
         <span class="skill-icon-wrap">${renderSkillIcon(skill.id, skill.stateName, 32)}</span>
-        <span>${String(skill.index + 1).padStart(2, "0")}</span>
         <strong>${escapeHtml(skill.title)}</strong>
         <small>${escapeHtml(skill.stateLabel)}</small>
         <span class="skill-path-evidence">${escapeHtml(skill.evidence)}</span>
@@ -5156,7 +5151,6 @@ function renderSkillMapPage() {
     const pathway = skillMapPrimaryPathwayForSkill(skill.id);
     return `<button class="skill-map-node skill-region-${escapeHtml(regionId)}${nodeState.practiceReady ? " is-practice-ready" : " is-mapped"}${nodeState.isUnlocked ? " is-unlocked" : " is-locked"}${nodeState.isCurrent ? " is-current" : ""}${nodeState.isComplete ? " is-durable" : ""}${selected ? " is-selected" : ""}${relatedIds.has(skill.id) ? " is-related" : ""}${pathwayMatch ? " is-pathway-member" : ""}" type="button" style="--x:${position.x}%; --y:${position.y}%;" data-action="skill-map-select" data-skill-map-id="${escapeHtml(skill.id)}" data-skill-state="${escapeHtml(nodeState.stateName)}" title="${escapeHtml(`${skillDevelopmentLabel(nodeState.stateName)}: ${nodeState.label}`)}" aria-pressed="${selected}" aria-label="${escapeHtml(skill.title)}. ${escapeHtml(nodeState.label)}. Pathway: ${escapeHtml(pathway.title)}. Category: ${escapeHtml(regionId)}. Maps to ${escapeHtml(skill.source)}.">
       <span class="skill-icon-wrap">${renderSkillIcon(skill.id, nodeState.stateName, 44)}</span>
-      <span>${String(index + 1).padStart(2, "0")}</span>
       <strong>${escapeHtml(skill.title)}</strong>
       <em>${escapeHtml(skill.level)}</em>
       <small>${escapeHtml(nodeState.label)}</small>
@@ -5164,11 +5158,8 @@ function renderSkillMapPage() {
   }).join("");
   const relationshipLegend = Object.entries(skillMapRelationshipTypes).map(([type, detail]) => `<span class="relationship-${escapeHtml(type)}"><i></i>${escapeHtml(detail.label)}</span>`).join("");
   root.innerHTML = `<div class="skill-map-layout">
-    <div class="skill-map-page-action">
-      <button class="${selectedState.isCurrent ? "primary" : "secondary"}" type="button" data-action="skill-map-practice" data-skill-map-id="${escapeHtml(selectedSkill.id)}"${selectedState.isUnlocked ? "" : " disabled"}>${selectedState.isCurrent ? "Start practice" : selectedState.isUnlocked ? "Practice this skill" : "Unlock this skill"}</button>
-    </div>
     <header class="skill-map-title">
-      <span class="eyebrow">Your stone library</span>
+      <span class="eyebrow">Skill World</span>
       <h1 id="skill-map-page-title">Skill Map</h1>
     </header>
     <section class="skill-map-canvas-card" aria-labelledby="skill-map-page-title">
